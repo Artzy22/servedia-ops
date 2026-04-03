@@ -37,11 +37,7 @@ jobs:
               except Exception as e:
                   return {"ok": False, "error": str(e)}
 
-          # Verify token
-          auth = slack_api("auth.test")
-          print(f"Token valid: {auth.get('ok')} | Bot: {auth.get('user')} | Team: {auth.get('team')}")
-
-          # Use users.conversations to get ONLY channels the bot is actually in
+          # Get channels the bot is member of
           member_channels = []
           cursor = ""
           while True:
@@ -58,7 +54,7 @@ jobs:
                   break
           print(f"Bot is member of {len(member_channels)} channels")
 
-          # If no member channels, try joining public channels first
+          # If no member channels, try joining public channels
           if len(member_channels) == 0:
               all_channels = []
               cursor = ""
@@ -73,7 +69,6 @@ jobs:
                   cursor = data.get("response_metadata", {}).get("next_cursor", "")
                   if not cursor:
                       break
-              print(f"Found {len(all_channels)} public channels, attempting to join...")
               for ch in all_channels:
                   result = slack_api("conversations.join", method="POST", body={"channel": ch["id"]})
                   if result.get("ok"):
@@ -81,8 +76,8 @@ jobs:
                   time.sleep(0.05)
               print(f"After joining: {len(member_channels)} member channels")
 
-          # Pull history from member channels
-          cutoff = str(time.time() - 86400)
+          # Pull history - try with 24h window first, fall back to most recent 50
+          cutoff_24h = str(time.time() - 86400)
           all_messages = []
           channel_summaries = []
           errors = []
@@ -90,15 +85,21 @@ jobs:
           for ch in member_channels:
               ch_id = ch["id"]
               ch_name = ch.get("name", ch_id)
-              params = f"channel={ch_id}&oldest={cutoff}&limit=100"
-              resp = slack_api("conversations.history", params)
+
+              # Try 24h window
+              resp = slack_api("conversations.history", f"channel={ch_id}&oldest={cutoff_24h}&limit=100")
               if resp.get("ok"):
-                  msgs = resp.get("messages", [])
+                  msgs = [m for m in resp.get("messages", []) if m.get("type") == "message" and not m.get("subtype") in ("channel_join","channel_leave","bot_add","bot_remove")]
+                  if len(msgs) == 0:
+                      # Fall back: get last 50 messages regardless of time
+                      resp2 = slack_api("conversations.history", f"channel={ch_id}&limit=50")
+                      if resp2.get("ok"):
+                          msgs = [m for m in resp2.get("messages", []) if m.get("type") == "message" and not m.get("subtype") in ("channel_join","channel_leave","bot_add","bot_remove")]
                   for m in msgs:
                       all_messages.append({
                           "channel": ch_name,
                           "channel_id": ch_id,
-                          "user": m.get("user", ""),
+                          "user": m.get("user", m.get("username", "")),
                           "text": m.get("text", ""),
                           "ts": m.get("ts", ""),
                           "thread_ts": m.get("thread_ts"),
@@ -113,12 +114,14 @@ jobs:
                       "topic": ch.get("topic", {}).get("value", ""),
                       "purpose": ch.get("purpose", {}).get("value", "")
                   })
+                  print(f"#{ch_name}: {len(msgs)} messages")
               else:
                   err = resp.get("error", "unknown")
                   errors.append({"channel": ch_name, "error": err})
+                  print(f"#{ch_name}: error - {err}")
               time.sleep(0.1)
 
-          print(f"Pulled {len(all_messages)} messages from {len(channel_summaries)} channels")
+          print(f"Total: {len(all_messages)} messages from {len(channel_summaries)} channels")
 
           import subprocess
           pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
