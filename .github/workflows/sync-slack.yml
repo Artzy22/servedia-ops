@@ -2,7 +2,7 @@ name: Sync Slack Messages
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/30 * * * *'  # Runs every 30 minutes
   workflow_dispatch:
 
 permissions:
@@ -24,62 +24,104 @@ jobs:
 
           token = os.environ["SLACK_BOT_TOKEN"]
 
-          def slack_get(endpoint, params=""):
+          def slack_api(endpoint, params="", method="GET", body=None):
               url = f"https://slack.com/api/{endpoint}?{params}"
-              req = urllib.request.Request(url, headers={
+              headers = {
                   "Authorization": f"Bearer {token}",
-                  "Content-Type": "application/json"
-              })
-              with urllib.request.urlopen(req) as resp:
-                  return json.loads(resp.read())
+                  "Content-Type": "application/json; charset=utf-8"
+              }
+              data_bytes = json.dumps(body).encode() if body else None
+              req = urllib.request.Request(url, data=data_bytes, headers=headers, method=method)
+              try:
+                  with urllib.request.urlopen(req, timeout=15) as r:
+                      return json.loads(r.read())
+              except Exception as e:
+                  return {"ok": False, "error": str(e)}
 
-          channels_data = slack_get("conversations.list", "types=public_channel,private_channel&limit=200")
-          if not channels_data.get("ok"):
-              raise Exception(f"Slack conversations.list failed: {channels_data.get('error')}")
+          # List all channels
+          all_channels = []
+          cursor = ""
+          while True:
+              params = f"limit=200&types=public_channel,private_channel&exclude_archived=true"
+              if cursor:
+                  params += f"&cursor={cursor}"
+              data = slack_api("conversations.list", params)
+              if not data.get("ok"):
+                  print(f"Error listing channels: {data.get('error')}")
+                  break
+              all_channels.extend(data.get("channels", []))
+              cursor = data.get("response_metadata", {}).get("next_cursor", "")
+              if not cursor:
+                  break
 
-          channels = channels_data.get("channels", [])
-          since = time.time() - 86400
+          print(f"Found {len(all_channels)} channels total")
 
+          # Try to join public channels the bot is not already in
+          joined = 0
+          for ch in all_channels:
+              if not ch.get("is_member") and not ch.get("is_private"):
+                  result = slack_api("conversations.join", method="POST", body={"channel": ch["id"]})
+                  if result.get("ok"):
+                      ch["is_member"] = True
+                      joined += 1
+                  time.sleep(0.1)
+          print(f"Joined {joined} new channels")
+
+          # Pull history only from channels we are a member of
+          member_channels = [c for c in all_channels if c.get("is_member")]
+          print(f"Pulling history from {len(member_channels)} member channels")
+
+          cutoff = str(time.time() - 86400)
           all_messages = []
-          channel_summary = []
+          channel_summaries = []
+          errors = []
 
-          for ch in channels:
+          for ch in member_channels:
               ch_id = ch["id"]
               ch_name = ch.get("name", ch_id)
-              try:
-                  history = slack_get("conversations.history", f"channel={ch_id}&oldest={since}&limit=50")
-                  msgs = history.get("messages", [])
+              params = f"channel={ch_id}&oldest={cutoff}&limit=100"
+              resp = slack_api("conversations.history", params)
+              if resp.get("ok"):
+                  msgs = resp.get("messages", [])
                   for m in msgs:
                       all_messages.append({
                           "channel": ch_name,
                           "channel_id": ch_id,
-                          "user": m.get("user", "bot"),
-                          "text": m.get("text", "")[:500],
-                          "ts": m.get("ts"),
+                          "user": m.get("user", ""),
+                          "text": m.get("text", ""),
+                          "ts": m.get("ts", ""),
                           "thread_ts": m.get("thread_ts"),
                           "reply_count": m.get("reply_count", 0),
-                          "reactions": [{"name": r["name"], "count": r["count"]} for r in m.get("reactions", [])]
+                          "reactions": len(m.get("reactions", []))
                       })
-                  channel_summary.append({"channel": ch_name, "message_count_24h": len(msgs)})
-              except Exception as e:
-                  channel_summary.append({"channel": ch_name, "error": str(e)})
-
-          all_messages.sort(key=lambda x: float(x.get("ts", 0)), reverse=True)
+                  channel_summaries.append({
+                      "channel": ch_name,
+                      "channel_id": ch_id,
+                      "message_count_24h": len(msgs),
+                      "is_private": ch.get("is_private", False),
+                      "topic": ch.get("topic", {}).get("value", ""),
+                      "purpose": ch.get("purpose", {}).get("value", "")
+                  })
+              else:
+                  err = resp.get("error", "unknown")
+                  if err not in ("not_in_channel", "channel_not_found"):
+                      errors.append({"channel": ch_name, "error": err})
+              time.sleep(0.1)
 
           import subprocess
-          pulled_at = subprocess.check_output(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
-
+          pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
           output = {
               "messages": all_messages,
-              "channels": channel_summary,
+              "channels": channel_summaries,
               "total_messages_24h": len(all_messages),
+              "total_channels": len(all_channels),
+              "member_channels": len(member_channels),
+              "errors": errors,
               "pulled_at": pulled_at
           }
-
           with open("data/slack.json", "w") as f:
               json.dump(output, f, indent=2)
-
-          print(f"Pulled {len(all_messages)} messages from {len(channels)} channels")
+          print(f"Pulled {len(all_messages)} messages from {len(member_channels)} member channels")
           PYEOF
 
       - name: Commit & push
@@ -88,4 +130,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add data/slack.json
           git diff --staged --quiet || git commit -m "sync slack messages [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
           git push
