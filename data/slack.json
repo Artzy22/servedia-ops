@@ -1,9 +1,18 @@
 {
   "messages": [],
-  "channels": [],
+  "channels": [
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "message_count_24h": 0,
+      "is_private": false,
+      "topic": "",
+      "purpose": ""
+    }
+  ],
   "total_messages_24h": 0,
-  "total_channels": 0,
-  "member_channels": 0,
+  "total_channels": 1,
+  "member_channels": 1,
   "errors": [],
-  "pulled_at": "2026-04-03T22:49:11Z"
+  "pulled_at": "2026-04-03T22:58:18Z"
 }
