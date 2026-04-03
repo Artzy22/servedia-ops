@@ -5,113 +5,108 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Servedia Ops Dashboard</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
-  .header{background:#111;border-bottom:1px solid #222;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-  .logo{font-size:20px;font-weight:700;letter-spacing:-0.5px}
-  .logo span{color:#7c3aed}
-  .header-meta{display:flex;align-items:center;gap:16px}
-  .sync-info{font-size:11px;color:#666;text-align:right}
-  .sync-info b{color:#aaa}
-  .refresh-btn{background:#1e1e2e;border:1px solid #333;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;transition:all .2s}
-  .refresh-btn:hover{background:#7c3aed;border-color:#7c3aed;color:#fff}
-  .tabs{background:#111;border-bottom:1px solid #222;padding:0 24px;display:flex;gap:4px}
-  .tab{padding:12px 20px;cursor:pointer;font-size:13px;font-weight:500;color:#666;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px}
-  .tab:hover{color:#ccc}
-  .tab.active{color:#fff;border-bottom-color:#7c3aed}
-  .tab-badge{background:#7c3aed;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
-  .tab-badge.green{background:#059669}
-  .tab-badge.orange{background:#d97706}
-  .tab-badge.red{background:#dc2626}
-  .content{padding:24px;max-width:1400px;margin:0 auto}
-  .panel{display:none}
-  .panel.active{display:block}
-  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-  .stat-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 20px}
-  .stat-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
-  .stat-value{font-size:26px;font-weight:700;color:#fff;line-height:1}
-  .stat-value.purple{color:#a78bfa}
-  .stat-value.green{color:#34d399}
-  .stat-value.blue{color:#60a5fa}
-  .stat-value.yellow{color:#fbbf24}
-  .stat-value.red{color:#f87171}
-  .stat-sub{font-size:11px;color:#555;margin-top:4px}
-  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;margin-top:8px}
-  .section-title{font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px}
-  .filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
-  .filter-input{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;flex:1;min-width:200px}
-  .filter-input:focus{outline:none;border-color:#7c3aed}
-  .filter-select{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer}
-  .filter-select:focus{outline:none;border-color:#7c3aed}
-  .status-group{margin-bottom:24px}
-  .status-group-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;font-weight:600;font-size:13px}
-  .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-  .task-card{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:14px 16px;margin-bottom:8px;display:flex;align-items:flex-start;gap:14px;transition:border-color .2s;cursor:pointer}
-  .task-card:hover{border-color:#333}
-  .task-card:hover .task-name{color:#a78bfa}
-  .task-left{flex:1;min-width:0}
-  .task-name{font-size:14px;font-weight:500;color:#ddd;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .task-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .task-meta-item{font-size:11px;color:#555;display:flex;align-items:center;gap:4px}
-  .task-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-  .priority-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
-  .priority-urgent{background:#3b0000;color:#f87171;border:1px solid #7f1d1d}
-  .priority-high{background:#431407;color:#fb923c;border:1px solid #7c2d12}
-  .priority-normal{background:#1e3a5f;color:#60a5fa;border:1px solid #1e40af}
-  .priority-low{background:#1a2e1a;color:#86efac;border:1px solid #166534}
-  .open-link{color:#7c3aed;font-size:11px;text-decoration:none;padding:3px 8px;border:1px solid #4c1d95;border-radius:4px;transition:all .15s}
-  .open-link:hover{background:#7c3aed;color:#fff}
-  .due-date{font-size:11px}
-  .due-overdue{color:#f87171}
-  .due-soon{color:#fbbf24}
-  .due-ok{color:#555}
-  .task-list-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:2px 8px;border-radius:4px;font-size:10px}
-  .meta-account-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
-  .account-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 18px}
-  .account-card.active{border-left:3px solid #059669}
-  .account-card.no-data{border-left:3px solid #374151;opacity:0.7}
-  .account-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-  .account-name{font-size:13px;font-weight:600;color:#e0e0e0;flex:1;margin-right:8px}
-  .account-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;flex-shrink:0}
-  .status-active{background:#064e3b;color:#34d399}
-  .status-nodata{background:#1f2937;color:#6b7280}
-  .metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-  .metric{background:#0d0d0d;border-radius:6px;padding:8px 10px}
-  .metric-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
-  .metric-value{font-size:15px;font-weight:700;color:#e0e0e0}
-  .metrics-tabs{display:flex;gap:4px;margin-bottom:10px}
-  .metrics-tab-btn{background:#0d0d0d;border:1px solid #222;color:#666;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer}
-  .metrics-tab-btn.active{background:#2d1b69;border-color:#7c3aed;color:#a78bfa}
-  .error-banner{background:#1c0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#f87171;display:flex;align-items:center;gap:8px}
-  .slack-layout{display:grid;grid-template-columns:280px 1fr;gap:16px}
-  .channel-list{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
-  .channel-list-header{padding:12px 14px;border-bottom:1px solid #222;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px}
-  .channel-item{padding:10px 14px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:space-between}
-  .channel-item:hover{background:#1a1a1a}
-  .channel-item.active-channel{background:#1e1b33}
-  .channel-name{font-size:13px;color:#ccc;display:flex;align-items:center;gap:6px}
-  .channel-count{background:#1e1e2e;color:#7c3aed;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
-  .messages-panel{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-  .messages-header{padding:12px 16px;border-bottom:1px solid #222;display:flex;align-items:center;gap:10px}
-  .messages-title{font-size:14px;font-weight:600;color:#e0e0e0}
-  .messages-body{padding:12px 16px;flex:1;overflow-y:auto;max-height:600px}
-  .message-item{padding:10px 0;border-bottom:1px solid #1a1a1a;display:flex;gap:12px}
-  .message-item:last-child{border-bottom:none}
-  .msg-avatar{width:32px;height:32px;border-radius:8px;background:#2d1b69;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#a78bfa;flex-shrink:0}
-  .msg-content{flex:1;min-width:0}
-  .msg-header{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
-  .msg-user{font-size:12px;font-weight:600;color:#a78bfa}
-  .msg-channel{font-size:10px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:4px}
-  .msg-time{font-size:10px;color:#444;margin-left:auto}
-  .msg-text{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word;white-space:pre-wrap}
-  .msg-thread{font-size:11px;color:#7c3aed;margin-top:4px}
-  .empty{text-align:center;padding:60px 20px;color:#444}
-  .empty-icon{font-size:48px;margin-bottom:12px}
-  .empty-text{font-size:14px;color:#555}
-  .no-results{padding:20px;text-align:center;color:#555;font-size:13px}
-  ::-webkit-scrollbar{width:6px;height:6px}
-  ::-webkit-scrollbar-track{background:#0d0d0d}
-  ::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
+.header{background:#111;border-bottom:1px solid #222;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{font-size:20px;font-weight:700;letter-spacing:-0.5px}
+.logo span{color:#7c3aed}
+.sync-info{font-size:11px;color:#666;text-align:right}
+.sync-info b{color:#aaa}
+.refresh-btn{background:#1e1e2e;border:1px solid #333;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;transition:all .2s}
+.refresh-btn:hover{background:#7c3aed;border-color:#7c3aed;color:#fff}
+.header-meta{display:flex;align-items:center;gap:16px}
+.tabs{background:#111;border-bottom:1px solid #222;padding:0 24px;display:flex;gap:4px}
+.tab{padding:12px 20px;cursor:pointer;font-size:13px;font-weight:500;color:#666;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px}
+.tab:hover{color:#ccc}
+.tab.active{color:#fff;border-bottom-color:#7c3aed}
+.tab-badge{background:#7c3aed;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
+.tab-badge.green{background:#059669}
+.tab-badge.orange{background:#d97706}
+.content{padding:24px;max-width:1400px;margin:0 auto}
+.panel{display:none}
+.panel.active{display:block}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.stat-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 20px}
+.stat-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
+.stat-value{font-size:26px;font-weight:700;color:#fff;line-height:1}
+.stat-value.purple{color:#a78bfa}
+.stat-value.green{color:#34d399}
+.stat-value.blue{color:#60a5fa}
+.stat-value.yellow{color:#fbbf24}
+.stat-value.red{color:#f87171}
+.filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+.filter-input{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;flex:1;min-width:200px}
+.filter-input:focus{outline:none;border-color:#7c3aed}
+.filter-select{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer}
+.filter-select:focus{outline:none;border-color:#7c3aed}
+.section-title{font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px}
+.status-group{margin-bottom:24px}
+.status-group-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;font-weight:600;font-size:13px}
+.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.task-table{width:100%;border-collapse:collapse}
+.task-table th{text-align:left;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1e1e1e;font-weight:600}
+.task-table td{padding:10px 12px;border-bottom:1px solid #1a1a1a;font-size:13px;vertical-align:middle}
+.task-table tr:hover td{background:#111}
+.task-name-cell{color:#ddd;font-weight:500;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-name-cell a{color:inherit;text-decoration:none}
+.task-name-cell a:hover{color:#a78bfa}
+.priority-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
+.priority-urgent{background:#3b0000;color:#f87171;border:1px solid #7f1d1d}
+.priority-high{background:#431407;color:#fb923c;border:1px solid #7c2d12}
+.priority-normal{background:#1e3a5f;color:#60a5fa;border:1px solid #1e40af}
+.priority-low{background:#1a2e1a;color:#86efac;border:1px solid #166534}
+.open-link{color:#7c3aed;font-size:11px;text-decoration:none;padding:3px 8px;border:1px solid #4c1d95;border-radius:4px;transition:all .15s}
+.open-link:hover{background:#7c3aed;color:#fff}
+.due-overdue{color:#f87171}
+.due-soon{color:#fbbf24}
+.due-ok{color:#555}
+.task-list-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:2px 8px;border-radius:4px;font-size:10px}
+.meta-account-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
+.account-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 18px}
+.account-card.active{border-left:3px solid #059669}
+.account-card.no-data{border-left:3px solid #374151;opacity:0.7}
+.account-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.account-name{font-size:13px;font-weight:600;color:#e0e0e0;flex:1;margin-right:8px}
+.account-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;flex-shrink:0}
+.status-active{background:#064e3b;color:#34d399}
+.status-nodata{background:#1f2937;color:#6b7280}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.metric{background:#0d0d0d;border-radius:6px;padding:8px 10px}
+.metric-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
+.metric-value{font-size:15px;font-weight:700;color:#e0e0e0}
+.metrics-tabs{display:flex;gap:4px;margin-bottom:10px}
+.metrics-tab-btn{background:#0d0d0d;border:1px solid #222;color:#666;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer}
+.metrics-tab-btn.active{background:#2d1b69;border-color:#7c3aed;color:#a78bfa}
+.error-banner{background:#1c0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#f87171}
+.slack-layout{display:grid;grid-template-columns:260px 1fr;gap:16px}
+.channel-list{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
+.channel-list-header{padding:12px 14px;border-bottom:1px solid #222;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px}
+.channel-item{padding:10px 14px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:space-between}
+.channel-item:hover{background:#1a1a1a}
+.channel-item.active-channel{background:#1e1b33}
+.channel-name{font-size:13px;color:#ccc}
+.channel-count{background:#1e1e2e;color:#7c3aed;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
+.messages-panel{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.messages-header{padding:12px 16px;border-bottom:1px solid #222}
+.messages-title{font-size:14px;font-weight:600;color:#e0e0e0}
+.messages-body{padding:12px 16px;flex:1;overflow-y:auto;max-height:600px}
+.message-item{padding:10px 0;border-bottom:1px solid #1a1a1a;display:flex;gap:12px}
+.message-item:last-child{border-bottom:none}
+.msg-avatar{width:32px;height:32px;border-radius:8px;background:#2d1b69;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#a78bfa;flex-shrink:0}
+.msg-content{flex:1;min-width:0}
+.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.msg-user{font-size:12px;font-weight:600;color:#a78bfa}
+.msg-channel{font-size:10px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:4px}
+.msg-time{font-size:10px;color:#444;margin-left:auto}
+.msg-text{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word;white-space:pre-wrap}
+.msg-thread{font-size:11px;color:#7c3aed;margin-top:4px}
+.empty{text-align:center;padding:60px 20px;color:#444}
+.empty-icon{font-size:48px;margin-bottom:12px}
+.empty-text{font-size:14px;color:#555}
+.no-results{padding:20px;text-align:center;color:#555;font-size:13px}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:#0d0d0d}
+::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
 </style>
 </head>
 <body>
@@ -119,343 +114,433 @@
   <div class="logo"><span>Servedia</span> Ops Dashboard</div>
   <div class="header-meta">
     <div class="sync-info" id="syncInfo">Loading...</div>
-    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+    <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
   </div>
 </div>
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('meta')">📊 Meta Ads <span class="tab-badge green" id="metaBadge">—</span></div>
-  <div class="tab" onclick="switchTab('clickup')">✅ ClickUp Tasks <span class="tab-badge" id="clickupBadge">—</span></div>
-  <div class="tab" onclick="switchTab('slack')">💬 Slack Activity <span class="tab-badge orange" id="slackBadge">—</span></div>
+  <div class="tab active" onclick="switchTab('meta')">&#128202; Meta Ads <span class="tab-badge green" id="metaBadge">&#8212;</span></div>
+  <div class="tab" onclick="switchTab('clickup')">&#9989; ClickUp Tasks <span class="tab-badge" id="clickupBadge">&#8212;</span></div>
+  <div class="tab" onclick="switchTab('slack')">&#128172; Slack Activity <span class="tab-badge orange" id="slackBadge">&#8212;</span></div>
 </div>
 <div class="content">
-<div class="panel active" id="panel-meta">
-  <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">Active Accounts</div><div class="stat-value purple" id="mActiveAccts">—</div></div>
-    <div class="stat-card"><div class="stat-label">Total Spend (7d)</div><div class="stat-value green" id="mSpend7">—</div></div>
-    <div class="stat-card"><div class="stat-label">Total Spend (30d)</div><div class="stat-value green" id="mSpend30">—</div></div>
-    <div class="stat-card"><div class="stat-label">Total Leads (7d)</div><div class="stat-value blue" id="mLeads7">—</div></div>
-    <div class="stat-card"><div class="stat-label">Avg CPL (7d)</div><div class="stat-value yellow" id="mCPL">—</div></div>
-    <div class="stat-card"><div class="stat-label">Impressions (7d)</div><div class="stat-value" id="mImpressions">—</div></div>
-    <div class="stat-card"><div class="stat-label">Clicks (7d)</div><div class="stat-value" id="mClicks">—</div></div>
-    <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="mErrors">—</div></div>
-  </div>
-  <div id="metaErrorBanner"></div>
-  <div class="filters">
-    <input class="filter-input" id="metaSearch" placeholder="🔍  Search account name..." oninput="renderMeta()">
-    <select class="filter-select" id="metaFilter" onchange="renderMeta()">
-      <option value="all">All Accounts</option>
-      <option value="active">Active Only</option>
-      <option value="no_data">No Data</option>
-    </select>
-    <select class="filter-select" id="metaSort" onchange="renderMeta()">
-      <option value="spend7">Sort: Spend (7d)</option>
-      <option value="spend30">Sort: Spend (30d)</option>
-      <option value="leads">Sort: Leads</option>
-      <option value="cpl">Sort: CPL</option>
-      <option value="name">Sort: Name A-Z</option>
-    </select>
-  </div>
-  <div class="section-header"><span class="section-title" id="metaCount">Loading...</span></div>
-  <div class="meta-account-grid" id="metaGrid"></div>
-</div>
-<div class="panel" id="panel-clickup">
-  <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value purple" id="cuTotal">—</div></div>
-    <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value red" id="cuUrgent">—</div></div>
-    <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value red" id="cuHighPri">—</div></div>
-    <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value red" id="cuOverdue">—</div></div>
-    <div class="stat-card"><div class="stat-label">No Due Date</div><div class="stat-value yellow" id="cuNoDue">—</div></div>
-    <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="cuUpdated">—</div></div>
-  </div>
-  <div class="filters">
-    <input class="filter-input" id="cuSearch" placeholder="🔍  Search tasks..." oninput="renderClickUp()">
-    <select class="filter-select" id="cuStatus" onchange="renderClickUp()"><option value="all">All Statuses</option></select>
-    <select class="filter-select" id="cuPriority" onchange="renderClickUp()">
-      <option value="all">All Priorities</option>
-      <option value="urgent">Urgent</option>
-      <option value="high">High</option>
-      <option value="normal">Normal</option>
-      <option value="low">Low</option>
-    </select>
-    <select class="filter-select" id="cuSort" onchange="renderClickUp()">
-      <option value="updated">Sort: Recently Updated</option>
-      <option value="created">Sort: Date Created</option>
-      <option value="due">Sort: Due Date</option>
-      <option value="priority">Sort: Priority</option>
-      <option value="name">Sort: Name A-Z</option>
-    </select>
-  </div>
-  <div id="clickupGroups"></div>
-</div>
-<div class="panel" id="panel-slack">
-  <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">Messages (24h)</div><div class="stat-value purple" id="slTotal">—</div></div>
-    <div class="stat-card"><div class="stat-label">Active Channels</div><div class="stat-value green" id="slActive">—</div></div>
-    <div class="stat-card"><div class="stat-label">Total Channels</div><div class="stat-value" id="slTotal2">—</div></div>
-    <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="slErrors">—</div></div>
-  </div>
-  <div class="filters">
-    <input class="filter-input" id="slSearch" placeholder="🔍  Search messages or channels..." oninput="renderSlack()">
-  </div>
-  <div class="slack-layout">
-    <div class="channel-list">
-      <div class="channel-list-header">Channels by Activity</div>
-      <div id="channelList"></div>
+  <div class="panel active" id="panel-meta">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Active Accounts</div><div class="stat-value purple" id="mActiveAccts">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Total Spend (7d)</div><div class="stat-value green" id="mSpend7">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Total Spend (30d)</div><div class="stat-value green" id="mSpend30">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Total Leads (7d)</div><div class="stat-value blue" id="mLeads7">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Avg CPL (7d)</div><div class="stat-value yellow" id="mCPL">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Impressions (7d)</div><div class="stat-value" id="mImpressions">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Clicks (7d)</div><div class="stat-value" id="mClicks">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="mErrors">&#8212;</div></div>
     </div>
-    <div class="messages-panel">
-      <div class="messages-header"><div class="messages-title" id="messagesTitle">All Recent Messages</div></div>
-      <div class="messages-body" id="messagesFeed"></div>
+    <div id="metaErrorBanner"></div>
+    <div class="filters">
+      <input class="filter-input" id="metaSearch" placeholder="Search account name..." oninput="renderMeta()">
+      <select class="filter-select" id="metaFilter" onchange="renderMeta()">
+        <option value="all">All Accounts</option>
+        <option value="active">Active Only</option>
+        <option value="no_data">No Data</option>
+      </select>
+      <select class="filter-select" id="metaSort" onchange="renderMeta()">
+        <option value="spend7">Sort: Spend (7d)</option>
+        <option value="spend30">Sort: Spend (30d)</option>
+        <option value="leads">Sort: Leads</option>
+        <option value="cpl">Sort: CPL</option>
+        <option value="name">Sort: Name A-Z</option>
+      </select>
+    </div>
+    <div class="section-title" id="metaCount">Loading...</div>
+    <div class="meta-account-grid" id="metaGrid"></div>
+  </div>
+
+  <div class="panel" id="panel-clickup">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value purple" id="cuTotal">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value red" id="cuUrgent">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value red" id="cuHighPri">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value red" id="cuOverdue">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">No Due Date</div><div class="stat-value yellow" id="cuNoDue">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="cuUpdated">&#8212;</div></div>
+    </div>
+    <div class="filters">
+      <input class="filter-input" id="cuSearch" placeholder="Search tasks..." oninput="renderClickUp()">
+      <select class="filter-select" id="cuStatus" onchange="renderClickUp()"><option value="all">All Statuses</option></select>
+      <select class="filter-select" id="cuPriority" onchange="renderClickUp()">
+        <option value="all">All Priorities</option>
+        <option value="urgent">Urgent</option>
+        <option value="high">High</option>
+        <option value="normal">Normal</option>
+        <option value="low">Low</option>
+      </select>
+      <select class="filter-select" id="cuSort" onchange="renderClickUp()">
+        <option value="updated">Sort: Recently Updated</option>
+        <option value="due">Sort: Due Date</option>
+        <option value="priority">Sort: Priority</option>
+        <option value="name">Sort: Name A-Z</option>
+      </select>
+    </div>
+    <div id="clickupGroups"></div>
+  </div>
+
+  <div class="panel" id="panel-slack">
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-label">Messages (recent)</div><div class="stat-value purple" id="slTotal">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Active Channels</div><div class="stat-value green" id="slActive">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Channels Monitored</div><div class="stat-value" id="slTotal2">&#8212;</div></div>
+      <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="slErrors">&#8212;</div></div>
+    </div>
+    <div class="filters">
+      <input class="filter-input" id="slSearch" placeholder="Search messages..." oninput="renderSlack()">
+      <select class="filter-select" id="slChanFilter" onchange="filterByChannelSelect()">
+        <option value="">All Channels</option>
+      </select>
+    </div>
+    <div class="slack-layout">
+      <div class="channel-list">
+        <div class="channel-list-header">Channels</div>
+        <div id="channelList"></div>
+      </div>
+      <div class="messages-panel">
+        <div class="messages-header"><div class="messages-title" id="messagesTitle">Recent Messages</div></div>
+        <div class="messages-body" id="messagesFeed"></div>
+      </div>
     </div>
   </div>
 </div>
-</div>
+
 <script>
-const REPO='Artzy22/servedia-ops';
-const BASE='https://raw.githubusercontent.com/'+REPO+'/main/data';
-let metaData=null,cuData=null,slData=null,selectedChannel=null;
+const REPO = 'Artzy22/servedia-ops';
+const BASE = 'https://raw.githubusercontent.com/' + REPO + '/main/data';
+let metaData = null, cuData = null, slData = null, selectedChannel = null;
 
-function switchTab(t){
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['meta','clickup','slack'][i]===t));
-  document.querySelectorAll('.panel').forEach(el=>el.classList.remove('active'));
-  document.getElementById('panel-'+t).classList.add('active');
+function switchTab(t) {
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  const names = ['meta', 'clickup', 'slack'];
+  tabs.forEach((el, i) => el.classList.toggle('active', names[i] === t));
+  panels.forEach(el => el.classList.remove('active'));
+  document.getElementById('panel-' + t).classList.add('active');
 }
 
-async function loadAll(){
-  document.getElementById('syncInfo').innerHTML='Refreshing...';
-  try{
-    const [m,c,s]=await Promise.all([
-      fetch(BASE+'/meta.json?_='+Date.now()).then(r=>r.json()),
-      fetch(BASE+'/clickup.json?_='+Date.now()).then(r=>r.json()),
-      fetch(BASE+'/slack.json?_='+Date.now()).then(r=>r.json())
+async function loadAll() {
+  document.getElementById('syncInfo').innerHTML = 'Refreshing...';
+  try {
+    const [m, c, s] = await Promise.all([
+      fetch(BASE + '/meta.json?_=' + Date.now()).then(r => r.json()),
+      fetch(BASE + '/clickup.json?_=' + Date.now()).then(r => r.json()),
+      fetch(BASE + '/slack.json?_=' + Date.now()).then(r => r.json())
     ]);
-    metaData=m;cuData=c;slData=s;
-    renderMeta();renderClickUp();renderSlack();
-    const times=[m.pulled_at?'Meta: '+fmtTime(m.pulled_at):'',c.pulled_at?'CU: '+fmtTime(c.pulled_at):'',s.pulled_at?'Slack: '+fmtTime(s.pulled_at):''].filter(Boolean).join(' · ');
-    document.getElementById('syncInfo').innerHTML='<b>Last sync</b><br>'+times;
-  }catch(e){document.getElementById('syncInfo').textContent='Error loading data';console.error(e);}
+    metaData = m; cuData = c; slData = s;
+    renderMeta(); renderClickUp(); renderSlack();
+    const times = [
+      m.pulled_at ? 'Meta: ' + fmtTime(m.pulled_at) : '',
+      c.pulled_at ? 'CU: ' + fmtTime(c.pulled_at) : '',
+      s.pulled_at ? 'Slack: ' + fmtTime(s.pulled_at) : ''
+    ].filter(Boolean).join(' &middot; ');
+    document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>' + times;
+  } catch(e) {
+    document.getElementById('syncInfo').textContent = 'Error loading data';
+    console.error(e);
+  }
 }
 
-function fmtTime(iso){
-  if(!iso)return'—';
-  const d=new Date(iso),now=new Date(),diff=Math.floor((now-d)/60000);
-  if(diff<1)return'just now';if(diff<60)return diff+'m ago';
-  if(diff<1440)return Math.floor(diff/60)+'h ago';
+function fmtTime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso), now = new Date(), diff = Math.floor((now - d) / 60000);
+  if (diff < 1) return 'just now';
+  if (diff < 60) return diff + 'm ago';
+  if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
   return d.toLocaleDateString();
 }
-function fmtCurrency(n){
-  if(n===null||n===undefined||isNaN(n))return'$0.00';
-  return'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+function fmtCurrency(n) {
+  if (n === null || n === undefined || isNaN(n)) return '$0.00';
+  return '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
-function fmtNum(n){
-  if(n===null||n===undefined||isNaN(n))return'0';
+
+function fmtNum(n) {
+  if (n === null || n === undefined || isNaN(n)) return '0';
   return Number(n).toLocaleString();
 }
 
-function renderMeta(){
-  if(!metaData)return;
-  const clients=metaData.clients||[];
-  const search=document.getElementById('metaSearch').value.toLowerCase();
-  const filter=document.getElementById('metaFilter').value;
-  const sort=document.getElementById('metaSort').value;
-  const active=clients.filter(c=>c.status==='active');
-  const totalSpend7=active.reduce((s,c)=>s+(c.last_7_days?.spend||0),0);
-  const totalSpend30=active.reduce((s,c)=>s+(c.last_30_days?.spend||0),0);
-  const totalLeads7=active.reduce((s,c)=>s+(c.last_7_days?.leads||0),0);
-  const totalClicks7=active.reduce((s,c)=>s+(c.last_7_days?.clicks||0),0);
-  const totalImpr7=active.reduce((s,c)=>s+(c.last_7_days?.impressions||0),0);
-  const avgCPL=totalLeads7>0?totalSpend7/totalLeads7:0;
-  const errors=(metaData.errors||[]).length;
-  document.getElementById('mActiveAccts').textContent=active.length+'/'+clients.length;
-  document.getElementById('mSpend7').textContent=fmtCurrency(totalSpend7);
-  document.getElementById('mSpend30').textContent=fmtCurrency(totalSpend30);
-  document.getElementById('mLeads7').textContent=fmtNum(totalLeads7);
-  document.getElementById('mCPL').textContent=totalLeads7>0?fmtCurrency(avgCPL):'—';
-  document.getElementById('mImpressions').textContent=totalImpr7>1000?Math.round(totalImpr7/1000)+'K':fmtNum(totalImpr7);
-  document.getElementById('mClicks').textContent=fmtNum(totalClicks7);
-  document.getElementById('mErrors').textContent=errors;
-  document.getElementById('metaBadge').textContent=active.length;
-  document.getElementById('metaErrorBanner').innerHTML=errors>0?'<div class="error-banner">⚠️ '+errors+' account(s) had errors. Data may be incomplete.</div>':'';
-  let filtered=clients.filter(c=>{
-    if(search&&!(c.account_name||'').toLowerCase().includes(search))return false;
-    if(filter==='active'&&c.status!=='active')return false;
-    if(filter==='no_data'&&c.status==='active')return false;
+function renderMeta() {
+  if (!metaData) return;
+  const clients = metaData.clients || [];
+  const search = document.getElementById('metaSearch').value.toLowerCase();
+  const filter = document.getElementById('metaFilter').value;
+  const sort = document.getElementById('metaSort').value;
+  const active = clients.filter(c => c.status === 'active');
+  const totalSpend7 = active.reduce((s, c) => s + (c.last_7_days?.spend || 0), 0);
+  const totalSpend30 = active.reduce((s, c) => s + (c.last_30_days?.spend || 0), 0);
+  const totalLeads7 = active.reduce((s, c) => s + (c.last_7_days?.leads || 0), 0);
+  const totalClicks7 = active.reduce((s, c) => s + (c.last_7_days?.clicks || 0), 0);
+  const totalImpr7 = active.reduce((s, c) => s + (c.last_7_days?.impressions || 0), 0);
+  const avgCPL = totalLeads7 > 0 ? totalSpend7 / totalLeads7 : 0;
+  const errors = (metaData.errors || []).length;
+
+  document.getElementById('mActiveAccts').textContent = active.length + '/' + clients.length;
+  document.getElementById('mSpend7').textContent = fmtCurrency(totalSpend7);
+  document.getElementById('mSpend30').textContent = fmtCurrency(totalSpend30);
+  document.getElementById('mLeads7').textContent = fmtNum(totalLeads7);
+  document.getElementById('mCPL').textContent = totalLeads7 > 0 ? fmtCurrency(avgCPL) : '—';
+  document.getElementById('mImpressions').textContent = totalImpr7 > 1000 ? Math.round(totalImpr7/1000) + 'K' : fmtNum(totalImpr7);
+  document.getElementById('mClicks').textContent = fmtNum(totalClicks7);
+  document.getElementById('mErrors').textContent = errors;
+  document.getElementById('metaBadge').textContent = active.length;
+  document.getElementById('metaErrorBanner').innerHTML = errors > 0
+    ? `<div class="error-banner">&#9888;&#65039; ${errors} account(s) had errors during sync.</div>` : '';
+
+  let filtered = clients.filter(c => {
+    if (search && !(c.account_name || '').toLowerCase().includes(search)) return false;
+    if (filter === 'active' && c.status !== 'active') return false;
+    if (filter === 'no_data' && c.status === 'active') return false;
     return true;
   });
-  filtered.sort((a,b)=>{
-    if(sort==='spend7')return(b.last_7_days?.spend||0)-(a.last_7_days?.spend||0);
-    if(sort==='spend30')return(b.last_30_days?.spend||0)-(a.last_30_days?.spend||0);
-    if(sort==='leads')return(b.last_7_days?.leads||0)-(a.last_7_days?.leads||0);
-    if(sort==='cpl'){const cA=a.last_7_days?.cost_per_lead||0,cB=b.last_7_days?.cost_per_lead||0;if(!cA)return 1;if(!cB)return-1;return cA-cB;}
-    if(sort==='name')return(a.account_name||'').localeCompare(b.account_name||'');
+  filtered.sort((a, b) => {
+    if (sort === 'spend7') return (b.last_7_days?.spend || 0) - (a.last_7_days?.spend || 0);
+    if (sort === 'spend30') return (b.last_30_days?.spend || 0) - (a.last_30_days?.spend || 0);
+    if (sort === 'leads') return (b.last_7_days?.leads || 0) - (a.last_7_days?.leads || 0);
+    if (sort === 'cpl') {
+      const cA = a.last_7_days?.cost_per_lead || 0, cB = b.last_7_days?.cost_per_lead || 0;
+      if (!cA) return 1; if (!cB) return -1; return cA - cB;
+    }
+    if (sort === 'name') return (a.account_name || '').localeCompare(b.account_name || '');
     return 0;
   });
-  document.getElementById('metaCount').textContent=filtered.length+' accounts';
-  const grid=document.getElementById('metaGrid');
-  if(!filtered.length){grid.innerHTML='<div class="no-results">No accounts match filters</div>';return;}
-  grid.innerHTML=filtered.map(c=>{
-    const d7=c.last_7_days||{},d30=c.last_30_days||{};
-    const isActive=c.status==='active';
-    const spend7=d7.spend||0,spend30=d30.spend||0,leads7=d7.leads||0,leads30=d30.leads||0;
-    const cpl7=leads7>0?(spend7/leads7):0;
-    const impr7=d7.impressions||0,clicks7=d7.clicks||0;
-    return '<div class="account-card '+(isActive?'active':'no-data')+'">'+
-      '<div class="account-header"><div class="account-name" title="'+c.account_name+'">'+(c.account_name||c.account_id)+'</div>'+
-      '<span class="account-status '+(isActive?'status-active':'status-nodata')+'">'+(isActive?'Active':'No Data')+'</span></div>'+
-      '<div class="metrics-tabs" id="mt-'+c.account_id+'">'+
-        '<button class="metrics-tab-btn active" onclick="switchMT(''+c.account_id+'','7d')">7 Days</button>'+
-        '<button class="metrics-tab-btn" onclick="switchMT(''+c.account_id+'','30d')">30 Days</button></div>'+
-      '<div id="mg-'+c.account_id+'-7d" class="metrics-grid">'+
-        '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">'+fmtCurrency(spend7)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">'+fmtNum(leads7)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">'+(cpl7>0?fmtCurrency(cpl7):'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">'+(impr7>1000?Math.round(impr7/1000)+'K':fmtNum(impr7))+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">'+fmtNum(clicks7)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">'+(d7.ctr?d7.ctr.toFixed(2)+'%':'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPM</div><div class="metric-value">'+(d7.cpm?fmtCurrency(d7.cpm):'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Reach</div><div class="metric-value">'+(d7.reach>1000?Math.round(d7.reach/1000)+'K':fmtNum(d7.reach||0))+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPC</div><div class="metric-value">'+(d7.cpc?fmtCurrency(d7.cpc):'—')+'</div></div></div>'+
-      '<div id="mg-'+c.account_id+'-30d" class="metrics-grid" style="display:none">'+
-        '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">'+fmtCurrency(spend30)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">'+fmtNum(leads30)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">'+(leads30>0?fmtCurrency(spend30/leads30):'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">'+(d30.impressions>1000?Math.round(d30.impressions/1000)+'K':fmtNum(d30.impressions||0))+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">'+fmtNum(d30.clicks||0)+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">'+(d30.ctr?d30.ctr.toFixed(2)+'%':'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPM</div><div class="metric-value">'+(d30.cpm?fmtCurrency(d30.cpm):'—')+'</div></div>'+
-        '<div class="metric"><div class="metric-label">Reach</div><div class="metric-value">'+(d30.reach>1000?Math.round(d30.reach/1000)+'K':fmtNum(d30.reach||0))+'</div></div>'+
-        '<div class="metric"><div class="metric-label">CPC</div><div class="metric-value">'+(d30.cpc?fmtCurrency(d30.cpc):'—')+'</div></div></div></div>';
+
+  document.getElementById('metaCount').textContent = filtered.length + ' accounts';
+  const grid = document.getElementById('metaGrid');
+  if (!filtered.length) { grid.innerHTML = '<div class="no-results">No accounts match filters</div>'; return; }
+
+  grid.innerHTML = filtered.map(c => {
+    const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
+    const isActive = c.status === 'active';
+    const spend7 = d7.spend || 0, spend30 = d30.spend || 0;
+    const leads7 = d7.leads || 0, leads30 = d30.leads || 0;
+    const cpl7 = leads7 > 0 ? spend7 / leads7 : 0;
+    const impr7 = d7.impressions || 0, clicks7 = d7.clicks || 0;
+    const aid = c.account_id;
+    return `<div class="account-card ${isActive ? 'active' : 'no-data'}">
+      <div class="account-header">
+        <div class="account-name" title="${c.account_name || ''}">${c.account_name || c.account_id}</div>
+        <span class="account-status ${isActive ? 'status-active' : 'status-nodata'}">${isActive ? 'Active' : 'No Data'}</span>
+      </div>
+      <div class="metrics-tabs" id="mt-${aid}">
+        <button class="metrics-tab-btn active" data-id="${aid}" data-p="7d" onclick="switchMT(this)">7 Days</button>
+        <button class="metrics-tab-btn" data-id="${aid}" data-p="30d" onclick="switchMT(this)">30 Days</button>
+      </div>
+      <div id="mg-${aid}-7d" class="metrics-grid">
+        <div class="metric"><div class="metric-label">Spend</div><div class="metric-value">${fmtCurrency(spend7)}</div></div>
+        <div class="metric"><div class="metric-label">Leads</div><div class="metric-value">${fmtNum(leads7)}</div></div>
+        <div class="metric"><div class="metric-label">CPL</div><div class="metric-value">${cpl7 > 0 ? fmtCurrency(cpl7) : '—'}</div></div>
+        <div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">${impr7 > 1000 ? Math.round(impr7/1000)+'K' : fmtNum(impr7)}</div></div>
+        <div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">${fmtNum(clicks7)}</div></div>
+        <div class="metric"><div class="metric-label">CTR</div><div class="metric-value">${d7.ctr ? d7.ctr.toFixed(2)+'%' : '—'}</div></div>
+        <div class="metric"><div class="metric-label">CPM</div><div class="metric-value">${d7.cpm ? fmtCurrency(d7.cpm) : '—'}</div></div>
+        <div class="metric"><div class="metric-label">Reach</div><div class="metric-value">${(d7.reach||0) > 1000 ? Math.round(d7.reach/1000)+'K' : fmtNum(d7.reach||0)}</div></div>
+        <div class="metric"><div class="metric-label">CPC</div><div class="metric-value">${d7.cpc ? fmtCurrency(d7.cpc) : '—'}</div></div>
+      </div>
+      <div id="mg-${aid}-30d" class="metrics-grid" style="display:none">
+        <div class="metric"><div class="metric-label">Spend</div><div class="metric-value">${fmtCurrency(spend30)}</div></div>
+        <div class="metric"><div class="metric-label">Leads</div><div class="metric-value">${fmtNum(leads30)}</div></div>
+        <div class="metric"><div class="metric-label">CPL</div><div class="metric-value">${leads30 > 0 ? fmtCurrency(spend30/leads30) : '—'}</div></div>
+        <div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">${(d30.impressions||0) > 1000 ? Math.round(d30.impressions/1000)+'K' : fmtNum(d30.impressions||0)}</div></div>
+        <div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">${fmtNum(d30.clicks||0)}</div></div>
+        <div class="metric"><div class="metric-label">CTR</div><div class="metric-value">${d30.ctr ? d30.ctr.toFixed(2)+'%' : '—'}</div></div>
+        <div class="metric"><div class="metric-label">CPM</div><div class="metric-value">${d30.cpm ? fmtCurrency(d30.cpm) : '—'}</div></div>
+        <div class="metric"><div class="metric-label">Reach</div><div class="metric-value">${(d30.reach||0) > 1000 ? Math.round(d30.reach/1000)+'K' : fmtNum(d30.reach||0)}</div></div>
+        <div class="metric"><div class="metric-label">CPC</div><div class="metric-value">${d30.cpc ? fmtCurrency(d30.cpc) : '—'}</div></div>
+      </div>
+    </div>`;
   }).join('');
 }
 
-function switchMT(id,p){
-  const c=document.getElementById('mt-'+id);
-  c.querySelectorAll('.metrics-tab-btn').forEach((b,i)=>b.classList.toggle('active',['7d','30d'][i]===p));
-  document.getElementById('mg-'+id+'-7d').style.display=p==='7d'?'grid':'none';
-  document.getElementById('mg-'+id+'-30d').style.display=p==='30d'?'grid':'none';
+function switchMT(btn) {
+  const aid = btn.dataset.id, p = btn.dataset.p;
+  const container = document.getElementById('mt-' + aid);
+  container.querySelectorAll('.metrics-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+  document.getElementById('mg-' + aid + '-7d').style.display = p === '7d' ? 'grid' : 'none';
+  document.getElementById('mg-' + aid + '-30d').style.display = p === '30d' ? 'grid' : 'none';
 }
 
-const PRI_ORDER={urgent:0,high:1,normal:2,low:3};
-function renderClickUp(){
-  if(!cuData)return;
-  const tasks=cuData.tasks||[];
-  const search=document.getElementById('cuSearch').value.toLowerCase();
-  const statusF=document.getElementById('cuStatus').value;
-  const priorityF=document.getElementById('cuPriority').value;
-  const sort=document.getElementById('cuSort').value;
-  const now=Date.now();
-  const statuses=[...new Set(tasks.map(t=>t.status||''))].sort();
-  const sel=document.getElementById('cuStatus');
-  if(sel.options.length<=1){statuses.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s||'(none)';sel.appendChild(o);});}
-  document.getElementById('cuTotal').textContent=tasks.length;
-  document.getElementById('cuUrgent').textContent=tasks.filter(t=>t.priority==='urgent').length;
-  document.getElementById('cuHighPri').textContent=tasks.filter(t=>t.priority==='high').length;
-  document.getElementById('cuOverdue').textContent=tasks.filter(t=>t.due_date&&Number(t.due_date)<now).length;
-  document.getElementById('cuNoDue').textContent=tasks.filter(t=>!t.due_date).length;
-  document.getElementById('clickupBadge').textContent=tasks.length;
-  if(cuData.pulled_at)document.getElementById('cuUpdated').textContent=fmtTime(cuData.pulled_at);
-  let filtered=tasks.filter(t=>{
-    if(search&&!(t.name||'').toLowerCase().includes(search))return false;
-    if(statusF!=='all'&&t.status!==statusF)return false;
-    if(priorityF!=='all'&&t.priority!==priorityF)return false;
-    return true;
-  });
-  filtered.sort((a,b)=>{
-    if(sort==='updated')return Number(b.date_updated||0)-Number(a.date_updated||0);
-    if(sort==='created')return Number(b.date_created||0)-Number(a.date_created||0);
-    if(sort==='due'){if(!a.due_date)return 1;if(!b.due_date)return-1;return Number(a.due_date)-Number(b.due_date);}
-    if(sort==='priority')return(PRI_ORDER[a.priority]||4)-(PRI_ORDER[b.priority]||4);
-    if(sort==='name')return(a.name||'').localeCompare(b.name||'');
-    return 0;
-  });
-  const groups={};
-  filtered.forEach(t=>{const s=t.status||'no status';if(!groups[s])groups[s]={color:t.status_color||'#555',tasks:[]};groups[s].tasks.push(t);});
-  const container=document.getElementById('clickupGroups');
-  if(!filtered.length){container.innerHTML='<div class="no-results">No tasks match filters.</div>';return;}
-  container.innerHTML=Object.entries(groups).map(([status,grp])=>{
-    const cards=grp.tasks.map(t=>{
-      const pri=t.priority||'normal';
-      const priCls=pri==='urgent'?'priority-urgent':pri==='high'?'priority-high':pri==='low'?'priority-low':'priority-normal';
-      let dueHtml='';
-      if(t.due_date){
-        const d=new Date(Number(t.due_date)),daysLeft=Math.ceil((d-now)/86400000);
-        const cls=daysLeft<0?'due-overdue':daysLeft<=3?'due-soon':'due-ok';
-        const lbl=daysLeft<0?'Overdue '+Math.abs(daysLeft)+'d':daysLeft===0?'Due today':daysLeft===1?'Due tomorrow':'Due in '+daysLeft+'d';
-        dueHtml='<span class="due-date '+cls+'">📅 '+lbl+' ('+d.toLocaleDateString()+')</span>';
-      }else{dueHtml='<span class="task-meta-item" style="color:#444">📅 No due date</span>';}
-      const assignees=(t.assignees||[]).map(a=>a.username||a.email||'?').join(', ');
-      const upd=t.date_updated?fmtTime(new Date(Number(t.date_updated)).toISOString()):'';
-      return '<div class="task-card" onclick="window.open(''+t.url+'','_blank')">'+
-        '<div class="task-left">'+
-          '<div class="task-name" title="'+(t.name||'')+'">'+(t.name||'Untitled')+'</div>'+
-          '<div class="task-meta">'+dueHtml+
-            (assignees?'<span class="task-meta-item">👤 '+assignees+'</span>':'')+
-            (t.list?'<span class="task-list-badge">'+t.list+'</span>':'')+
-            (upd?'<span class="task-meta-item">🕐 Updated '+upd+'</span>':'')+
-          '</div></div>'+
-        '<div class="task-right">'+
-          '<span class="priority-badge '+priCls+'">'+pri+'</span>'+
-          '<a class="open-link" href="'+t.url+'" target="_blank" onclick="event.stopPropagation()">↗ Open</a>'+
-        '</div></div>';
-    }).join('');
-    return '<div class="status-group">'+
-      '<div class="status-group-header" style="background:'+grp.color+'18;border-left:3px solid '+grp.color+'">'+
-        '<div class="status-dot" style="background:'+grp.color+'"></div>'+
-        '<span style="color:'+grp.color+'">'+status.toUpperCase()+'</span>'+
-        '<span style="color:#555;font-weight:400;font-size:12px">'+grp.tasks.length+' task'+(grp.tasks.length!==1?'s':'')+'</span></div>'+
-      cards+'</div>';
-  }).join('');
-}
+const PRI_ORDER = {urgent:0, high:1, normal:2, low:3};
 
-function renderSlack(){
-  if(!slData)return;
-  const msgs=slData.messages||[],channels=slData.channels||[];
-  const search=document.getElementById('slSearch').value.toLowerCase();
-  document.getElementById('slTotal').textContent=slData.total_messages_24h||0;
-  document.getElementById('slActive').textContent=channels.filter(c=>c.message_count_24h>0).length;
-  document.getElementById('slTotal2').textContent=slData.total_channels||0;
-  document.getElementById('slErrors').textContent=(slData.errors||[]).length;
-  document.getElementById('slackBadge').textContent=slData.total_messages_24h||0;
-  const sorted=[...channels].sort((a,b)=>b.message_count_24h-a.message_count_24h);
-  const clEl=document.getElementById('channelList');
-  if(!channels.length){
-    clEl.innerHTML='<div style="padding:20px;color:#555;font-size:12px;text-align:center">No channels found.<br>Bot needs channel permissions.</div>';
-  }else{
-    clEl.innerHTML='<div class="channel-item '+(selectedChannel===null?'active-channel':'')+'" onclick="filterByChannel(null)">'+
-      '<span class="channel-name">📋 All channels</span><span class="channel-count">'+msgs.length+'</span></div>'+
-      sorted.map(ch=>'<div class="channel-item '+(selectedChannel===ch.channel?'active-channel':'')+'" onclick="filterByChannel(''+ch.channel+'')">'+
-        '<span class="channel-name">'+(ch.is_private?'🔒':'#')+' '+ch.channel+'</span>'+
-        '<span class="channel-count">'+ch.message_count_24h+'</span></div>').join('');
+function renderClickUp() {
+  if (!cuData) return;
+  const tasks = cuData.tasks || [];
+  const search = document.getElementById('cuSearch').value.toLowerCase();
+  const statusF = document.getElementById('cuStatus').value;
+  const priorityF = document.getElementById('cuPriority').value;
+  const sort = document.getElementById('cuSort').value;
+  const now = Date.now();
+
+  const statuses = [...new Set(tasks.map(t => t.status || ''))].sort();
+  const sel = document.getElementById('cuStatus');
+  if (sel.options.length <= 1) {
+    statuses.forEach(s => {
+      const o = document.createElement('option');
+      o.value = s; o.textContent = s || '(none)';
+      sel.appendChild(o);
+    });
   }
-  let filteredMsgs=msgs;
-  if(selectedChannel)filteredMsgs=msgs.filter(m=>m.channel===selectedChannel);
-  if(search)filteredMsgs=filteredMsgs.filter(m=>(m.text||'').toLowerCase().includes(search)||(m.channel||'').toLowerCase().includes(search)||(m.user||'').toLowerCase().includes(search));
-  filteredMsgs=[...filteredMsgs].sort((a,b)=>Number(b.ts||0)-Number(a.ts||0));
-  document.getElementById('messagesTitle').textContent=(selectedChannel?'#'+selectedChannel:'All Recent Messages')+' ('+filteredMsgs.length+')';
-  const feed=document.getElementById('messagesFeed');
-  if(!filteredMsgs.length){
-    feed.innerHTML='<div class="empty"><div class="empty-icon">💬</div><div class="empty-text">'+(msgs.length?'No messages match filters.':'No messages in 24h. Bot may need to join channels.')+'</div></div>';
+
+  document.getElementById('cuTotal').textContent = tasks.length;
+  document.getElementById('cuUrgent').textContent = tasks.filter(t => t.priority === 'urgent').length;
+  document.getElementById('cuHighPri').textContent = tasks.filter(t => t.priority === 'high').length;
+  document.getElementById('cuOverdue').textContent = tasks.filter(t => t.due_date && Number(t.due_date) < now).length;
+  document.getElementById('cuNoDue').textContent = tasks.filter(t => !t.due_date).length;
+  document.getElementById('clickupBadge').textContent = tasks.length;
+  if (cuData.pulled_at) document.getElementById('cuUpdated').textContent = fmtTime(cuData.pulled_at);
+
+  let filtered = tasks.filter(t => {
+    if (search && !(t.name || '').toLowerCase().includes(search)) return false;
+    if (statusF !== 'all' && t.status !== statusF) return false;
+    if (priorityF !== 'all' && t.priority !== priorityF) return false;
+    return true;
+  });
+  filtered.sort((a, b) => {
+    if (sort === 'updated') return Number(b.date_updated||0) - Number(a.date_updated||0);
+    if (sort === 'due') { if (!a.due_date) return 1; if (!b.due_date) return -1; return Number(a.due_date) - Number(b.due_date); }
+    if (sort === 'priority') return (PRI_ORDER[a.priority]||4) - (PRI_ORDER[b.priority]||4);
+    if (sort === 'name') return (a.name||'').localeCompare(b.name||'');
+    return 0;
+  });
+
+  const groups = {};
+  filtered.forEach(t => {
+    const s = t.status || 'no status';
+    if (!groups[s]) groups[s] = {color: t.status_color || '#555', tasks: []};
+    groups[s].tasks.push(t);
+  });
+
+  const container = document.getElementById('clickupGroups');
+  if (!filtered.length) { container.innerHTML = '<div class="no-results">No tasks match filters.</div>'; return; }
+
+  container.innerHTML = Object.entries(groups).map(([status, grp]) => {
+    const rows = grp.tasks.map(t => {
+      const pri = t.priority || 'normal';
+      const priCls = pri === 'urgent' ? 'priority-urgent' : pri === 'high' ? 'priority-high' : pri === 'low' ? 'priority-low' : 'priority-normal';
+      let dueHtml = '';
+      if (t.due_date) {
+        const d = new Date(Number(t.due_date)), daysLeft = Math.ceil((d - now) / 86400000);
+        const cls = daysLeft < 0 ? 'due-overdue' : daysLeft <= 3 ? 'due-soon' : 'due-ok';
+        const lbl = daysLeft < 0 ? `Overdue ${Math.abs(daysLeft)}d` : daysLeft === 0 ? 'Due today' : daysLeft === 1 ? 'Due tomorrow' : `Due in ${daysLeft}d`;
+        dueHtml = `<span class="${cls}" style="font-size:11px">${lbl} (${d.toLocaleDateString()})</span>`;
+      } else {
+        dueHtml = '<span style="color:#444;font-size:11px">No due date</span>';
+      }
+      const assignees = (t.assignees || []).map(a => a.username || a.email || '?').join(', ');
+      const upd = t.date_updated ? fmtTime(new Date(Number(t.date_updated)).toISOString()) : '';
+      const url = t.url || '#';
+      return `<tr>
+        <td class="task-name-cell"><a href="${url}" target="_blank">${t.name || 'Untitled'}</a></td>
+        <td>${dueHtml}</td>
+        <td>${assignees ? `<span style="font-size:12px;color:#aaa">${assignees}</span>` : '<span style="color:#444">—</span>'}</td>
+        <td>${t.list ? `<span class="task-list-badge">${t.list}</span>` : ''}</td>
+        <td><span class="priority-badge ${priCls}">${pri}</span></td>
+        <td style="font-size:11px;color:#555">${upd}</td>
+        <td><a class="open-link" href="${url}" target="_blank">&#8599; Open</a></td>
+      </tr>`;
+    }).join('');
+
+    return `<div class="status-group">
+      <div class="status-group-header" style="background:${grp.color}18;border-left:3px solid ${grp.color}">
+        <div class="status-dot" style="background:${grp.color}"></div>
+        <span style="color:${grp.color}">${status.toUpperCase()}</span>
+        <span style="color:#555;font-weight:400;font-size:12px">${grp.tasks.length} task${grp.tasks.length !== 1 ? 's' : ''}</span>
+      </div>
+      <table class="task-table">
+        <thead><tr>
+          <th>Task</th><th>Due</th><th>Assignee</th><th>List</th><th>Priority</th><th>Updated</th><th></th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
+}
+
+function renderSlack() {
+  if (!slData) return;
+  const msgs = slData.messages || [], channels = slData.channels || [];
+  const search = document.getElementById('slSearch').value.toLowerCase();
+
+  document.getElementById('slTotal').textContent = msgs.length;
+  document.getElementById('slActive').textContent = channels.filter(c => c.message_count_24h > 0).length;
+  document.getElementById('slTotal2').textContent = slData.member_channels || 0;
+  document.getElementById('slErrors').textContent = (slData.errors || []).length;
+  document.getElementById('slackBadge').textContent = msgs.length;
+
+  // Populate channel filter dropdown
+  const sel = document.getElementById('slChanFilter');
+  if (sel.options.length <= 1) {
+    channels.forEach(ch => {
+      const o = document.createElement('option');
+      o.value = ch.channel; o.textContent = '#' + ch.channel + ' (' + ch.message_count_24h + ')';
+      sel.appendChild(o);
+    });
+  }
+
+  const sorted = [...channels].sort((a, b) => b.message_count_24h - a.message_count_24h);
+  const clEl = document.getElementById('channelList');
+  if (!channels.length) {
+    clEl.innerHTML = '<div style="padding:20px;color:#555;font-size:12px;text-align:center">No channels. Invite bot to channels in Slack.</div>';
+  } else {
+    clEl.innerHTML = `<div class="channel-item ${selectedChannel === null ? 'active-channel' : ''}" onclick="filterByChannel(null)">
+      <span class="channel-name">All channels</span><span class="channel-count">${msgs.length}</span>
+    </div>` + sorted.map(ch => `<div class="channel-item ${selectedChannel === ch.channel ? 'active-channel' : ''}" onclick="filterByChannel('${ch.channel}')">
+      <span class="channel-name">${ch.is_private ? '&#128274;' : '#'} ${ch.channel}</span>
+      <span class="channel-count">${ch.message_count_24h}</span>
+    </div>`).join('');
+  }
+
+  let filteredMsgs = msgs;
+  if (selectedChannel) filteredMsgs = msgs.filter(m => m.channel === selectedChannel);
+  if (search) filteredMsgs = filteredMsgs.filter(m =>
+    (m.text || '').toLowerCase().includes(search) ||
+    (m.channel || '').toLowerCase().includes(search) ||
+    (m.user || '').toLowerCase().includes(search)
+  );
+  filteredMsgs = [...filteredMsgs].sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
+
+  document.getElementById('messagesTitle').textContent =
+    (selectedChannel ? '#' + selectedChannel : 'All Recent Messages') + ' (' + filteredMsgs.length + ')';
+
+  const feed = document.getElementById('messagesFeed');
+  if (!filteredMsgs.length) {
+    feed.innerHTML = `<div class="empty"><div class="empty-icon">&#128172;</div><div class="empty-text">${
+      msgs.length ? 'No messages match filters.' : 'No messages yet. Invite the bot to more Slack channels.'
+    }</div></div>`;
     return;
   }
-  feed.innerHTML=filteredMsgs.slice(0,200).map(m=>{
-    const initials=(m.user||'?').slice(0,2).toUpperCase();
-    const ts=m.ts?new Date(Number(m.ts)*1000):null;
-    const timeStr=ts?ts.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
-    const dateStr=ts?ts.toLocaleDateString([],{month:'short',day:'numeric'}):'';
-    const text=(m.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return '<div class="message-item">'+
-      '<div class="msg-avatar">'+initials+'</div>'+
-      '<div class="msg-content">'+
-        '<div class="msg-header">'+
-          '<span class="msg-user">'+(m.user||'Unknown')+'</span>'+
-          (!selectedChannel?'<span class="msg-channel">#'+m.channel+'</span>':'')+
-          '<span class="msg-time">'+dateStr+' '+timeStr+(m.reactions>0?' · '+m.reactions+' rxn':'')+'</span></div>'+
-        '<div class="msg-text">'+(text||'<em style="color:#444">(empty)</em>')+'</div>'+
-        (m.reply_count>0?'<div class="msg-thread">↩ '+m.reply_count+' repl'+(m.reply_count===1?'y':'ies')+'</div>':'')+
-      '</div></div>';
+
+  feed.innerHTML = filteredMsgs.slice(0, 200).map(m => {
+    const initials = (m.user || '?').slice(0, 2).toUpperCase();
+    const ts = m.ts ? new Date(Number(m.ts) * 1000) : null;
+    const timeStr = ts ? ts.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
+    const dateStr = ts ? ts.toLocaleDateString([], {month:'short', day:'numeric'}) : '';
+    const text = (m.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="message-item">
+      <div class="msg-avatar">${initials}</div>
+      <div class="msg-content">
+        <div class="msg-header">
+          <span class="msg-user">${m.user || 'Unknown'}</span>
+          ${!selectedChannel ? `<span class="msg-channel">#${m.channel}</span>` : ''}
+          <span class="msg-time">${dateStr} ${timeStr}${m.reactions > 0 ? ' &middot; ' + m.reactions + ' rxn' : ''}</span>
+        </div>
+        <div class="msg-text">${text || '<em style="color:#444">(empty)</em>'}</div>
+        ${m.reply_count > 0 ? `<div class="msg-thread">&#8617; ${m.reply_count} repl${m.reply_count === 1 ? 'y' : 'ies'}</div>` : ''}
+      </div>
+    </div>`;
   }).join('');
 }
 
-function filterByChannel(ch){selectedChannel=ch;renderSlack();}
+function filterByChannel(ch) { selectedChannel = ch; renderSlack(); }
+function filterByChannelSelect() {
+  const v = document.getElementById('slChanFilter').value;
+  filterByChannel(v || null);
+}
+
 loadAll();
 </script>
 </body>
