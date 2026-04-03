@@ -1,0 +1,91 @@
+name: Sync Slack Messages
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull Slack messages
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, time, os, urllib.request
+
+          token = os.environ["SLACK_BOT_TOKEN"]
+
+          def slack_get(endpoint, params=""):
+              url = f"https://slack.com/api/{endpoint}?{params}"
+              req = urllib.request.Request(url, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json"
+              })
+              with urllib.request.urlopen(req) as resp:
+                  return json.loads(resp.read())
+
+          channels_data = slack_get("conversations.list", "types=public_channel,private_channel&limit=200")
+          if not channels_data.get("ok"):
+              raise Exception(f"Slack conversations.list failed: {channels_data.get('error')}")
+
+          channels = channels_data.get("channels", [])
+          since = time.time() - 86400
+
+          all_messages = []
+          channel_summary = []
+
+          for ch in channels:
+              ch_id = ch["id"]
+              ch_name = ch.get("name", ch_id)
+              try:
+                  history = slack_get("conversations.history", f"channel={ch_id}&oldest={since}&limit=50")
+                  msgs = history.get("messages", [])
+                  for m in msgs:
+                      all_messages.append({
+                          "channel": ch_name,
+                          "channel_id": ch_id,
+                          "user": m.get("user", "bot"),
+                          "text": m.get("text", "")[:500],
+                          "ts": m.get("ts"),
+                          "thread_ts": m.get("thread_ts"),
+                          "reply_count": m.get("reply_count", 0),
+                          "reactions": [{"name": r["name"], "count": r["count"]} for r in m.get("reactions", [])]
+                      })
+                  channel_summary.append({"channel": ch_name, "message_count_24h": len(msgs)})
+              except Exception as e:
+                  channel_summary.append({"channel": ch_name, "error": str(e)})
+
+          all_messages.sort(key=lambda x: float(x.get("ts", 0)), reverse=True)
+
+          import subprocess
+          pulled_at = subprocess.check_output(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
+
+          output = {
+              "messages": all_messages,
+              "channels": channel_summary,
+              "total_messages_24h": len(all_messages),
+              "pulled_at": pulled_at
+          }
+
+          with open("data/slack.json", "w") as f:
+              json.dump(output, f, indent=2)
+
+          print(f"Pulled {len(all_messages)} messages from {len(channels)} channels")
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/slack.json
+          git diff --staged --quiet || git commit -m "sync slack messages [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push
