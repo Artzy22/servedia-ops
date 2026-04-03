@@ -2,7 +2,7 @@ name: Sync Slack Messages
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # Runs every 30 minutes
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -21,7 +21,6 @@ jobs:
         run: |
           python3 << 'PYEOF'
           import json, time, os, urllib.request
-
           token = os.environ["SLACK_BOT_TOKEN"]
 
           def slack_api(endpoint, params="", method="GET", body=None):
@@ -53,35 +52,32 @@ jobs:
               cursor = data.get("response_metadata", {}).get("next_cursor", "")
               if not cursor:
                   break
-
           print(f"Found {len(all_channels)} channels total")
 
-          # Try to join public channels the bot is not already in
+          # Try to join public channels (silently skip failures)
           joined = 0
           for ch in all_channels:
-              if not ch.get("is_member") and not ch.get("is_private"):
+              if not ch.get("is_private"):
                   result = slack_api("conversations.join", method="POST", body={"channel": ch["id"]})
                   if result.get("ok"):
-                      ch["is_member"] = True
                       joined += 1
-                  time.sleep(0.1)
-          print(f"Joined {joined} new channels")
+                  time.sleep(0.05)
+          print(f"Joined {joined} new public channels")
 
-          # Pull history only from channels we are a member of
-          member_channels = [c for c in all_channels if c.get("is_member")]
-          print(f"Pulling history from {len(member_channels)} member channels")
-
+          # Pull history from ALL channels - skip those we can't access
           cutoff = str(time.time() - 86400)
           all_messages = []
           channel_summaries = []
           errors = []
+          member_count = 0
 
-          for ch in member_channels:
+          for ch in all_channels:
               ch_id = ch["id"]
               ch_name = ch.get("name", ch_id)
               params = f"channel={ch_id}&oldest={cutoff}&limit=100"
               resp = slack_api("conversations.history", params)
               if resp.get("ok"):
+                  member_count += 1
                   msgs = resp.get("messages", [])
                   for m in msgs:
                       all_messages.append({
@@ -104,9 +100,11 @@ jobs:
                   })
               else:
                   err = resp.get("error", "unknown")
-                  if err not in ("not_in_channel", "channel_not_found"):
+                  if err not in ("not_in_channel", "channel_not_found", "missing_scope"):
                       errors.append({"channel": ch_name, "error": err})
               time.sleep(0.1)
+
+          print(f"Accessible channels: {member_count}")
 
           import subprocess
           pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
@@ -115,13 +113,13 @@ jobs:
               "channels": channel_summaries,
               "total_messages_24h": len(all_messages),
               "total_channels": len(all_channels),
-              "member_channels": len(member_channels),
+              "member_channels": member_count,
               "errors": errors,
               "pulled_at": pulled_at
           }
           with open("data/slack.json", "w") as f:
               json.dump(output, f, indent=2)
-          print(f"Pulled {len(all_messages)} messages from {len(member_channels)} member channels")
+          print(f"Pulled {len(all_messages)} messages from {member_count} channels")
           PYEOF
 
       - name: Commit & push
