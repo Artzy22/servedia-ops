@@ -1,0 +1,137 @@
+name: Sync Meta KPIs
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Pull Meta Ads data
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, urllib.parse, os, time
+          from datetime import datetime, timedelta
+
+          token = os.environ["META_ACCESS_TOKEN"]
+
+          AD_ACCOUNTS = {
+              "2151825605165694": "Nunova Health & Image",
+              "1725352711466085": "AC - AVU Collective",
+              "1306679120584024": "Beyond Vitaliti",
+              "420940994267261": "Body Slim WLC",
+              "497576716728644": "Body by Lily",
+              "662967109685873": "Celebrity Body Sculpting",
+              "785026324565387": "Cloud Chiropractic Servedia",
+              "1108581597844624": "Cosmetic Surgery Of New York - SA",
+              "1072278307590785": "Cosmetico - SA",
+              "283412697676323": "Dr. Michelle Zubair",
+              "1837871783720841": "Ensoul Aesthetics And Wellness - SA",
+              "404232133542932": "Golden Health & Beauty",
+              "1230444507356265": "Healthpreneur",
+              "813563481027887": "Heritage Wellness and Medspa",
+              "1566788920935861": "Iconic Laser",
+              "571905160084946": "Ideal Weightloss",
+              "1108868149742936": "Jule's Fibroblast & Body Contour",
+              "1033045841275568": "Luminous Laser and Skin Spa",
+              "947326761106052": "MLA Ad Account",
+              "1795278261246132": "McQuiston Dental & Aesthetics",
+              "873011548816017": "Michel Medspa - Dana Point",
+              "624982636077867": "Precision Weight Loss",
+              "664585076610096": "Prestige Laser & Skin Clinic",
+              "510154927988642": "Servedia - B2B - CHF",
+              "3896645637242883": "Servedia - Hiring - CHF",
+              "524158318772571": "Skinholic(2025) - AIMOP",
+              "4140577459602242": "Skinsation Aesthetics - SA",
+              "502049325517257": "The MAC OKC",
+              "1603057050496702": "Thorpe Wellness 2.0",
+              "1242208869314128": "Transformations Esthetics & Wellness",
+              "982882907385968": "Transformative Wellness",
+              "1488627745841127": "Vital Life",
+              "894241480205692": "Wellness Herbal - SA",
+              "1121472973270105": "Wilmarwell LLC",
+              "1400828974006140": "beautyandwellnesscenter",
+              "1464948185130737": "dailey aesthetics",
+              "890702377151942": "servedia - gencore aesthetic"
+          }
+
+          today = datetime.utcnow().strftime("%Y-%m-%d")
+          seven_days_ago = (datetime.utcnow() - timedelta(days=7)).strftime("%Y-%m-%d")
+          thirty_days_ago = (datetime.utcnow() - timedelta(days=30)).strftime("%Y-%m-%d")
+
+          def fetch_insights(account_id, since, until):
+              params = urllib.parse.urlencode({
+                  "access_token": token,
+                  "fields": "account_name,spend,impressions,clicks,cpc,cpm,ctr,reach,frequency,actions,cost_per_action_type",
+                  "time_range": json.dumps({"since": since, "until": until}),
+                  "level": "account"
+              })
+              url = f"https://graph.facebook.com/v19.0/act_{account_id}/insights?{params}"
+              try:
+                  req = urllib.request.Request(url)
+                  with urllib.request.urlopen(req, timeout=30) as resp:
+                      return json.loads(resp.read())
+              except Exception as e:
+                  return {"error": str(e)}
+
+          clients = []
+          errors = []
+
+          for account_id, account_name in AD_ACCOUNTS.items():
+              print(f"  Fetching: {account_name}...")
+              data_7d = fetch_insights(account_id, seven_days_ago, today)
+              data_30d = fetch_insights(account_id, thirty_days_ago, today)
+
+              if "error" in data_7d or "error" in data_30d:
+                  errors.append({"account_id": account_id, "account_name": account_name})
+                  clients.append({"account_id": account_id, "account_name": account_name, "status": "error", "error": str(data_7d.get("error") or data_30d.get("error"))})
+                  time.sleep(0.5)
+                  continue
+
+              row_7d = (data_7d.get("data") or [{}])[0]
+              row_30d = (data_30d.get("data") or [{}])[0]
+
+              def get_leads(row):
+                  for a in row.get("actions", []):
+                      if a.get("action_type") == "lead": return int(a.get("value", 0))
+                  return 0
+
+              def get_cpl(row):
+                  for a in row.get("cost_per_action_type", []):
+                      if a.get("action_type") == "lead": return float(a.get("value", 0))
+                  return 0
+
+              clients.append({
+                  "account_id": account_id, "account_name": account_name,
+                  "status": "active" if row_7d else "no_data",
+                  "last_7_days": {"spend": float(row_7d.get("spend",0)), "impressions": int(row_7d.get("impressions",0)), "clicks": int(row_7d.get("clicks",0)), "cpc": float(row_7d.get("cpc",0)), "cpm": float(row_7d.get("cpm",0)), "ctr": float(row_7d.get("ctr",0)), "reach": int(row_7d.get("reach",0)), "leads": get_leads(row_7d), "cost_per_lead": get_cpl(row_7d)},
+                  "last_30_days": {"spend": float(row_30d.get("spend",0)), "impressions": int(row_30d.get("impressions",0)), "clicks": int(row_30d.get("clicks",0)), "cpc": float(row_30d.get("cpc",0)), "cpm": float(row_30d.get("cpm",0)), "ctr": float(row_30d.get("ctr",0)), "reach": int(row_30d.get("reach",0)), "leads": get_leads(row_30d), "cost_per_lead": get_cpl(row_30d)}
+              })
+              time.sleep(0.5)
+
+          import subprocess
+          pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
+          output = {"clients": clients, "total_accounts": len(AD_ACCOUNTS), "accounts_with_data": len([c for c in clients if c["status"]=="active"]), "accounts_with_errors": len(errors), "errors": errors, "pulled_at": pulled_at}
+
+          with open("data/meta.json","w") as f:
+              json.dump(output, f, indent=2)
+          print(f"Pulled data for {output['accounts_with_data']}/{output['total_accounts']} accounts")
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/meta.json
+          git diff --staged --quiet || git commit -m "sync meta kpis [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push
