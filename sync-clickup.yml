@@ -1,0 +1,88 @@
+name: Sync Slack Messages
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Slack messages from all key channels
+        run: |
+          node -e "
+            const https = require('https');
+            const fs = require('fs');
+
+            const TOKEN = '${{ secrets.SLACK_BOT_TOKEN }}';
+
+            const channels = [
+              { id: 'C0AQGQ021AQ', name: '#flagadset' },
+              { id: 'C0AQGPX58MA', name: '#summary' },
+              { id: 'C0AQ6QS1DC3', name: '#healthyadsets' }
+            ];
+
+            function fetchChannel(channelId) {
+              return new Promise((resolve, reject) => {
+                const url = \`https://slack.com/api/conversations.history?channel=\${channelId}&limit=15\`;
+                const options = {
+                  headers: { 'Authorization': 'Bearer ' + TOKEN }
+                };
+                https.get(url, options, res => {
+                  let data = '';
+                  res.on('data', d => data += d);
+                  res.on('end', () => resolve(JSON.parse(data)));
+                }).on('error', reject);
+              });
+            }
+
+            async function main() {
+              const allMessages = [];
+              for (const ch of channels) {
+                try {
+                  const res = await fetchChannel(ch.id);
+                  const msgs = res.messages || [];
+                  for (const m of msgs) {
+                    if (!m.text) continue;
+                    const ts = parseFloat(m.ts || 0);
+                    const date = new Date(ts * 1000);
+                    const now = new Date();
+                    const diffHrs = (now - date) / 3600000;
+                    let timeLabel;
+                    if (diffHrs < 1) timeLabel = Math.round(diffHrs * 60) + 'm ago';
+                    else if (diffHrs < 24) timeLabel = Math.round(diffHrs) + 'h ago';
+                    else timeLabel = date.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+
+                    allMessages.push({
+                      channel: ch.name,
+                      user: m.username || m.user || 'Team',
+                      text: m.text.slice(0, 300),
+                      time: timeLabel,
+                      ts: m.ts,
+                      unread: diffHrs < 8
+                    });
+                  }
+                } catch(e) {
+                  console.error('Failed channel ' + ch.name + ': ' + e.message);
+                }
+              }
+
+              allMessages.sort((a,b) => parseFloat(b.ts) - parseFloat(a.ts));
+              const out = { messages: allMessages.slice(0, 50), pulled_at: new Date().toISOString() };
+              fs.writeFileSync('data/slack.json', JSON.stringify(out, null, 2));
+              console.log('Slack: ' + allMessages.length + ' messages');
+            }
+
+            main();
+          "
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/slack.json
+          git diff --staged --quiet || git commit -m "sync: Slack $(date -u +%H:%M)"
+          git push

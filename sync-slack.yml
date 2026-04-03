@@ -1,0 +1,143 @@
+name: Sync Meta KPIs
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch Meta KPIs for all clients
+        run: |
+          node -e "
+            const https = require('https');
+            const fs = require('fs');
+
+            const TOKEN = '${{ secrets.META_ACCESS_TOKEN }}';
+
+            const clients = [
+              { client: 'Prestige Laser & Skin Clinic',        account_id: 'act_664585076610096',  budget: 50 },
+              { client: 'Body Slim WLC',                        account_id: 'act_420940994267261',  budget: 50 },
+              { client: 'Celebrity Body Sculpting',             account_id: 'act_662967109685873',  budget: 60 },
+              { client: 'Cosmetico Medspa',                     account_id: 'act_1072278307590785', budget: 50 },
+              { client: 'Dr. Michelle Zubair',                  account_id: 'act_283412697676323',  budget: 50 },
+              { client: 'Healthpreneur',                        account_id: 'act_1230444507356265', budget: 50 },
+              { client: 'Ideal Weightloss',                     account_id: 'act_571905160084946',  budget: 50 },
+              { client: 'Luminous Laser and Skin Spa',          account_id: 'act_1033045841275568', budget: 50 },
+              { client: 'Skinholic (2025)',                     account_id: 'act_524158318772571',  budget: 50 },
+              { client: 'Skinsation Aesthetics',                account_id: 'act_4140577459602242', budget: 50 },
+              { client: 'The MAC OKC',                          account_id: 'act_502049325517257',  budget: 50 },
+              { client: 'Thorpe Wellness 2.0',                  account_id: 'act_1603057050496702', budget: 50 },
+              { client: 'Transformations Esthetics & Wellness', account_id: 'act_1242208869314128', budget: 50 },
+              { client: 'Transformative Wellness',              account_id: 'act_982882907385968',  budget: 50 },
+              { client: 'Vital Life',                           account_id: 'act_1488627745841127', budget: 50 },
+              { client: 'Wilmarwell LLC',                       account_id: 'act_1121472973270105', budget: 50 },
+              { client: 'AVU Collective',                       account_id: 'act_1725352711466085', budget: 50 },
+              { client: 'Beyond Vitaliti',                      account_id: 'act_1306679120584024', budget: 50 },
+              { client: 'Body By Lily',                         account_id: 'act_497576716728644',  budget: 50 },
+              { client: 'Cloud Chiropractic',                   account_id: 'act_785026324565387',  budget: 50 },
+              { client: 'Golden Health & Beauty',               account_id: 'act_404232133542932',  budget: 50 },
+              { client: 'McQuiston Dental & Aesthetics',        account_id: 'act_1795278261246132', budget: 50 },
+              { client: 'Michel Medspa - Dana Point',           account_id: 'act_873011548816017',  budget: 50 },
+              { client: 'Nunova Health & Image',                account_id: 'act_2151825605165694', budget: 50 },
+              { client: 'Precision Weight Loss',                account_id: 'act_624982636077867',  budget: 50 },
+              { client: 'Wellness Herbal',                      account_id: 'act_894241480205692',  budget: 50 },
+              { client: 'Dailey Aesthetics',                    account_id: 'act_1464948185130737', budget: 50 },
+              { client: 'Ensoul Aesthetics And Wellness',       account_id: 'act_1837871783720841', budget: 50 },
+              { client: 'Jules Fibroblast and Body Contour',    account_id: 'act_1108868149742936', budget: 50 },
+              { client: 'Medical Laser And Aesthetics',         account_id: 'act_947326761106052',  budget: 50 }
+            ];
+
+            const today = new Date();
+            const fmt = d => d.toISOString().split('T')[0];
+            const since7 = new Date(today); since7.setDate(today.getDate() - 7);
+
+            function fetchInsights(accountId) {
+              return new Promise((resolve) => {
+                const params = new URLSearchParams({
+                  fields: 'spend,impressions,reach,clicks,frequency,actions',
+                  time_range: JSON.stringify({ since: fmt(since7), until: fmt(today) }),
+                  level: 'account',
+                  limit: '1',
+                  access_token: TOKEN
+                });
+                const url = \`https://graph.facebook.com/v19.0/\${accountId}/insights?\${params}\`;
+                https.get(url, res => {
+                  let data = '';
+                  res.on('data', d => data += d);
+                  res.on('end', () => { try { resolve(JSON.parse(data)); } catch(e) { resolve({}); } });
+                }).on('error', () => resolve({}));
+              });
+            }
+
+            async function main() {
+              const results = [];
+              for (const c of clients) {
+                await new Promise(r => setTimeout(r, 200)); // rate limit
+                try {
+                  const res = await fetchInsights(c.account_id);
+                  const ins = (res.data || [])[0] || {};
+                  const spend = parseFloat(ins.spend || 0);
+                  const impressions = parseInt(ins.impressions || 0);
+                  const clicks = parseInt(ins.clicks || 0);
+                  const actions = ins.actions || [];
+
+                  let leads = 0, bookings = 0;
+                  for (const a of actions) {
+                    const v = parseInt(a.value || 0);
+                    if (['lead','offsite_conversion.fb_pixel_lead','offsite_complete_registration_add_meta_leads'].includes(a.action_type)) leads += v;
+                    if (a.action_type === 'omni_complete_registration') bookings += v;
+                  }
+
+                  const cpl = leads > 0 ? spend / leads : 0;
+                  const cpb = bookings > 0 ? spend / bookings : 0;
+                  const ctr = impressions > 0 ? (clicks / impressions) * 100 : 0;
+                  const cpm = impressions > 0 ? (spend / impressions) * 1000 : 0;
+                  const r2 = n => Math.round(n * 100) / 100;
+
+                  let kpiStatus;
+                  if (leads === 0)    kpiStatus = 'NO DATA';
+                  else if (cpl < 10)  kpiStatus = 'Good';
+                  else if (cpl <= 15) kpiStatus = 'Watch';
+                  else if (cpl <= 20) kpiStatus = 'Borderline';
+                  else if (cpl <= 28) kpiStatus = 'Prob Cut';
+                  else                kpiStatus = 'CUT';
+
+                  results.push({
+                    client:     c.client,
+                    account_id: c.account_id,
+                    spend:      r2(spend),
+                    leads,
+                    bookings,
+                    cpl:        r2(cpl),
+                    cpb:        r2(cpb),
+                    ctr:        r2(ctr),
+                    cpm:        r2(cpm),
+                    kpi_status: kpiStatus,
+                    period:     '7d'
+                  });
+                  console.log(c.client + ': CPL=' + (cpl ? '$' + cpl.toFixed(2) : 'N/A') + ' | ' + kpiStatus);
+                } catch(e) {
+                  results.push({ client: c.client, account_id: c.account_id, kpi_status: 'ERROR', spend: 0, leads: 0, cpl: 0 });
+                }
+              }
+
+              const out = { clients: results, pulled_at: new Date().toISOString() };
+              fs.writeFileSync('data/meta.json', JSON.stringify(out, null, 2));
+              console.log('Meta: ' + results.length + ' clients synced');
+            }
+
+            main();
+          "
+
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/meta.json
+          git diff --staged --quiet || git commit -m "sync: Meta KPIs $(date -u +%H:%M)"
+          git push
