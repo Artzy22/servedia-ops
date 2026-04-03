@@ -1,1 +1,1821 @@
-{"tasks":[],"count":0,"pulled_at":""}
+{
+  "tasks": [
+    {
+      "id": "86c95u3h0",
+      "name": "LeBodee MedSpa",
+      "status": "new sign ups",
+      "status_color": "#87909e",
+      "assignees": [],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1775155800158",
+      "date_updated": "1775155805129",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c95u3h0",
+      "tags": []
+    },
+    {
+      "id": "86c93targ",
+      "name": "Glow Luxe",
+      "status": "new sign ups",
+      "status_color": "#87909e",
+      "assignees": [],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1774945802992",
+      "date_updated": "1775218801725",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c93targ",
+      "tags": []
+    },
+    {
+      "id": "86c93kmfu",
+      "name": "Weight And Wellbeing ",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774920404534",
+      "date_updated": "1775240053745",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c93kmfu",
+      "tags": []
+    },
+    {
+      "id": "86c93hccm",
+      "name": "Wisconsin Medical Weight Loss ",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774906280855",
+      "date_updated": "1775240048709",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c93hccm",
+      "tags": []
+    },
+    {
+      "id": "86c926yam",
+      "name": "Growing Younger Clinic ",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774654149226",
+      "date_updated": "1775240037146",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c926yam",
+      "tags": []
+    },
+    {
+      "id": "86c923w72",
+      "name": "Zubair Cosmetic Gynecology and Medspa",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774634182573",
+      "date_updated": "1775240083785",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c923w72",
+      "tags": []
+    },
+    {
+      "id": "86c91d4y4",
+      "name": "Ideal Weight Loss Cosmetic Center",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774544689090",
+      "date_updated": "1775240087777",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c91d4y4",
+      "tags": []
+    },
+    {
+      "id": "86c90vxxq",
+      "name": "Body Slim Med Spa",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": "1774900800000",
+      "date_created": "1774475705997",
+      "date_updated": "1775240079689",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c90vxxq",
+      "tags": []
+    },
+    {
+      "id": "86c90vwjz",
+      "name": "Sonoran Skin Renewal ",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1774475375037",
+      "date_updated": "1775240042785",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c90vwjz",
+      "tags": []
+    },
+    {
+      "id": "86c8yj45c",
+      "name": "Wilmarwell ",
+      "status": "waiting on team",
+      "status_color": "#a18072",
+      "assignees": [
+        "Felipe Guimaraes",
+        "Byron Vale"
+      ],
+      "priority": null,
+      "due_date": "1774987200000",
+      "date_created": "1774112285267",
+      "date_updated": "1775242216737",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8yj45c",
+      "tags": []
+    },
+    {
+      "id": "86c8ye53w",
+      "name": "Skinholic Aesthetics And Laser",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1774042816374",
+      "date_updated": "1775240096875",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8ye53w",
+      "tags": []
+    },
+    {
+      "id": "86c8ychpn",
+      "name": "Connected Health And Skin",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1774027498394",
+      "date_updated": "1775240018085",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8ychpn",
+      "tags": []
+    },
+    {
+      "id": "86c8x2f60",
+      "name": "McKinzie Aesthetics Center",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": "1775073600000",
+      "date_created": "1773855311643",
+      "date_updated": "1775240074498",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8x2f60",
+      "tags": []
+    },
+    {
+      "id": "86c8wdcha",
+      "name": "Endurance HRT And Aesthetics",
+      "status": "new sign ups",
+      "status_color": "#87909e",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1773766523249",
+      "date_updated": "1774363617053",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8wdcha",
+      "tags": []
+    },
+    {
+      "id": "86c8vrqpe",
+      "name": "Brains and Beauty Aesthetics",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1773715658889",
+      "date_updated": "1775240026306",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8vrqpe",
+      "tags": []
+    },
+    {
+      "id": "86c8vjt79",
+      "name": "Spa Matrix",
+      "status": "waiting on client",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Felipe Guimaraes",
+        "Anca Elamparo",
+        "Byron Vale"
+      ],
+      "priority": "high",
+      "due_date": "1774296000000",
+      "date_created": "1773679129842",
+      "date_updated": "1775234981573",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8vjt79",
+      "tags": []
+    },
+    {
+      "id": "86c8uee2j",
+      "name": "Thorpe Wellness",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Adriana Gonzalez"
+      ],
+      "priority": "high",
+      "due_date": "1774814400000",
+      "date_created": "1773428164692",
+      "date_updated": "1775240064258",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8uee2j",
+      "tags": []
+    },
+    {
+      "id": "86c8tumby",
+      "name": "The Lamkin Clinic",
+      "status": "waiting on team",
+      "status_color": "#a18072",
+      "assignees": [
+        "Adriana Gonzalez",
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1774382400000",
+      "date_created": "1773351717600",
+      "date_updated": "1775064942860",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8tumby",
+      "tags": []
+    },
+    {
+      "id": "86c8t3ur0",
+      "name": "Tulsa Body Sculpting",
+      "status": "waiting on team",
+      "status_color": "#a18072",
+      "assignees": [
+        "Adriana Gonzalez",
+        "Anca Elamparo"
+      ],
+      "priority": "high",
+      "due_date": "1774814400000",
+      "date_created": "1773266555903",
+      "date_updated": "1775072436344",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8t3ur0",
+      "tags": []
+    },
+    {
+      "id": "86c8ryne4",
+      "name": "Pinnacle Integrative Orthopedic",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Adriana Gonzalez"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1773243415003",
+      "date_updated": "1775243992228",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8ryne4",
+      "tags": []
+    },
+    {
+      "id": "86c8ryn97",
+      "name": "Uplift Aesthetics",
+      "status": "waiting on team",
+      "status_color": "#a18072",
+      "assignees": [
+        "Adriana Gonzalez",
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1774296000000",
+      "date_created": "1773243401315",
+      "date_updated": "1775137431894",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8ryn97",
+      "tags": []
+    },
+    {
+      "id": "86c8fc9cr",
+      "name": "The Longevity Collective",
+      "status": "waiting on client",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Adriana Gonzalez",
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1773025200000",
+      "date_created": "1772044378039",
+      "date_updated": "1775049795615",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8fc9cr",
+      "tags": []
+    },
+    {
+      "id": "86c8ak2jm",
+      "name": "Elite Beauty Lab",
+      "status": "post-onboarding call",
+      "status_color": "#f8ae00",
+      "assignees": [
+        "Julianne Navarro",
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1771431582436",
+      "date_updated": "1775240101202",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c8ak2jm",
+      "tags": []
+    },
+    {
+      "id": "86c874198",
+      "name": "Papillon Effect Medspa ",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Adriana Gonzalez"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1770933991184",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c874198",
+      "tags": []
+    },
+    {
+      "id": "86c83m38b",
+      "name": "Luxora Aesthetics",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Autumn Ismirnioglou",
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1770926400000",
+      "date_created": "1770581331571",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c83m38b",
+      "tags": []
+    },
+    {
+      "id": "86c82h706",
+      "name": "Calmer U",
+      "status": "new sign ups",
+      "status_color": "#87909e",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1770364453303",
+      "date_updated": "1774364046449",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c82h706",
+      "tags": []
+    },
+    {
+      "id": "86c7g0uke",
+      "name": "Delray Laser and Medical Spa",
+      "status": "launch ready",
+      "status_color": "#ee5e99",
+      "assignees": [
+        "Julianne Navarro",
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": "1773226800000",
+      "date_created": "1767987832866",
+      "date_updated": "1775228520251",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c7g0uke",
+      "tags": []
+    },
+    {
+      "id": "86c7a8vtj",
+      "name": "Liv Dermatology And Aesthetics",
+      "status": "ob form submitted",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Julianne Navarro",
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1767288740373",
+      "date_updated": "1775240058582",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c7a8vtj",
+      "tags": []
+    },
+    {
+      "id": "86c70aguk",
+      "name": "Tech: Conversational AI Set Up",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765742400000",
+      "date_created": "1765320438251",
+      "date_updated": "1765914854088",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70aguk",
+      "tags": []
+    },
+    {
+      "id": "86c70aguj",
+      "name": "Tech: Set Up CKB and Sales Scripts",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765742400000",
+      "date_created": "1765320437725",
+      "date_updated": "1765830067265",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70aguj",
+      "tags": []
+    },
+    {
+      "id": "86c70agug",
+      "name": "Tech: Set Up New Offer",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765742400000",
+      "date_created": "1765320437042",
+      "date_updated": "1765913597172",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70agug",
+      "tags": []
+    },
+    {
+      "id": "86c70aguf",
+      "name": "Tech: Calendar Integration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765742400000",
+      "date_created": "1765320436378",
+      "date_updated": "1766539182605",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70aguf",
+      "tags": []
+    },
+    {
+      "id": "86c70ague",
+      "name": "MB: Setup Client Reporting",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Adham Soudy"
+      ],
+      "priority": null,
+      "due_date": "1765483200000",
+      "date_created": "1765320435840",
+      "date_updated": "1766770227598",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70ague",
+      "tags": []
+    },
+    {
+      "id": "86c70agua",
+      "name": "MB: Create Marketing Assets",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Adham Soudy"
+      ],
+      "priority": null,
+      "due_date": "1765483200000",
+      "date_created": "1765320432780",
+      "date_updated": "1766539154693",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c70agua",
+      "tags": []
+    },
+    {
+      "id": "86c6yr6en",
+      "name": "PM: Update All ClickUp Fields",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1765129219368",
+      "date_updated": "1766539281768",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6yr6en",
+      "tags": []
+    },
+    {
+      "id": "86c6yr6eg",
+      "name": "PM: Add Client to Spam Checker",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1765129218262",
+      "date_updated": "1766539148430",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6yr6eg",
+      "tags": []
+    },
+    {
+      "id": "86c6yr6dj",
+      "name": "Tech: Hot Prospector Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765310400000",
+      "date_created": "1765129213315",
+      "date_updated": "1766094047909",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6yr6dj",
+      "tags": []
+    },
+    {
+      "id": "86c6yr6de",
+      "name": "Tech: A2P Registration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765310400000",
+      "date_created": "1765129211555",
+      "date_updated": "1766411510122",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6yr6de",
+      "tags": []
+    },
+    {
+      "id": "86c6yr6d8",
+      "name": "Tech: GHL Onboarding",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765310400000",
+      "date_created": "1765129210490",
+      "date_updated": "1765828558361",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6yr6d8",
+      "tags": []
+    },
+    {
+      "id": "86c6y88z4",
+      "name": "Tech: Conversational AI Set Up",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764957394035",
+      "date_updated": "1765486268325",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y88z4",
+      "tags": []
+    },
+    {
+      "id": "86c6y88z1",
+      "name": "Tech: Set Up CKB and Sales Scripts",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764957393368",
+      "date_updated": "1765480660933",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y88z1",
+      "tags": []
+    },
+    {
+      "id": "86c6y88yy",
+      "name": "Tech: Set Up New Offer",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764957392607",
+      "date_updated": "1765561927880",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y88yy",
+      "tags": []
+    },
+    {
+      "id": "86c6y88yt",
+      "name": "Tech: Calendar Integration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764957391538",
+      "date_updated": "1768047785526",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y88yt",
+      "tags": []
+    },
+    {
+      "id": "86c6y7jbr",
+      "name": "O41 Skin Lab",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1764953415370",
+      "date_updated": "1774367699807",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y7jbr",
+      "tags": []
+    },
+    {
+      "id": "86c6y73q4",
+      "name": "PM: Update All ClickUp Fields",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1764951522975",
+      "date_updated": "1767623933476",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y73q4",
+      "tags": []
+    },
+    {
+      "id": "86c6y73py",
+      "name": "PM: Add Client to Spam Checker",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1764951522153",
+      "date_updated": "1767623929453",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y73py",
+      "tags": []
+    },
+    {
+      "id": "86c6y73p4",
+      "name": "Tech: Hot Prospector Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764951516688",
+      "date_updated": "1765481755747",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y73p4",
+      "tags": []
+    },
+    {
+      "id": "86c6y73nj",
+      "name": "Tech: A2P Registration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764951514924",
+      "date_updated": "1766727025112",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y73nj",
+      "tags": []
+    },
+    {
+      "id": "86c6y73nd",
+      "name": "Tech: GHL Onboarding",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": null,
+      "due_date": "1765224000000",
+      "date_created": "1764951514270",
+      "date_updated": "1765470878236",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6y73nd",
+      "tags": []
+    },
+    {
+      "id": "86c6wyvym",
+      "name": "About Face And Body MedSpa",
+      "status": "waiting on client",
+      "status_color": "#1090e0",
+      "assignees": [
+        "Autumn Ismirnioglou",
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": "1772136000000",
+      "date_created": "1764790147587",
+      "date_updated": "1774975438525",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6wyvym",
+      "tags": []
+    },
+    {
+      "id": "86c6r566t",
+      "name": "DK Med Spa",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1764164752108",
+      "date_updated": "1774367559680",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c6r566t",
+      "tags": []
+    },
+    {
+      "id": "86c67jvwj",
+      "name": "MB: Automation and Workflow Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688649575",
+      "date_updated": "1761943284859",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvwj",
+      "tags": []
+    },
+    {
+      "id": "86c67jvwd",
+      "name": "MB: Configure Forms and Funnels",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688649052",
+      "date_updated": "1761943281481",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvwd",
+      "tags": []
+    },
+    {
+      "id": "86c67jvwa",
+      "name": "MB: Set Campaign Custom Values",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688648523",
+      "date_updated": "1761943278039",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvwa",
+      "tags": []
+    },
+    {
+      "id": "86c67jvvp",
+      "name": "MB: Internal Client Folder Setup ",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688645725",
+      "date_updated": "1761943291327",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvvp",
+      "tags": []
+    },
+    {
+      "id": "86c67jvvk",
+      "name": "MB: Write Calling Scripts",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688644936",
+      "date_updated": "1761940878120",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvvk",
+      "tags": []
+    },
+    {
+      "id": "86c67jvv8",
+      "name": "MB: Build high-converting funnels",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688642678",
+      "date_updated": "1761945158547",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvv8",
+      "tags": []
+    },
+    {
+      "id": "86c67jvv5",
+      "name": "MB: Ad Swipe File",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688641966",
+      "date_updated": "1761925332461",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvv5",
+      "tags": []
+    },
+    {
+      "id": "86c67jvv1",
+      "name": "MB: Ad Copy Swipe File\r\n\u200b",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": null,
+      "due_date": "1761854400000",
+      "date_created": "1761688641275",
+      "date_updated": "1761925329825",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c67jvv1",
+      "tags": []
+    },
+    {
+      "id": "86c65nkn8",
+      "name": "Tech: Setup GHL Conversational AI",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": "high",
+      "due_date": "1765224000000",
+      "date_created": "1761334004251",
+      "date_updated": "1765562746176",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c65nkn8",
+      "tags": []
+    },
+    {
+      "id": "86c65nkmd",
+      "name": "Tech: Hot Prospector Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea",
+        "Jemie Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1761595200000",
+      "date_created": "1761333999968",
+      "date_updated": "1762126638411",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c65nkmd",
+      "tags": []
+    },
+    {
+      "id": "86c65nkm1",
+      "name": "Tech: Setting Up a GoHighLevel Sub-Account For New Clients",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea",
+        "Jemie Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1761595200000",
+      "date_created": "1761333998382",
+      "date_updated": "1762126581395",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c65nkm1",
+      "tags": []
+    },
+    {
+      "id": "86c65nkkw",
+      "name": "Tech: A2P Registration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Allyza Abe"
+      ],
+      "priority": "high",
+      "due_date": "1765224000000",
+      "date_created": "1761333997505",
+      "date_updated": "1765562790787",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c65nkkw",
+      "tags": []
+    },
+    {
+      "id": "86c65nkku",
+      "name": "Tech: Create a GHL Sub-Account & Invite the client to it",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea",
+        "Jemie Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1761595200000",
+      "date_created": "1761333996853",
+      "date_updated": "1761893887285",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c65nkku",
+      "tags": []
+    },
+    {
+      "id": "86c61vhwg",
+      "name": "Baq body sculpting and Brows",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Autumn Ismirnioglou",
+        "Pat Gargarutea",
+        "Dwight Antecristo",
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1760727421152",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c61vhwg",
+      "tags": []
+    },
+    {
+      "id": "86c60jz8a",
+      "name": "PM: Update ClickUp Custom Fields Before Launching\r\n\u200b",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": "high",
+      "due_date": "1761076800000",
+      "date_created": "1760560661230",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz8a",
+      "tags": []
+    },
+    {
+      "id": "86c60jz88",
+      "name": "PM: Make sure that Quality Control Checklist is Completed\r\n\u200b",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Pat Gargarutea"
+      ],
+      "priority": "high",
+      "due_date": "1761076800000",
+      "date_created": "1760560660739",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz88",
+      "tags": []
+    },
+    {
+      "id": "86c60jz85",
+      "name": "MB: Automation and Workflow Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560660199",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz85",
+      "tags": []
+    },
+    {
+      "id": "86c60jz81",
+      "name": "MB: Configure Forms and Funnels",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560659378",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz81",
+      "tags": []
+    },
+    {
+      "id": "86c60jz7y",
+      "name": "MB: Set Campaign Custom Values",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560658646",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz7y",
+      "tags": []
+    },
+    {
+      "id": "86c60jz7t",
+      "name": "MB: Reporting Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560657412",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz7t",
+      "tags": []
+    },
+    {
+      "id": "86c60jz7p",
+      "name": "MB: Setting Up Ads in Ads Manager for Client",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560656774",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz7p",
+      "tags": []
+    },
+    {
+      "id": "86c60jz7c",
+      "name": "MB: Write Calling Scripts",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560655524",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz7c",
+      "tags": []
+    },
+    {
+      "id": "86c60jz73",
+      "name": "MB: Build high-converting funnels",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560653493",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz73",
+      "tags": []
+    },
+    {
+      "id": "86c60jz6w",
+      "name": "MB: Ad Swipe File",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560652930",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz6w",
+      "tags": []
+    },
+    {
+      "id": "86c60jz6n",
+      "name": "MB: Ad Copy Swipe File\r\n\u200b",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1760990400000",
+      "date_created": "1760560652317",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz6n",
+      "tags": []
+    },
+    {
+      "id": "86c60jz6k",
+      "name": "Tech: Setup GHL Conversational AI",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1760644800000",
+      "date_created": "1760560651714",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz6k",
+      "tags": []
+    },
+    {
+      "id": "86c60jz64",
+      "name": "Tech: Hot Prospector Setup",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1760644800000",
+      "date_created": "1760560647427",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz64",
+      "tags": []
+    },
+    {
+      "id": "86c60jz60",
+      "name": "Tech: Setting Up a GoHighLevel Sub-Account For New Clients",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1760644800000",
+      "date_created": "1760560645372",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz60",
+      "tags": []
+    },
+    {
+      "id": "86c60jz5u",
+      "name": "Tech: A2P Registration",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1760644800000",
+      "date_created": "1760560644659",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz5u",
+      "tags": []
+    },
+    {
+      "id": "86c60jz5t",
+      "name": "Tech: Create a GHL Sub-Account & Invite the client to it",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "high",
+      "due_date": "1760644800000",
+      "date_created": "1760560644102",
+      "date_updated": "1768549996107",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jz5t",
+      "tags": []
+    },
+    {
+      "id": "86c60jc8t",
+      "name": "Skin21",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1760557516362",
+      "date_updated": "1774367899916",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c60jc8t",
+      "tags": []
+    },
+    {
+      "id": "86c5zzt7m",
+      "name": "Blossom Works Wellness",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1760489474695",
+      "date_updated": "1774367821328",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5zzt7m",
+      "tags": []
+    },
+    {
+      "id": "86c5z9v91",
+      "name": "SiBelle MedSpa",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Autumn Ismirnioglou",
+        "Pat Gargarutea"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1760386832439",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5z9v91",
+      "tags": []
+    },
+    {
+      "id": "86c5way46",
+      "name": "Medical Spa at Pro Club",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Adriana Gonzalez"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1759866757748",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5way46",
+      "tags": []
+    },
+    {
+      "id": "86c5vk03v",
+      "name": "Newday Beauty and Wellness",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro",
+        "Pat Gargarutea",
+        "Jhon Jalea",
+        "Autumn Ismirnioglou"
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_created": "1759777825745",
+      "date_updated": "1773764872040",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5vk03v",
+      "tags": []
+    },
+    {
+      "id": "86c5ufy2b",
+      "name": "LX Gynecology and Med Spa",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1759517251992",
+      "date_updated": "1774367241073",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5ufy2b",
+      "tags": []
+    },
+    {
+      "id": "86c5rndyu",
+      "name": "Rare Beauty Spa",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Felipe Guimaraes"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1759276659637",
+      "date_updated": "1774368112442",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5rndyu",
+      "tags": []
+    },
+    {
+      "id": "86c5qq2rb",
+      "name": "Potomac Skin Care",
+      "status": "ghosting (churned)",
+      "status_color": "#b660e0",
+      "assignees": [
+        "Julianne Navarro",
+        "Felipe Guimaraes"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1759171151328",
+      "date_updated": "1774367978493",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5qq2rb",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt85",
+      "name": "Calendar Sync",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": "normal",
+      "due_date": "1759348800000",
+      "date_created": "1758815149872",
+      "date_updated": "1759322573505",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt85",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt83",
+      "name": "Purchase CRM Number",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Adriana Gonzalez"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815149322",
+      "date_updated": "1759871889952",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt83",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt7x",
+      "name": "Write Ad Copies",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815148428",
+      "date_updated": "1759872648463",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt7x",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt7r",
+      "name": "Funnel",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815147790",
+      "date_updated": "1759783514738",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt7r",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt7g",
+      "name": " Create Ads",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815146858",
+      "date_updated": "1759788584764",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt7g",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt7c",
+      "name": "Setup Ads in Ads Manager",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815145886",
+      "date_updated": "1759875026006",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt7c",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt79",
+      "name": "Setup Client Reporting",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815145089",
+      "date_updated": "1759876958302",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt79",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt74",
+      "name": "Onboard to HotProspector",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1758815144486",
+      "date_updated": "1759849789670",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt74",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt70",
+      "name": "Write Calling Scripts",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Julianne Navarro"
+      ],
+      "priority": "high",
+      "due_date": "1759348800000",
+      "date_created": "1758815143888",
+      "date_updated": "1759786758405",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt70",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt6u",
+      "name": "Custom Values Sync A2P Assets and General",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1758815143303",
+      "date_updated": "1759849785434",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt6u",
+      "tags": []
+    },
+    {
+      "id": "86c5nxt6p",
+      "name": "Add Company Name Tag",
+      "status": "completed",
+      "status_color": "#008844",
+      "assignees": [
+        "Jhon Jalea"
+      ],
+      "priority": null,
+      "due_date": null,
+      "date_created": "1758815142561",
+      "date_updated": "1759849783400",
+      "list": "Client Onboarding",
+      "folder": "hidden",
+      "space": "90155467378",
+      "url": "https://app.clickup.com/t/86c5nxt6p",
+      "tags": []
+    }
+  ],
+  "count": 100,
+  "pulled_at": "2026-04-03T22:15:37Z"
+}
