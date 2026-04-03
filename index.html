@@ -1,431 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Servedia Ops Center</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Bricolage+Grotesque:wght@300;400;500;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Servedia Ops Dashboard</title>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#07070f;--s1:#0d0d1a;--s2:#121220;--s3:#181828;--s4:#1e1e30;
-  --wire:rgba(255,255,255,0.05);--wire2:rgba(255,255,255,0.09);--wire3:rgba(255,255,255,0.15);
-  --ink:#e4e2f0;--ink2:#9896b0;--ink3:#5a5870;--ink4:#38364a;
-  --lime:#b8ff47;--lime2:rgba(184,255,71,0.14);--lime3:rgba(184,255,71,0.05);
-  --red:#ff4d6d;--red2:rgba(255,77,109,0.14);
-  --amber:#ffb830;--amber2:rgba(255,184,48,0.14);
-  --blue:#6b8cff;--blue2:rgba(107,140,255,0.14);
-  --teal:#2dd4bf;--teal2:rgba(45,212,191,0.12);
-  --mono:'IBM Plex Mono',monospace;--display:'Bricolage Grotesque',sans-serif;
-  --r:5px;--r2:10px;
-}
-html{font-size:14px}
-body{background:var(--bg);color:var(--ink);font-family:var(--display);font-weight:300;min-height:100vh;overflow-x:hidden}
-body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);pointer-events:none;z-index:9999}
-
-/* LAYOUT */
-.app{display:grid;grid-template-columns:200px 1fr;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
-
-/* TOPBAR */
-.topbar{grid-column:1/-1;display:flex;align-items:center;border-bottom:1px solid var(--wire2);background:rgba(7,7,15,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
-.brand{display:flex;align-items:center;gap:10px;padding:0 18px;border-right:1px solid var(--wire2);height:100%;min-width:200px}
-.brand-dot{width:8px;height:8px;background:var(--lime);border-radius:50%;animation:pulse 2s ease-in-out infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.brand-name{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase}
-.topbar-mid{flex:1;display:flex;align-items:center;gap:20px;padding:0 20px}
-.sync-status{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--ink3)}
-.sync-dot{width:5px;height:5px;border-radius:50%;background:var(--lime)}
-.sync-dot.loading{background:var(--amber);animation:blink .5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
-.topbar-right{padding:0 18px;border-left:1px solid var(--wire2);height:100%;display:flex;align-items:center}
-.clock{font-family:var(--mono);font-size:11px;color:var(--ink3)}
-
-/* SIDEBAR */
-.sidebar{background:var(--s1);border-right:1px solid var(--wire2);overflow-y:auto;display:flex;flex-direction:column}
-.sb-sec{padding:14px 14px 6px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink4);text-transform:uppercase}
-.sb-item{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;transition:all .12s}
-.sb-item:hover{background:var(--s2);border-left-color:var(--wire3)}
-.sb-item.active{background:var(--lime3);border-left-color:var(--lime)}
-.sb-left{display:flex;align-items:center;gap:8px}
-.sb-icon{font-size:12px;width:14px;text-align:center}
-.sb-label{font-size:12px;color:var(--ink2)}
-.sb-item.active .sb-label{color:var(--ink)}
-.sb-badge{font-family:var(--mono);font-size:9px;padding:1px 6px;border-radius:20px;background:var(--s3);color:var(--ink3)}
-.sb-badge.hot{background:var(--red2);color:var(--red)}
-.sb-div{height:1px;background:var(--wire);margin:6px 14px}
-.pip{width:5px;height:5px;border-radius:50%}
-
-/* MAIN */
-.main{overflow-y:auto;display:flex;flex-direction:column}
-
-/* KPI BAR */
-.kpi-bar{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--wire2);flex-shrink:0}
-.kpi{padding:14px 18px;border-right:1px solid var(--wire2)}
-.kpi:last-child{border-right:none}
-.kpi-label{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--ink3);text-transform:uppercase;margin-bottom:6px}
-.kpi-val{font-family:var(--mono);font-size:22px;font-weight:500;line-height:1}
-.kpi-val.hot{color:var(--red)}
-.kpi-val.warn{color:var(--amber)}
-.kpi-val.ok{color:var(--lime)}
-.kpi-sub{font-size:10px;color:var(--ink4);margin-top:3px}
-
-/* CONTENT */
-.content{flex:1;padding:18px;display:flex;flex-direction:column;gap:14px}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-
-/* CARD */
-.card{background:var(--s1);border:1px solid var(--wire2);border-radius:var(--r2);overflow:hidden}
-.card-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--wire2);background:var(--s2)}
-.card-title{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2)}
-.card-meta{font-family:var(--mono);font-size:9px;color:var(--ink4)}
-
-/* TASK ROW */
-.task-row{display:grid;grid-template-columns:3px 1fr 110px 70px 50px 24px;align-items:center;gap:10px;padding:9px 14px;border-bottom:1px solid var(--wire);cursor:default;transition:background .1s}
-.task-row:last-child{border-bottom:none}
-.task-row:hover{background:var(--s2)}
-.pri-bar{height:26px;border-radius:2px}
-.pri-urgent{background:var(--red)}
-.pri-high{background:var(--amber)}
-.pri-normal{background:var(--blue)}
-.pri-low{background:var(--ink4)}
-.task-name{font-size:12px;color:var(--ink);line-height:1.3;margin-bottom:2px}
-.task-id{font-family:var(--mono);font-size:9px;color:var(--ink4)}
-.task-client{font-family:var(--mono);font-size:9px;padding:2px 7px;border-radius:20px;border:1px solid var(--wire3);color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-.task-status{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:20px;text-align:center}
-.st-open,.st-to_do{background:var(--blue2);color:var(--blue)}
-.st-in_progress{background:var(--amber2);color:var(--amber)}
-.st-done,.st-complete{background:var(--teal2);color:var(--teal)}
-.task-due{font-family:var(--mono);font-size:9px;color:var(--ink3);text-align:right}
-.task-due.over{color:var(--red)}
-.avatar{width:22px;height:22px;border-radius:50%;background:var(--s4);border:1px solid var(--wire3);display:flex;align-items:center;justify-content:center;font-size:7px;color:var(--ink3);font-family:var(--mono)}
-
-/* SLACK */
-.slack-row{display:flex;gap:10px;padding:10px 14px;border-bottom:1px solid var(--wire);cursor:default;transition:background .1s}
-.slack-row:last-child{border-bottom:none}
-.slack-row:hover{background:var(--s2)}
-.slack-row.unread{background:rgba(107,140,255,0.03)}
-.slack-av{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0}
-.slack-body{flex:1;min-width:0}
-.slack-hdr{display:flex;align-items:baseline;gap:6px;margin-bottom:2px}
-.slack-user{font-size:12px;font-weight:500}
-.slack-chan{font-family:var(--mono);font-size:9px;color:var(--blue)}
-.slack-time{font-family:var(--mono);font-size:9px;color:var(--ink3);margin-left:auto}
-.slack-text{font-size:11px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.unread-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;margin-top:4px}
-
-/* META TABLE */
-.meta-table{width:100%;border-collapse:collapse}
-.meta-table th{font-family:var(--mono);font-size:9px;letter-spacing:.08em;color:var(--ink4);text-transform:uppercase;padding:7px 12px;text-align:left;border-bottom:1px solid var(--wire2);font-weight:400}
-.meta-table td{padding:7px 12px;font-size:11px;color:var(--ink2);border-bottom:1px solid var(--wire)}
-.meta-table tr:last-child td{border-bottom:none}
-.meta-table tr:hover td{background:var(--s2)}
-.kpi-chip{font-family:var(--mono);font-size:9px;padding:2px 6px;border-radius:20px}
-.chip-Good{background:var(--lime2);color:var(--lime)}
-.chip-Watch{background:var(--amber2);color:var(--amber)}
-.chip-Borderline{background:rgba(255,140,48,.15);color:#ff9630}
-.chip-Prob-Cut,.chip-Prob_Cut{background:var(--red2);color:var(--red)}
-.chip-CUT{background:var(--red2);color:var(--red);font-weight:600}
-.chip-NO-DATA,.chip-NO_DATA{background:var(--s3);color:var(--ink4)}
-.chip-ERROR{background:var(--s3);color:var(--ink4)}
-
-/* EMPTY */
-.empty{padding:24px;text-align:center;font-family:var(--mono);font-size:10px;color:var(--ink4);letter-spacing:.06em}
-
-/* SCROLLBAR */
-::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
-
-@media(max-width:860px){.app{grid-template-columns:1fr}.sidebar{display:none}.kpi-bar{grid-template-columns:repeat(3,1fr)}.two-col{grid-template-columns:1fr}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0d0d0d;color:#e5e5e5;font-family:'Inter',system-ui,sans-serif;min-height:100vh}
+  a{color:inherit;text-decoration:none}
+  .header{background:#111;border-bottom:1px solid #222;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+  .header h1{font-size:18px;font-weight:700;letter-spacing:-.3px;color:#fff}
+  .header h1 span{color:#7c5cfc}
+  .pulled-at{font-size:11px;color:#555;margin-top:2px}
+  .refresh-btn{background:#1e1e1e;border:1px solid #333;color:#aaa;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s}
+  .refresh-btn:hover{background:#2a2a2a;color:#fff}
+  .tabs{display:flex;gap:4px;padding:16px 28px 0;border-bottom:1px solid #1e1e1e}
+  .tab{padding:8px 18px;border-radius:8px 8px 0 0;cursor:pointer;font-size:13px;font-weight:500;color:#666;border:1px solid transparent;border-bottom:none;transition:all .2s;position:relative;bottom:-1px}
+  .tab.active{background:#111;border-color:#222;color:#fff}
+  .tab:hover:not(.active){color:#aaa}
+  .tab-badge{display:inline-block;background:#7c5cfc22;color:#7c5cfc;border-radius:99px;padding:1px 7px;font-size:10px;margin-left:6px}
+  .main{padding:24px 28px}
+  .panel{display:none}
+  .panel.active{display:block}
+  .summary-bar{display:flex;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+  .summary-card{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:14px 18px;flex:1;min-width:140px}
+  .summary-card .label{font-size:11px;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .summary-card .value{font-size:22px;font-weight:700;color:#fff}
+  .summary-card .value.green{color:#22c55e}
+  .summary-card .value.red{color:#ef4444}
+  .summary-card .value.purple{color:#7c5cfc}
+  .toolbar{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
+  .search-input{background:#111;border:1px solid #222;color:#e5e5e5;padding:8px 12px;border-radius:7px;font-size:13px;width:260px;outline:none;transition:border .2s}
+  .search-input:focus{border-color:#7c5cfc}
+  .search-input::placeholder{color:#444}
+  .filter-select{background:#111;border:1px solid #222;color:#aaa;padding:7px 10px;border-radius:7px;font-size:12px;outline:none;cursor:pointer}
+  .filter-select:focus{border-color:#7c5cfc}
+  .result-count{font-size:12px;color:#555;margin-left:auto}
+  .table-wrap{overflow-x:auto;border-radius:10px;border:1px solid #1e1e1e}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  thead th{background:#111;padding:10px 14px;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:#555;border-bottom:1px solid #1e1e1e;white-space:nowrap}
+  tbody tr{border-bottom:1px solid #161616;transition:background .15s}
+  tbody tr:hover{background:#161616}
+  tbody tr:last-child{border-bottom:none}
+  td{padding:10px 14px;vertical-align:middle;white-space:nowrap}
+  td.name-col{white-space:normal;max-width:200px;font-weight:500;color:#ddd}
+  td a{color:#7c5cfc;font-size:11px}
+  td a:hover{text-decoration:underline}
+  .pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:500}
+  .pill-green{background:#16a34a22;color:#22c55e;border:1px solid #16a34a44}
+  .pill-yellow{background:#d9770622;color:#f59e0b;border:1px solid #d9770644}
+  .pill-red{background:#dc262622;color:#ef4444;border:1px solid #dc262644}
+  .pill-blue{background:#2563eb22;color:#60a5fa;border:1px solid #2563eb44}
+  .pill-purple{background:#7c3aed22;color:#a78bfa;border:1px solid #7c3aed44}
+  .pill-gray{background:#33333344;color:#888;border:1px solid #333}
+  .avatar{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#7c5cfc33;color:#a78bfa;font-size:9px;font-weight:700;border:1px solid #7c5cfc44;margin-left:-4px}
+  .avatar:first-child{margin-left:0}
+  .avatars{display:flex;align-items:center}
+  .msg-list{display:flex;flex-direction:column;gap:10px}
+  .msg-card{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:14px 16px;transition:border .2s}
+  .msg-card:hover{border-color:#333}
+  .msg-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .msg-channel{font-size:11px;color:#7c5cfc;font-weight:600}
+  .msg-user{font-size:11px;color:#555}
+  .msg-time{font-size:11px;color:#444;margin-left:auto}
+  .msg-text{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word}
+  .msg-reactions{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .reaction{background:#1e1e1e;border:1px solid #2a2a2a;border-radius:99px;padding:2px 8px;font-size:11px;color:#888}
+  .empty-state{text-align:center;padding:60px 20px;color:#444}
+  .empty-state .icon{font-size:40px;margin-bottom:12px}
+  .empty-state p{font-size:14px}
+  .loading{text-align:center;padding:40px;color:#555;font-size:13px}
+  .meta-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .meta-card{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:16px;transition:border .2s}
+  .meta-card:hover{border-color:#333}
+  .meta-card-name{font-size:13px;font-weight:600;color:#ddd;margin-bottom:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meta-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
+  .meta-row .k{color:#555}
+  .meta-row .v{color:#ccc;font-weight:500}
+  .meta-row .v.green{color:#22c55e}
+  .meta-divider{border:none;border-top:1px solid #1e1e1e;margin:8px 0}
+  .meta-period-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .meta-card.error-card{border-color:#dc262633;opacity:.7}
+  .meta-card.no-data-card{opacity:.5}
+  @media(max-width:600px){.header{padding:12px 16px}.tabs{padding:12px 16px 0}.main{padding:16px}.summary-bar{gap:8px}.summary-card{min-width:120px}}
 </style>
 </head>
 <body>
-<div class="app">
-
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-dot"></div>
-      <span class="brand-name">Servedia Ops</span>
-    </div>
-    <div class="topbar-mid">
-      <div class="sync-status"><div class="sync-dot" id="sync-dot"></div><span id="sync-label">Loading...</span></div>
-      <div class="sync-status" style="margin-left:8px">Updated: <span style="color:var(--ink2);margin-left:4px" id="last-sync">—</span></div>
-    </div>
-    <div class="topbar-right">
-      <div class="clock" id="clock"></div>
-    </div>
-  </header>
-
-  <nav class="sidebar">
-    <div class="sb-sec">Views</div>
-    <div class="sb-item active" onclick="nav('overview',this)"><div class="sb-left"><span class="sb-icon">⚡</span><span class="sb-label">Overview</span></div></div>
-    <div class="sb-item" onclick="nav('tasks',this)"><div class="sb-left"><span class="sb-icon">✓</span><span class="sb-label">ClickUp Tasks</span></div><span class="sb-badge hot" id="sb-tasks">—</span></div>
-    <div class="sb-item" onclick="nav('slack',this)"><div class="sb-left"><span class="sb-icon">💬</span><span class="sb-label">Slack</span></div><span class="sb-badge" id="sb-slack">—</span></div>
-    <div class="sb-item" onclick="nav('meta',this)"><div class="sb-left"><span class="sb-icon">📊</span><span class="sb-label">Meta KPIs</span></div></div>
-    <div class="sb-div"></div>
-    <div class="sb-sec">Filter by client</div>
-    <div id="client-list"></div>
-  </nav>
-
-  <main class="main">
-    <div class="kpi-bar">
-      <div class="kpi"><div class="kpi-label">Open Tasks</div><div class="kpi-val" id="k-tasks">—</div><div class="kpi-sub">assigned to me</div></div>
-      <div class="kpi"><div class="kpi-label">Urgent</div><div class="kpi-val hot" id="k-urgent">—</div><div class="kpi-sub">need action now</div></div>
-      <div class="kpi"><div class="kpi-label">Unread Slack</div><div class="kpi-val warn" id="k-slack">—</div><div class="kpi-sub">messages</div></div>
-      <div class="kpi"><div class="kpi-label">Flagged Accounts</div><div class="kpi-val hot" id="k-flagged">—</div><div class="kpi-sub">CPL needs attention</div></div>
-      <div class="kpi"><div class="kpi-label">Avg CPL (7d)</div><div class="kpi-val ok" id="k-cpl">—</div><div class="kpi-sub">all active clients</div></div>
-    </div>
-    <div class="content" id="content"></div>
-  </main>
-</div>
-
-<script>
-// ── CONFIG ──
-// Change this to your GitHub username/repo after pushing
-const REPO = 'YOUR_GITHUB_USERNAME/servedia-ops';
-const BASE = `https://raw.githubusercontent.com/${REPO}/main/data`;
-
-// ── STATE ──
-let DATA = { tasks: [], slack: [], meta: [] };
-let currentView = 'overview';
-let clientFilter = null;
-
-// ── CLOCK ──
-setInterval(() => {
-  document.getElementById('clock').textContent = new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-}, 1000);
-
-// ── FETCH ──
-async function fetchJSON(path, fallback) {
-  try {
-    const r = await fetch(`${BASE}/${path}?t=${Date.now()}`);
-    if (!r.ok) throw new Error(r.status);
-    return await r.json();
-  } catch(e) {
-    console.warn('Fetch failed:', path, e.message);
-    return fallback;
-  }
-}
-
-async function sync() {
-  const dot = document.getElementById('sync-dot');
-  const lbl = document.getElementById('sync-label');
-  dot.classList.add('loading');
-  lbl.textContent = 'Syncing...';
-
-  const [cu, sl, mt] = await Promise.all([
-    fetchJSON('clickup.json', {tasks:[],count:0}),
-    fetchJSON('slack.json',   {messages:[]}),
-    fetchJSON('meta.json',    {clients:[]})
-  ]);
-
-  DATA.tasks = cu.tasks || [];
-  DATA.slack = sl.messages || [];
-  DATA.meta  = mt.clients || [];
-
-  dot.classList.remove('loading');
-  lbl.textContent = 'Live';
-  document.getElementById('last-sync').textContent = new Date().toLocaleTimeString();
-
-  updateMetrics();
-  buildClientList();
-  render();
-}
-
-// ── METRICS ──
-function updateMetrics() {
-  const open    = DATA.tasks.filter(t => t.status !== 'done' && t.status !== 'complete').length;
-  const urgent  = DATA.tasks.filter(t => t.priority === 'urgent' && t.status !== 'done').length;
-  const unread  = DATA.slack.filter(s => s.unread).length;
-  const flagged = DATA.meta.filter(m => ['Prob Cut','CUT','Borderline'].includes(m.kpi_status)).length;
-  const active  = DATA.meta.filter(m => m.cpl > 0);
-  const avgCPL  = active.length ? (active.reduce((s,m) => s + m.cpl, 0) / active.length) : 0;
-
-  document.getElementById('k-tasks').textContent   = open;
-  document.getElementById('k-urgent').textContent  = urgent;
-  document.getElementById('k-slack').textContent   = unread;
-  document.getElementById('k-flagged').textContent = flagged;
-  document.getElementById('k-cpl').textContent     = avgCPL ? '$' + avgCPL.toFixed(2) : '—';
-  document.getElementById('sb-tasks').textContent  = open;
-  document.getElementById('sb-slack').textContent  = unread;
-}
-
-// ── CLIENT LIST ──
-const CLIENT_COLORS = ['#ff4d6d','#ffb830','#6b8cff','#2dd4bf','#b8ff47','#a78bfa','#f472b6','#38bdf8'];
-function buildClientList() {
-  const clients = [...new Set(DATA.tasks.map(t => t.client))].slice(0, 10);
-  document.getElementById('client-list').innerHTML = clients.map((c,i) => `
-    <div class="sb-item" onclick="filterClient('${c.replace(/'/g,"\\'")}',this)">
-      <div class="sb-left">
-        <div class="pip" style="background:${CLIENT_COLORS[i%CLIENT_COLORS.length]}"></div>
-        <span class="sb-label" style="font-size:11px">${c}</span>
-      </div>
-    </div>`).join('');
-}
-
-function filterClient(c, el) {
-  clientFilter = c;
-  document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('active'));
-  el.classList.add('active');
-  currentView = 'tasks';
-  render();
-}
-
-// ── NAV ──
-function nav(v, el) {
-  currentView = v;
-  clientFilter = null;
-  document.querySelectorAll('.sb-item').forEach(x => x.classList.remove('active'));
-  if (el) el.classList.add('active');
-  render();
-}
-
-// ── RENDER ──
-function render() {
-  const c = document.getElementById('content');
-  if (currentView === 'overview') c.innerHTML = renderOverview();
-  else if (currentView === 'tasks') c.innerHTML = renderTasks();
-  else if (currentView === 'slack') c.innerHTML = renderSlack();
-  else if (currentView === 'meta')  c.innerHTML = renderMeta();
-}
-
-// ── HELPERS ──
-function priBar(p) { return `<div class="pri-bar pri-${p}" style="width:3px"></div>`; }
-function statusBadge(s) {
-  const k = s.replace(/ /g,'_');
-  const labels = {open:'open',to_do:'to do',in_progress:'in progress',done:'done',complete:'done'};
-  return `<span class="task-status st-${k}">${labels[k]||s}</span>`;
-}
-function dueStr(due) {
-  if (!due) return '';
-  const d = new Date(due);
-  return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
-}
-function isOverdue(due) {
-  if (!due) return false;
-  return new Date(due) < new Date();
-}
-function kpiChip(status) {
-  const k = (status||'').replace(/ /g,'-');
-  return `<span class="kpi-chip chip-${k}">${status}</span>`;
-}
-
-// ── OVERVIEW ──
-function renderOverview() {
-  const urgent  = DATA.tasks.filter(t => t.priority==='urgent' && t.status!=='done').slice(0,5);
-  const unread  = DATA.slack.filter(s => s.unread).slice(0,5);
-  const flagged = DATA.meta.filter(m => ['Prob Cut','CUT'].includes(m.kpi_status)).slice(0,6);
-
-  return `
-  <div class="two-col">
-    <div class="card">
-      <div class="card-head"><span class="card-title" style="color:var(--red)">● Urgent tasks</span><span class="card-meta">${urgent.length} items</span></div>
-      ${urgent.length ? urgent.map(t => `
-      <div class="task-row">
-        ${priBar(t.priority)}
-        <div><div class="task-name">${t.name}</div><div class="task-id">${t.id} · ${t.client}</div></div>
-        ${statusBadge(t.status)}
-        <div class="task-due ${isOverdue(t.due)?'over':''}">${dueStr(t.due)}</div>
-        <div></div>
-        <div class="avatar">${t.assignee||'BV'}</div>
-      </div>`).join('') : '<div class="empty">No urgent tasks ✓</div>'}
-    </div>
-    <div class="card">
-      <div class="card-head"><span class="card-title" style="color:var(--blue)">💬 Unread Slack</span><span class="card-meta">${unread.length} unread</span></div>
-      ${unread.length ? unread.map(s => `
-      <div class="slack-row unread">
-        <div class="slack-av" style="background:var(--blue2);color:var(--blue)">${(s.user||'?')[0].toUpperCase()}</div>
-        <div class="slack-body">
-          <div class="slack-hdr"><span class="slack-user">${s.user}</span><span class="slack-chan">${s.channel}</span><span class="slack-time">${s.time}</span></div>
-          <div class="slack-text">${s.text}</div>
-        </div>
-        <div class="unread-dot"></div>
-      </div>`).join('') : '<div class="empty">Inbox zero ✓</div>'}
-    </div>
+<div class="header">
+  <div>
+    <h1><span>Servedia</span> Ops Dashboard</h1>
+    <div class="pulled-at" id="global-pulled">Loading...</div>
   </div>
-  ${flagged.length ? `
-  <div class="card">
-    <div class="card-head"><span class="card-title" style="color:var(--red)">🚨 Flagged Meta accounts (7d)</span><span class="card-meta">${flagged.length} need attention</span></div>
-    <table class="meta-table">
-      <thead><tr><th>Client</th><th>Spend</th><th>Leads</th><th>CPL</th><th>Status</th><th>Action</th></tr></thead>
-      <tbody>${flagged.map(m => `
-      <tr>
-        <td style="color:var(--ink)">${m.client}</td>
-        <td>$${m.spend}</td><td>${m.leads}</td><td>${m.cpl ? '$'+m.cpl : '—'}</td>
-        <td>${kpiChip(m.kpi_status)}</td>
-        <td style="font-size:10px;color:var(--ink3)">${m.cpl > 20 ? 'Review creative' : 'Monitor'}</td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>` : ''}`;
-}
-
-// ── TASKS ──
-function renderTasks() {
-  let tasks = DATA.tasks.filter(t => t.status !== 'done' && t.status !== 'complete');
-  if (clientFilter) tasks = tasks.filter(t => t.client === clientFilter);
-  return `
-  <div class="card">
-    <div class="card-head">
-      <span class="card-title">✓ ${clientFilter ? clientFilter + ' tasks' : 'All open tasks'}</span>
-      <span class="card-meta">${tasks.length} tasks${clientFilter ? ` · <span onclick="clientFilter=null;render()" style="cursor:pointer;color:var(--blue)">× clear</span>` : ''}</span>
+  <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
+</div>
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('meta')">Meta Ads <span class="tab-badge" id="meta-badge">37</span></div>
+  <div class="tab" onclick="switchTab('clickup')">ClickUp Tasks <span class="tab-badge" id="clickup-badge">&#8212;</span></div>
+  <div class="tab" onclick="switchTab('slack')">Slack Activity <span class="tab-badge" id="slack-badge">&#8212;</span></div>
+</div>
+<div class="main">
+  <div class="panel active" id="panel-meta">
+    <div class="summary-bar" id="meta-summary"></div>
+    <div class="toolbar">
+      <input class="search-input" id="meta-search" placeholder="Search account name..." oninput="renderMeta()"/>
+      <select class="filter-select" id="meta-filter" onchange="renderMeta()">
+        <option value="all">All Accounts</option>
+        <option value="active">Active Only</option>
+        <option value="no_data">No Data</option>
+        <option value="error">Errors</option>
+      </select>
+      <select class="filter-select" id="meta-period" onchange="renderMeta()">
+        <option value="7">Last 7 Days</option>
+        <option value="30">Last 30 Days</option>
+      </select>
+      <span class="result-count" id="meta-count"></span>
     </div>
-    ${tasks.length ? tasks.map(t => `
-    <div class="task-row">
-      ${priBar(t.priority)}
-      <div><div class="task-name">${t.name}</div><div class="task-id">${t.id}${t.comments ? ' · 💬 '+t.comments : ''}</div></div>
-      <div class="task-client">${t.client}</div>
-      ${statusBadge(t.status)}
-      <div class="task-due ${isOverdue(t.due)?'over':''}">${dueStr(t.due)}</div>
-      <div class="avatar">${t.assignee||'BV'}</div>
-    </div>`).join('') : '<div class="empty">No open tasks ✓</div>'}
-  </div>`;
+    <div id="meta-content" class="loading">Loading Meta Ads data...</div>
+  </div>
+  <div class="panel" id="panel-clickup">
+    <div class="summary-bar" id="clickup-summary"></div>
+    <div class="toolbar">
+      <input class="search-input" id="clickup-search" placeholder="Search task name..." oninput="renderClickup()"/>
+      <select class="filter-select" id="clickup-status" onchange="renderClickup()">
+        <option value="all">All Statuses</option>
+        <option value="open">Open</option>
+        <option value="in progress">In Progress</option>
+        <option value="complete">Complete</option>
+      </select>
+      <select class="filter-select" id="clickup-assignee" onchange="renderClickup()">
+        <option value="all">All Assignees</option>
+      </select>
+      <span class="result-count" id="clickup-count"></span>
+    </div>
+    <div id="clickup-content" class="loading">Loading ClickUp tasks...</div>
+  </div>
+  <div class="panel" id="panel-slack">
+    <div class="summary-bar" id="slack-summary"></div>
+    <div class="toolbar">
+      <input class="search-input" id="slack-search" placeholder="Search messages..." oninput="renderSlack()"/>
+      <select class="filter-select" id="slack-channel" onchange="renderSlack()">
+        <option value="all">All Channels</option>
+      </select>
+      <span class="result-count" id="slack-count"></span>
+    </div>
+    <div id="slack-content" class="loading">Loading Slack messages...</div>
+  </div>
+</div>
+<script>
+const REPO = 'Artzy22/servedia-ops';
+const BASE = 'https://raw.githubusercontent.com/' + REPO + '/main/data';
+let metaData=null,clickupData=null,slackData=null;
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{const p=['meta','clickup','slack'];t.classList.toggle('active',p[i]===name);});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
 }
-
-// ── SLACK ──
-function renderSlack() {
-  const msgs = DATA.slack;
-  return `
-  <div class="card">
-    <div class="card-head"><span class="card-title">💬 Slack inbox</span><span class="card-meta">${msgs.filter(m=>m.unread).length} unread · ${msgs.length} total</span></div>
-    ${msgs.length ? msgs.map(s => `
-    <div class="slack-row ${s.unread?'unread':''}">
-      <div class="slack-av" style="background:${s.unread?'var(--blue2)':'var(--s3)'};color:${s.unread?'var(--blue)':'var(--ink3)'}">${(s.user||'?')[0].toUpperCase()}</div>
-      <div class="slack-body">
-        <div class="slack-hdr"><span class="slack-user">${s.user}</span><span class="slack-chan">${s.channel}</span><span class="slack-time">${s.time}</span></div>
-        <div class="slack-text">${s.text}</div>
-      </div>
-      ${s.unread ? '<div class="unread-dot"></div>' : '<div style="width:6px"></div>'}
-    </div>`).join('') : '<div class="empty">No messages loaded</div>'}
-  </div>`;
+async function fetchJSON(url){const r=await fetch(url+'?_='+Date.now());if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+function fmt$(n){return n==null?'--':'$'+Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function fmtN(n){return n==null?'--':Number(n).toLocaleString();}
+function fmtPct(n){return n==null?'--':Number(n).toFixed(2)+'%';}
+function timeAgo(ts){if(!ts)return'';const d=(Date.now()/1000)-parseFloat(ts);if(d<60)return Math.round(d)+'s ago';if(d<3600)return Math.round(d/60)+'m ago';if(d<86400)return Math.round(d/3600)+'h ago';return Math.round(d/86400)+'d ago';}
+function statusPill(s){if(!s)return'<span class="pill pill-gray">--</span>';const sl=s.toLowerCase();if(sl.includes('complete')||sl.includes('done')||sl.includes('closed'))return'<span class="pill pill-green">'+s+'</span>';if(sl.includes('progress')||sl.includes('active')||sl.includes('review'))return'<span class="pill pill-blue">'+s+'</span>';if(sl.includes('block')||sl.includes('urgent'))return'<span class="pill pill-red">'+s+'</span>';if(sl.includes('open')||sl.includes('todo')||sl.includes('backlog'))return'<span class="pill pill-gray">'+s+'</span>';return'<span class="pill pill-purple">'+s+'</span>';}
+function priorityPill(p){if(!p)return'';const pl=p.toLowerCase();if(pl==='urgent')return'<span class="pill pill-red">Urgent</span>';if(pl==='high')return'<span class="pill pill-yellow">High</span>';if(pl==='normal')return'<span class="pill pill-blue">Normal</span>';if(pl==='low')return'<span class="pill pill-gray">Low</span>';return'<span class="pill pill-gray">'+p+'</span>';}
+async function loadMeta(){try{metaData=await fetchJSON(BASE+'/meta.json');renderMeta();}catch(e){document.getElementById('meta-content').innerHTML='<div class="empty-state"><div class="icon">!</div><p>Could not load Meta data. Run the sync-meta workflow first.</p></div>';}}
+function renderMeta(){
+  if(!metaData)return;
+  const search=document.getElementById('meta-search').value.toLowerCase();
+  const filter=document.getElementById('meta-filter').value;
+  const period=document.getElementById('meta-period').value==='30'?'last_30_days':'last_7_days';
+  let clients=metaData.clients||[];
+  if(filter!=='all')clients=clients.filter(c=>c.status===filter);
+  if(search)clients=clients.filter(c=>c.account_name.toLowerCase().includes(search));
+  document.getElementById('meta-count').textContent=clients.length+' account'+(clients.length!==1?'s':'');
+  document.getElementById('meta-badge').textContent=(metaData.clients||[]).length;
+  document.getElementById('global-pulled').textContent=metaData.pulled_at?'Last synced: '+new Date(metaData.pulled_at).toLocaleString():'';
+  const active=(metaData.clients||[]).filter(c=>c.status==='active');
+  const totalSpend=active.reduce((s,c)=>s+(c[period]&&c[period].spend||0),0);
+  const totalLeads=active.reduce((s,c)=>s+(c[period]&&c[period].leads||0),0);
+  const totalImpr=active.reduce((s,c)=>s+(c[period]&&c[period].impressions||0),0);
+  document.getElementById('meta-summary').innerHTML='<div class="summary-card"><div class="label">Active Accounts</div><div class="value purple">'+active.length+'</div></div><div class="summary-card"><div class="label">Total Spend ('+(period==='last_7_days'?'7d':'30d')+')</div><div class="value">'+fmt$(totalSpend)+'</div></div><div class="summary-card"><div class="label">Total Leads</div><div class="value green">'+fmtN(totalLeads)+'</div></div><div class="summary-card"><div class="label">Total Impressions</div><div class="value">'+fmtN(totalImpr)+'</div></div><div class="summary-card"><div class="label">Errors</div><div class="value '+(metaData.accounts_with_errors>0?'red':'')+'">'+((metaData.accounts_with_errors)||0)+'</div></div>';
+  if(!clients.length){document.getElementById('meta-content').innerHTML='<div class="empty-state"><div class="icon">?</div><p>No accounts match your filters.</p></div>';return;}
+  const cards=clients.map(c=>{const d=c[period]||{};const isErr=c.status==='error';const noData=c.status==='no_data';return '<div class="meta-card'+(isErr?' error-card':'')+(noData?' no-data-card':'')+'"><div class="meta-card-name" title="'+c.account_name+'">'+c.account_name+'</div>'+(isErr?'<div style="color:#ef4444;font-size:11px">Error fetching data</div>':noData?'<div style="color:#666;font-size:11px">No data</div>':'<div class="meta-period-label">'+(period==='last_7_days'?'Last 7 Days':'Last 30 Days')+'</div><div class="meta-row"><span class="k">Spend</span><span class="v">'+fmt$(d.spend)+'</span></div><div class="meta-row"><span class="k">Leads</span><span class="v green">'+fmtN(d.leads)+'</span></div><div class="meta-row"><span class="k">CPL</span><span class="v">'+(d.cost_per_lead?fmt$(d.cost_per_lead):'--')+'</span></div><hr class="meta-divider"/><div class="meta-row"><span class="k">Impressions</span><span class="v">'+fmtN(d.impressions)+'</span></div><div class="meta-row"><span class="k">Clicks</span><span class="v">'+fmtN(d.clicks)+'</span></div><div class="meta-row"><span class="k">CTR</span><span class="v">'+fmtPct(d.ctr)+'</span></div><div class="meta-row"><span class="k">CPC</span><span class="v">'+fmt$(d.cpc)+'</span></div><div class="meta-row"><span class="k">CPM</span><span class="v">'+fmt$(d.cpm)+'</span></div><div class="meta-row"><span class="k">Reach</span><span class="v">'+fmtN(d.reach)+'</span></div>')+'</div>';}).join('');
+  document.getElementById('meta-content').innerHTML='<div class="meta-grid">'+cards+'</div>';
 }
-
-// ── META ──
-function renderMeta() {
-  const clients = DATA.meta;
-  const sorted  = [...clients].sort((a,b) => {
-    const o = {CUT:0,'Prob Cut':1,Borderline:2,Watch:3,Good:4,'NO DATA':5,ERROR:6};
-    return (o[a.kpi_status]??9) - (o[b.kpi_status]??9);
-  });
-  return `
-  <div class="card">
-    <div class="card-head"><span class="card-title">📊 Meta KPIs — last 7 days</span><span class="card-meta">${clients.length} clients</span></div>
-    <table class="meta-table">
-      <thead><tr><th>Client</th><th>Spend</th><th>Leads</th><th>CPL</th><th>CPB</th><th>CTR%</th><th>Status</th></tr></thead>
-      <tbody>${sorted.map(m => `
-      <tr>
-        <td style="color:var(--ink);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.client}</td>
-        <td>$${m.spend||0}</td>
-        <td>${m.leads||0}</td>
-        <td style="color:${m.cpl>20?'var(--red)':m.cpl>10?'var(--amber)':m.cpl>0?'var(--lime)':'var(--ink3)'}">${m.cpl ? '$'+m.cpl : '—'}</td>
-        <td style="color:${m.cpb>100?'var(--red)':'var(--ink2)'}">${m.cpb ? '$'+m.cpb : '—'}</td>
-        <td>${m.ctr ? m.ctr.toFixed(2)+'%' : '—'}</td>
-        <td>${kpiChip(m.kpi_status)}</td>
-      </tr>`).join('')}</tbody>
-    </table>
-  </div>`;
+async function loadClickup(){try{clickupData=await fetchJSON(BASE+'/clickup.json');const assignees=[...new Set((clickupData.tasks||[]).flatMap(t=>t.assignees||[]))].filter(Boolean).sort();const sel=document.getElementById('clickup-assignee');assignees.forEach(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;sel.appendChild(o);});renderClickup();}catch(e){document.getElementById('clickup-content').innerHTML='<div class="empty-state"><div class="icon">!</div><p>Could not load ClickUp data.</p></div>';}}
+function renderClickup(){
+  if(!clickupData)return;
+  const search=document.getElementById('clickup-search').value.toLowerCase();
+  const status=document.getElementById('clickup-status').value;
+  const assignee=document.getElementById('clickup-assignee').value;
+  let tasks=clickupData.tasks||[];
+  if(status!=='all')tasks=tasks.filter(t=>(t.status||'').toLowerCase().includes(status));
+  if(assignee!=='all')tasks=tasks.filter(t=>(t.assignees||[]).includes(assignee));
+  if(search)tasks=tasks.filter(t=>(t.name||'').toLowerCase().includes(search));
+  document.getElementById('clickup-count').textContent=tasks.length+' task'+(tasks.length!==1?'s':'');
+  document.getElementById('clickup-badge').textContent=(clickupData.tasks||[]).length;
+  const all=clickupData.tasks||[];
+  const open=all.filter(t=>!['complete','closed','done'].some(s=>(t.status||'').toLowerCase().includes(s)));
+  document.getElementById('clickup-summary').innerHTML='<div class="summary-card"><div class="label">Total</div><div class="value purple">'+all.length+'</div></div><div class="summary-card"><div class="label">Open</div><div class="value">'+open.length+'</div></div><div class="summary-card"><div class="label">Completed</div><div class="value green">'+(all.length-open.length)+'</div></div><div class="summary-card"><div class="label">Last Synced</div><div class="value" style="font-size:13px">'+(clickupData.pulled_at?new Date(clickupData.pulled_at).toLocaleTimeString():'--')+'</div></div>';
+  if(!tasks.length){document.getElementById('clickup-content').innerHTML='<div class="empty-state"><div class="icon">?</div><p>No tasks match your filters.</p></div>';return;}
+  const rows=tasks.map(t=>{const due=t.due_date?new Date(parseInt(t.due_date)).toLocaleDateString():'--';const avatars=(t.assignees||[]).map(a=>'<div class="avatar" title="'+a+'">'+a.substring(0,2).toUpperCase()+'</div>').join('');return'<tr><td class="name-col">'+(t.url?'<a href="'+t.url+'" target="_blank">'+(t.name||'Untitled')+'</a>':(t.name||'Untitled'))+'</td><td>'+statusPill(t.status)+'</td><td>'+priorityPill(t.priority)+'</td><td><div class="avatars">'+(avatars||'<span style="color:#444">--</span>')+'</div></td><td>'+due+'</td><td>'+(t.list||'--')+'</td></tr>';}).join('');
+  document.getElementById('clickup-content').innerHTML='<div class="table-wrap"><table><thead><tr><th>Task</th><th>Status</th><th>Priority</th><th>Assignees</th><th>Due</th><th>List</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
 }
-
-// ── INIT ──
-sync();
-setInterval(sync, 5 * 60 * 1000); // refresh every 5 min (GitHub caches raw files)
+async function loadSlack(){try{slackData=await fetchJSON(BASE+'/slack.json');const channels=[...new Set((slackData.messages||[]).map(m=>m.channel))].filter(Boolean).sort();const sel=document.getElementById('slack-channel');channels.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent='#'+c;sel.appendChild(o);});renderSlack();}catch(e){document.getElementById('slack-content').innerHTML='<div class="empty-state"><div class="icon">!</div><p>Could not load Slack data.</p></div>';}}
+function renderSlack(){
+  if(!slackData)return;
+  const search=document.getElementById('slack-search').value.toLowerCase();
+  const channel=document.getElementById('slack-channel').value;
+  let msgs=slackData.messages||[];
+  if(channel!=='all')msgs=msgs.filter(m=>m.channel===channel);
+  if(search)msgs=msgs.filter(m=>(m.text||'').toLowerCase().includes(search)||(m.user||'').toLowerCase().includes(search));
+  document.getElementById('slack-count').textContent=msgs.length+' message'+(msgs.length!==1?'s':'');
+  document.getElementById('slack-badge').textContent=slackData.total_messages_24h||(slackData.messages||[]).length;
+  const chs=slackData.channels||[];
+  document.getElementById('slack-summary').innerHTML='<div class="summary-card"><div class="label">Messages (24h)</div><div class="value purple">'+(slackData.total_messages_24h||0)+'</div></div><div class="summary-card"><div class="label">Channels</div><div class="value">'+chs.length+'</div></div><div class="summary-card"><div class="label">Last Synced</div><div class="value" style="font-size:13px">'+(slackData.pulled_at?new Date(slackData.pulled_at).toLocaleTimeString():'--')+'</div></div>';
+  if(!msgs.length){document.getElementById('slack-content').innerHTML='<div class="empty-state"><div class="icon">~</div><p>No messages found.</p></div>';return;}
+  const cards=msgs.slice(0,200).map(m=>{const reactions=(m.reactions||[]).map(r=>'<span class="reaction">:'+r.name+': '+r.count+'</span>').join('');return'<div class="msg-card"><div class="msg-header"><span class="msg-channel">#'+m.channel+'</span><span class="msg-user">'+(m.user||'bot')+'</span>'+(m.reply_count?'<span class="pill pill-blue" style="font-size:10px">'+m.reply_count+' repl'+(m.reply_count!==1?'ies':'y')+'</span>':'')+'<span class="msg-time">'+timeAgo(m.ts)+'</span></div><div class="msg-text">'+((m.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')||'<em style="color:#444">No text</em>')+'</div>'+(reactions?'<div class="msg-reactions">'+reactions+'</div>':'')+'</div>';}).join('');
+  document.getElementById('slack-content').innerHTML='<div class="msg-list">'+cards+'</div>';
+}
+async function loadAll(){document.getElementById('global-pulled').textContent='Refreshing...';await Promise.all([loadMeta(),loadClickup(),loadSlack()]);}
+loadAll();
 </script>
 </body>
 </html>
