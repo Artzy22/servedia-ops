@@ -37,47 +37,62 @@ jobs:
               except Exception as e:
                   return {"ok": False, "error": str(e)}
 
-          # List all channels
-          all_channels = []
+          # Verify token
+          auth = slack_api("auth.test")
+          print(f"Token valid: {auth.get('ok')} | Bot: {auth.get('user')} | Team: {auth.get('team')}")
+
+          # Use users.conversations to get ONLY channels the bot is actually in
+          member_channels = []
           cursor = ""
           while True:
               params = f"limit=200&types=public_channel,private_channel&exclude_archived=true"
               if cursor:
                   params += f"&cursor={cursor}"
-              data = slack_api("conversations.list", params)
+              data = slack_api("users.conversations", params)
               if not data.get("ok"):
-                  print(f"Error listing channels: {data.get('error')}")
+                  print(f"users.conversations error: {data.get('error')}")
                   break
-              all_channels.extend(data.get("channels", []))
+              member_channels.extend(data.get("channels", []))
               cursor = data.get("response_metadata", {}).get("next_cursor", "")
               if not cursor:
                   break
-          print(f"Found {len(all_channels)} channels total")
+          print(f"Bot is member of {len(member_channels)} channels")
 
-          # Try to join public channels (silently skip failures)
-          joined = 0
-          for ch in all_channels:
-              if not ch.get("is_private"):
+          # If no member channels, try joining public channels first
+          if len(member_channels) == 0:
+              all_channels = []
+              cursor = ""
+              while True:
+                  params = f"limit=200&types=public_channel&exclude_archived=true"
+                  if cursor:
+                      params += f"&cursor={cursor}"
+                  data = slack_api("conversations.list", params)
+                  if not data.get("ok"):
+                      break
+                  all_channels.extend(data.get("channels", []))
+                  cursor = data.get("response_metadata", {}).get("next_cursor", "")
+                  if not cursor:
+                      break
+              print(f"Found {len(all_channels)} public channels, attempting to join...")
+              for ch in all_channels:
                   result = slack_api("conversations.join", method="POST", body={"channel": ch["id"]})
                   if result.get("ok"):
-                      joined += 1
+                      member_channels.append(result.get("channel", ch))
                   time.sleep(0.05)
-          print(f"Joined {joined} new public channels")
+              print(f"After joining: {len(member_channels)} member channels")
 
-          # Pull history from ALL channels - skip those we can't access
+          # Pull history from member channels
           cutoff = str(time.time() - 86400)
           all_messages = []
           channel_summaries = []
           errors = []
-          member_count = 0
 
-          for ch in all_channels:
+          for ch in member_channels:
               ch_id = ch["id"]
               ch_name = ch.get("name", ch_id)
               params = f"channel={ch_id}&oldest={cutoff}&limit=100"
               resp = slack_api("conversations.history", params)
               if resp.get("ok"):
-                  member_count += 1
                   msgs = resp.get("messages", [])
                   for m in msgs:
                       all_messages.append({
@@ -100,11 +115,10 @@ jobs:
                   })
               else:
                   err = resp.get("error", "unknown")
-                  if err not in ("not_in_channel", "channel_not_found", "missing_scope"):
-                      errors.append({"channel": ch_name, "error": err})
+                  errors.append({"channel": ch_name, "error": err})
               time.sleep(0.1)
 
-          print(f"Accessible channels: {member_count}")
+          print(f"Pulled {len(all_messages)} messages from {len(channel_summaries)} channels")
 
           import subprocess
           pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
@@ -112,14 +126,13 @@ jobs:
               "messages": all_messages,
               "channels": channel_summaries,
               "total_messages_24h": len(all_messages),
-              "total_channels": len(all_channels),
-              "member_channels": member_count,
+              "total_channels": len(member_channels),
+              "member_channels": len(member_channels),
               "errors": errors,
               "pulled_at": pulled_at
           }
           with open("data/slack.json", "w") as f:
               json.dump(output, f, indent=2)
-          print(f"Pulled {len(all_messages)} messages from {member_count} channels")
           PYEOF
 
       - name: Commit & push
