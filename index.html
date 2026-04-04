@@ -69,203 +69,141 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .maint-suggestions strong{color:#fbbf24;display:block;margin-bottom:6px}
 .maint-suggestions li{list-style:none;padding:2px 0;border-bottom:1px solid #111}
 .maint-suggestions li:last-child{border:none}
-.maint-suggestions li::before{content:"• ";color:#7c3aed}
-.maint-controls{display:flex;gap:8px;margin-top:10px}
-.maint-btn{font-size:11px;padding:5px 12px;border:none;cursor:pointer;border-radius:6px;transition:opacity .2s}
-.maint-btn.rev{background:#064e3b22;color:#34d399}
-.maint-btn.flag{background:#450a0a22;color:#ef4444}
-.maint-btn:hover{opacity:.7}
-.maint-notes{width:100%;background:#0d0d0d;border:none;color:#ccc;padding:8px;font-size:11px;resize:vertical}
+.maint-suggestions li::before{content:"â¢ ";color:#7c3aed}
+.maint-controls{display:flex;gap:8px;margin-bottom:10px}
+.maint-btn{font-size:11px;padding:5px 10px;border-radius:6px;border:1px solid #333;cursor:pointer;font-weight:600;background:#0d0d0d;color:#555;transition:all .15s}
+.maint-btn.rev-active{background:#064e3b;border-color:#059669;color:#34d399}
+.maint-btn.flag-active{background:#450a0a;border-color:#ef4444;color:#f87171}
+.maint-notes{width:100%;background:#0d0d0d;border:1px solid #222;color:#ccc;padding:8px;border-radius:6px;font-size:12px;resize:vertical;min-height:60px;font-family:inherit;margin-bottom:4px}
 .maint-notes:focus{outline:none;border-color:#7c3aed}
-.notes-saved{font-size:9px;color:#34d399;margin-top:2px}
-.vid-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start}
-.vid-col{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:12px;min-height:200px}
-.vid-col-header{font-size:11px;font-weight:700;color:#fff;padding:8px;border-bottom:1px solid #1a1a1a;margin-bottom:8px}
-.vid-card{background:#191919;border:1px solid #222;border-radius:8px;padding:10px;font-size:11px}
-.vid-card:hover{border-color:#7c3aed}
-.vid-card-client{font-weight:700;color:#fff;font-size:11px;margin-bottom:4px}
-.vid-card-task{font-size:12px;color:#e0e0e0;margin-bottom:6px;line-height:1.4}
-.vid-card-meta{font-size:10px;color:#666;margin-top:4px}
-.vid-status{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;color:#ccc}
-.vid-status-color{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px}
-.vid-link{font-size:11px;color:#7c3aed;text-decoration:none}
-.vid-link:hover{text-decoration:underline}
+.maint-hint{font-size:10px;color:#555;height:14px}
+.btn-save-notes{background:#1e1b33;border:1px solid #2d2b55;color:#a78bfa;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600}
+.btn-save-notes:hover{background:#2d2b55}
+.status-group{margin-bottom:20px}
+.status-group-header{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #1a1a1a;margin-bottom:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-table{width:100%;border-collapse:collapse}
+.task-table th{text-align:left;padding:8px 12px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid #1e1e1e;font-weight:600}
+.task-table td{padding:10px 12px;border-bottom:1px solid #1a1a1a;font-size:13px;vertical-align:middle}
+.task-table tr:hover td{background:#111}
+.task-name-cell{color:#ddd;font-weight:500;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.task-list-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:2px 8px;border-radius:4px;font-size:10px}
+.priority-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.priority-urgent{background:#450a0a;color:#f87171}
+.priority-high{background:#2a1a00;color:#fb923c}
+.priority-normal{background:#1a1a2e;color:#818cf8}
+.priority-low{background:#1a2a1a;color:#4ade80}
+.open-link{color:#555;text-decoration:none;font-size:12px}
+.open-link:hover{color:#a78bfa}
+.due-overdue{color:#f87171}
+.due-soon{color:#fbbf24}
+.due-ok{color:#555}
+.slack-layout{display:grid;grid-template-columns:220px 1fr;gap:0;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden;min-height:500px}
+.channel-list{background:#111;border-right:1px solid #1e1e1e;padding:12px 0}
+.channel-list-header{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.5px;padding:6px 16px 10px}
+.channel-item{padding:8px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between}
+.channel-item:hover{background:#1a1a1a}
+.channel-item.active-channel{background:#1e1b33}
+.channel-name{font-size:13px;color:#ccc}
+.channel-count{background:#1e1e2e;color:#7c3aed;border-radius:10px;padding:1px 7px;font-size:10px}
+.messages-panel{background:#0d0d0d;display:flex;flex-direction:column}
+.messages-header{padding:12px 16px;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:8px}
+.messages-title{font-size:13px;font-weight:600;color:#fff}
+.messages-body{padding:12px 16px;overflow-y:auto;flex:1}
+.message-item{padding:10px 0;border-bottom:1px solid #111;display:flex;gap:10px}
+.msg-avatar{width:32px;height:32px;border-radius:50%;background:#1e1b33;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#a78bfa;flex-shrink:0}
+.msg-content{flex:1;min-width:0}
+.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
+.msg-user{font-size:12px;font-weight:600;color:#a78bfa}
+.msg-channel{font-size:10px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:4px}
+.msg-time{font-size:10px;color:#444;margin-left:auto}
+.msg-text{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word}
+.msg-thread{font-size:11px;color:#7c3aed;margin-top:4px}
+.video-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.video-col{background:#111;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden}
+.video-col-header{padding:12px 16px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #1a1a1a}
+.video-col-header.done{background:#052e16;color:#34d399}
+.video-col-header.needs-approval{background:#451a03;color:#fb923c}
+.video-col-header.in-progress{background:#1e1b33;color:#a78bfa}
+.video-col-header.not-started{background:#111;color:#555}
+.video-count{background:rgba(255,255,255,.1);border-radius:10px;padding:1px 8px;font-size:11px}
+.video-cards{padding:10px}
+.video-card{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.video-card:last-child{margin-bottom:0}
+.video-client{font-size:11px;color:#7c3aed;font-weight:700;margin-bottom:3px}
+.video-task{font-size:13px;color:#ddd;font-weight:500;margin-bottom:6px;line-height:1.3}
+.video-meta{display:flex;align-items:center;gap:8px;font-size:10px;color:#555;flex-wrap:wrap}
+.video-assignee{background:#1a1a1a;padding:1px 6px;border-radius:4px;color:#888}
+.video-due{color:#fbbf24}
+.video-link{color:#555;text-decoration:none;margin-left:auto;font-size:13px}
+.video-link:hover{color:#7c3aed}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="logo">Servedia Ops <span>Dashboard</span></div>
+  <div class="logo"><span>Servedia</span> Ops Dashboard</div>
   <div class="header-meta">
-    <div class="sync-info" id="syncInfo">Loading...</div>
-    <button class="refresh-btn" onclick="loadAll()">â³ Refresh</button>
+    <div class="sync-info" id="syncInfo"><b>Last sync</b><br>Loading...</div>
+    <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
   </div>
 </div>
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('meta')">
-    Meta Ads <span class="tab-badge green" id="metaCount">0</span>
-  </div>
-  <div class="tab" onclick="switchTab('cu')">
-    ClickUp Tasks <span class="tab-badge orange" id="cuCount">0</span>
-  </div>
-  <div class="tab" onclick="switchTab('slack')">
-    Slack Activity
-  </div>
-  <div class="tab" onclick="switchTab('video')">
-    Video Editing <span class="tab-badge blue" id="vidCount">0</span>
-  </div>
+  <div class="tab active" onclick="switchTab('meta')">&#128202; Meta Ads <span class="tab-badge green" id="metaBadge">&#8211;</span></div>
+  <div class="tab" onclick="switchTab('clickup')">&#10003; ClickUp Tasks <span class="tab-badge" id="clickupBadge">&#8211;</span></div>
+  <div class="tab" onclick="switchTab('slack')">&#128172; Slack Activity <span class="tab-badge orange" id="slackBadge">&#8211;</span></div>
+  <div class="tab" onclick="switchTab('video')">&#127909; Video Editing <span class="tab-badge blue" id="videoBadge">&#8211;</span></div>
 </div>
 <div class="content">
-<div id="metaPanel" class="panel active">
-<div class="section-title">Account Performance (Last 7 Days)</div>
-<div class="filters">
-  <input class="filter-input" type="text" id="metaSearch" placeholder="Search accounts..." oninput="renderMeta()">
-  <select class="filter-select" id="metaFilter" onchange="renderMeta()">
-    <option value="all">All Accounts</option>
-    <option value="active">Active Only</option>
-  </select>
-</div>
-<div id="metaAccounts"></div>
-</div>
-<div id="cuPanel" class="panel">
-<div class="section-title">ClickUp Tasks</div>
-<div class="filters">
-  <input class="filter-input" type="text" id="cuSearch" placeholder="Search tasks..." oninput="renderCU()">
-  <select class="filter-select" id="cuFilter" onchange="renderCU()">
-    <option value="all">All Lists</option>
-    <option value="me">Me (Byron / Anka)</option>
-    <option value="list">By List</option>
-  </select>
-</div>
-<div id="cuTasks"></div>
-</div>
-<div id="slackPanel" class="panel">
-<div class="section-title">Slack Activity</div>
-<div class="filters">
-  <select class="filter-select" id="slackChannel" onchange="renderSlack()">
-    <option value="all">All Channels</option>
-  </select>
-</div>
-<div id="slackContent"></div>
-</div>
-<div id="videoPanel" class="panel">
-<div class="section-title">Video Editing</div>
-<div class="filters">
-  <input class="filter-input" type="text" id="vidSearch" placeholder="Search tasks..." oninput="renderVideo()">
-</div>
-<div id="videoContent"></div>
-</div>
-</div>
-<script>
-const REPO = 'Artzy22/servedia-ops';
-const BASE = 'https://raw.githubusercontent.com/' + REPO + '/main/data';
-let metaData = null, cuData = null, slData = null, selectedChannel = null, vidData = null;
-const DRIVE_MAP = [
-  {keys:['avu collective','ac - avu'], id:'1DnXWXW0qQebja-9rnkexFBAulQHVarFk'},
-  {keys:['beyond vitaliti'], id:'1C3nEjWBhFg9qEocHf8jVOrTNVlY9rH4A'},
-  {keys:['body slim'], id:'1R3WJv7hjU9r0Fmkqi_ESToVlqbqDZl21'},
-  {keys:['body by lily'], id:'1DoF729UK35u8xzjkwSxPbDo74fsB8280'},
-  {keys:['celebrity bod'], id:'1Rv-GGwgtU5NKGMqDd7b4du4igy1jp-LJ'},
-  {keys:['cloud chiropract'], id:'1KERRazayayUEc8quY_vN5E0Ch8quY_TW'},
-  {keys:['cosmetic surgery of new york'], id:'1kI7b2qsxAJTH3hR6XMgOAjLRl8W7DHoy'},
-  {keys:['cosmetico'], id:'169q66vwyG4Yj70Ccam4kbgoz9j3WrU'},
-  {keys:['dailey aesthetics'], id:'1OIgkXu2GGqPX8jScHVuLFbJmdrE2Nl0a'},
-  {keys:['ensoul'], id:'1DfturiBvl5SN9_K02owIaHUn7mney8'},
-  {keys:['gencore'], id:'1zeYxCMxmmngiKiWqA-MkIgUdA4HQObyg'},
-  {keys:['golden health'], id:'1NvdJJq3uNZMQitLv3ECVBtR98IeRUtl'},
-  {keys:['hec wellness'], id:'1vY7PA8sXaAma2aU2DlX-e7dsdPlasEN'},
-  {keys:['heritage wellness'], id:'1SrGuKYkoDdrpo66TQQRLiTlrTqxD4ZN'},
-  {keys:['iconic laser'], id:'1Iti9zzkPSSnAK0A2K0APUSSnAk0A2K0Aw'},
-  {keys:['image wellness boutique'], id:'1-Z2m_l2IKvB-_Bre0mbD_3i0Q'},
-  {keys:['jule'], id:'1ZkAeiSQJaDqo1vcy1To-To-To-To-To-To'},
-  {keys:['beauty and wellness med spa','beautyandwellness'], id:'14b7NI6MHtR3x8fpNCMtmL8dSUgGJGnxg'},
-  {keys:['delray laser'], id:'1MKkW5DUZ0w1FcHW5KUA5LmD5Stm8pX8V'}
-];
-5,255,.1);border-radius:8px;padding:10px 12px;font-size:11px;color:#666}
-.maint-notes-saved{font-size:9px;color:#34d399;margin-top:2px}
 
-function findDriveFolder(name) {
-  const nm = name.lower().trim();
-  for (const ent of DRIVE_MAP) {
-    if (ent.keys.some(k => nm.includes(k) || k.includes(nm))) return ent.id;
-  }
-  return null;
-}
-function getDriveLink(name) {
-  const id = findDriveFolder(name);
-  if (id) return `https://drive.google.com/drive/folders/${id}`;
-  return `https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr?q=${encodeURIComponent(name)}`;
-}
-function getSuggestions(c) {
-  const suggs = [];
-  const m = c.metrics || {};
-  if (m.ctr != null && m.ctr < 1) suggs.push(`â	¢ Low CTR (${m.ctr.toFixed(2)}%) alert your creatives`);
-  if (m.cpc != null && m.cpc > 5) suggs.push(`ð¸ High CPC (${m.cpc.toFixed(2)}) analyze audience`);
-  if (m.freq != null && m.freq > 3.5) suggs.push(`ðº High Freq (${m.freq.toFixed(1)}x) - refresh ads`);
-  if (m.spend > 500 && (m.leads||0) < 1) suggs.push(`ð $${m.spend.toFixed(2)} spent with 0 leads`);
-  if (m.cpl != null && m.cpl > 200) suggs.push(`ð¨ High CPL (${m.cpl.toFixed(2)}) switch campaign messaging`);
-  if (m.spend === 0) suggs.push(`â¹ Zero spend - is the account active?`);
-  if (m.impressions != null && m.impressions < 500) suggs.push(`ð Low impressions (${m.impressions}) - expand audience`);
-  return suggs;
-}
-function maintHTML(c) {
-  if (!c) return '';
-  const key = c.id;
-  const state = JSON.parse(localStorage.getItem('maint_state') || '{}');
-  const notes = localStorage.getItem(`maint_notes_${key}`) || '';
-  const isReviewed = state[key] === 'rev';
-  const isFlagged = state[key] === 'flag';
-  const suggs = getSuggestions(c);
-  const adsLink = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id.replace(/[^\d]/g,'')}`;
-  const driveLink = getDriveLink(c.name);
-  return `
-  <div class="maint-section" data-key="${key}">
-    <div class="maint-header" onclick="this.closest('.maint-body').toggle('hidden')">
-      <span class="maint-chevron">â¼</span>
-      <span class="maint-title">DAILY MAINTENANCE</span>
-      <div class="maint-badges">
-        <span class="maint-badge ${isReviewed?'mbrev':''}" onclick="toggleMaintState('${key}','rev')">â Reviewed</span>
-        <span class="maint-badge ${isFlagged?'mbflag':''}" onclick="toggleMaintState('${key}','flag')">ð© Flag Issue</span>
-      </div>
-    </div>
-    <div class="maint-body">
-      <div class="maint-links">
-        <a href="${adsLink}" target="_blank" class="maint-link ads">ð Ads Mgr</a>
-        <a href="${driveLink}" target="_blank" class="maint-link drive">ð Drive</a>
-      </div>
-      ${suggs.length > 0 ? `<div class="maint-suggestions"><strong>Suggestions:</strong><ul>${suggs.map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
-      <textarea class="maint-notes" placeholder="Notes/change log..." oninput="saveNotes('${key}',this.value)">${notes}</textarea>
-      ${notes ? `<span class="maint-notes-saved">Saved</span>` : ''}
-      <div class="maint-controls">
-        <button class="maint-btn rev" onclick="toggleMaintState('${key}','rev')">â</button>
-        <button class="maint-btn flag" onclick="toggleMaintState('${key}','flag')">ð©</button>
-      </div>
-    </div>
+<div id="panel-meta" class="panel active">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Active Accounts</div><div class="stat-value purple" id="mActiveAccts">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Total Spend (7d)</div><div class="stat-value green" id="mSpend7">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Total Spend (30d)</div><div class="stat-value green" id="mSpend30">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Total Leads (7d)</div><div class="stat-value blue" id="mLeads7">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Avg CPL (7d)</div><div class="stat-value yellow" id="mCPL">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Impressions (7d)</div><div class="stat-value" id="mImpres">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="mUpdated">&#8211;</div></div>
   </div>
-`;
-}
-function toggleMaintState(key, newState) {
-  const state = JSON.parse(localStorage.getItem('maint_state') || '{}');
-  if (state[key] === newState) delete state[key];
-  else state[key] = newState;
-  localStorage.setItem('maint_state', JSON.stringify(state));
-  renderMeta();
-}
-function saveNotes(key, val) {
-  if (val) localStorage.setItem(`maint_notes_${key}`, val);
-  else localStorage.removeItem(`maint_notes_${key}`);
-  const ta = document.querySelector(`[data-key="${key}"] .maint-notes-saved`);
-  if (ta) {
-    ta.style.display = val ? '' : 'none';
-  }
-}
-function loadAll() {
-  const ts = Date.now();
-  document.getElementById('syncInfo').textContent = 'Loading...';
-  Promise.allSettled([
-    fetch(BASE + '/meta.json?_=' + ts),
-    fetch(BASE + '/clickup.json?_=' + ts),
-    fetch(BASE + '/slack.json?_=' + ts),
-    fetch(BASE + '/video-editing.json?_=' + ts)Urgent</option>
+  <div id="metaErrorBanner"></div>
+  <div class="filters">
+    <input class="filter-input" id="metaSearch" placeholder="Search account name..." oninput="renderMeta()">
+    <select class="filter-select" id="metaFilter" onchange="renderMeta()">
+      <option value="all">All Accounts</option>
+      <option value="active">Active Only</option>
+      <option value="no_data">No Data</option>
+    </select>
+    <select class="filter-select" id="metaSort" onchange="renderMeta()">
+      <option value="spend7">Sort: Spend (7d)</option>
+      <option value="spend30">Sort: Spend (30d)</option>
+      <option value="leads">Sort: Leads</option>
+      <option value="cpl">Sort: CPL</option>
+      <option value="name">Sort: Name A-Z</option>
+      <option value="flagged">Sort: Flagged First</option>
+    </select>
+    <button class="btn-save-notes" onclick="pushNotesToGitHub()">&#128190; Save Notes to GitHub</button>
+  </div>
+  <div class="section-title" id="metaCount">Loading...</div>
+  <div class="meta-account-grid" id="metaGrid"></div>
+</div>
+
+<div id="panel-clickup" class="panel">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value purple" id="cuTotal">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value red" id="cuUrgent">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value red" id="cuHighPri">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value red" id="cuOverdue">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">No Due Date</div><div class="stat-value yellow" id="cuNoDue">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="cuUpdated">&#8211;</div></div>
+  </div>
+  <div class="filters">
+    <input class="filter-input" id="cuSearch" placeholder="Search tasks..." oninput="renderClickUp()">
+    <select class="filter-select" id="cuStatus" onchange="renderClickUp()">
+      <option value="all">All Statuses</option>
+    </select>
+    <select class="filter-select" id="cuPriority" onchange="renderClickUp()">
+      <option value="all">All Priorities</option>
+      <option value="urgent">Urgent</option>
       <option value="high">High</option>
       <option value="normal">Normal</option>
       <option value="low">Low</option>
@@ -737,7 +675,7 @@ function renderVideo() {
   const filtered = tasks.filter(t => !search || (t.client_name||'').toLowerCase().includes(search) || (t.name||'').toLowerCase().includes(search));
 
   const STATUS_GROUPS = [
-    {key:'done', label:'\u2705 Done', cls:'done', match: s => s && (s.toLowerCase().includes('done') || s.toLowerCase().includes('complete))},
+    {key:'done', label:'\u2705 Done', cls:'done', match: s => s && (s.toLowerCase().includes('done') || s.toLowerCase().includes('complet'))},
     {key:'approval', label:'\uD83D\uDC40 Needs Approval', cls:'needs-approval', match: s => s && s.toLowerCase().includes('approval')},
     {key:'progress', label:'\u26A1 In Progress', cls:'in-progress', match: s => s && s.toLowerCase().includes('progress')},
     {key:'other', label:'\u23F3 Not Started / Other', cls:'not-started', match: () => true},
