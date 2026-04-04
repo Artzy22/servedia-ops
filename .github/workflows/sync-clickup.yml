@@ -22,53 +22,59 @@ jobs:
           LIST_ID="901512199678"
 
           RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true&subtasks=true&page=0" \
-            -H "Authorization: ${CLICKUP_API_KEY}" \
-            -H "Content-Type: application/json")
-
+            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true" \
+            -H "Authorization: ${CLICKUP_API_KEY}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
 
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "::error::ClickUp API returned HTTP $HTTP_CODE"
+            echo "ERROR: ClickUp API returned HTTP $HTTP_CODE"
             echo "$BODY"
             exit 1
           fi
 
           PULLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
           echo "$BODY" | python3 -c "
-          import sys, json
-          data = json.load(sys.stdin)
-          tasks = data.get('tasks', [])
-          output = {
-            'tasks': [{
-              'id': t.get('id'),
-              'name': t.get('name'),
-              'status': t.get('status', {}).get('status'),
-              'status_color': t.get('status', {}).get('color'),
-              'assignees': [a.get('username', a.get('email', '')) for a in t.get('assignees', [])],
-              'priority': t.get('priority', {}).get('priority') if t.get('priority') else None,
-              'due_date': t.get('due_date'),
-              'date_created': t.get('date_created'),
-              'date_updated': t.get('date_updated'),
-              'list': t.get('list', {}).get('name'),
-              'folder': t.get('folder', {}).get('name'),
-              'space': t.get('space', {}).get('id'),
-              'url': t.get('url'),
-              'tags': [tag.get('name') for tag in t.get('tags', [])]
-            } for t in tasks],
-            'count': len(tasks),
-            'pulled_at': '$PULLED_AT'
-          }
-          print(json.dumps(output, indent=2))
-          " > data/clickup.json
+import sys, json
+data = json.load(sys.stdin)
+tasks = data.get('tasks', [])
 
-          echo "Pulled $(python3 -c "import json; print(json.load(open('data/clickup.json'))['count'])") tasks"
+output = {
+    'tasks': [
+        {
+            'id': t.get('id'),
+            'name': t.get('name'),
+            'status': t.get('status', {}).get('status'),
+            'status_color': t.get('status', {}).get('color'),
+            'priority': t.get('priority', {}).get('priority') if t.get('priority') else None,
+            'due_date': t.get('due_date'),
+            'date_updated': t.get('date_updated'),
+            'url': t.get('url'),
+            'list_name': t.get('list', {}).get('name'),
+            'assignees': [
+                {
+                    'id': a.get('id'),
+                    'username': a.get('username'),
+                    'email': a.get('email')
+                }
+                for a in t.get('assignees', [])
+            ]
+        }
+        for t in tasks
+    ],
+    'count': len(tasks),
+    'pulled_at': '$PULLED_AT'
+}
+print(json.dumps(output, indent=2))
+" > data/clickup.json
+          echo "Synced $(python3 -c "import json; d=json.load(open('data/clickup.json')); print(d['count'])") tasks"
 
-      - name: Commit & push
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
           git add data/clickup.json
-          git diff --staged --quiet || git commit -m "sync clickup tasks [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git diff --staged --quiet || git commit -m "sync clickup [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
           git push
