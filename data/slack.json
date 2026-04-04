@@ -509,16 +509,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0APLPRSMQR",
-      "text": ":rotating_light: *PROBLEM FLAGGED* <!channel>\n\n*Client:* Medical Laser And Aesthetics\n*Flagged by:* Anca Elamparo\n*Issue:* no ads running\n*Ad Account:* <https://adsmanager.facebook.com/adsmanager/manage/campaigns?global_scope_id=770478474190624&amp;business_id=770478474190624&amp;act=947326761106052&amp;redirect_session_id=e975e45d-6ed2-4438-bd54-4d9591a1c5cb#|View Ad Account>\n",
-      "ts": "1775249120.578929",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -533,15 +523,15 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
-      "message_count_24h": 7,
+      "message_count_24h": 6,
       "is_private": false,
       "topic": "",
       "purpose": ""
     }
   ],
-  "total_messages_24h": 52,
+  "total_messages_24h": 51,
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-04T20:27:42Z"
+  "pulled_at": "2026-04-04T20:58:06Z"
 }
