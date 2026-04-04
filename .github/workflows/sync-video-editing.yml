@@ -18,7 +18,7 @@ jobs:
         env:
           CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
         run: |
-          LIST_ID="8cnp5x7-4995"
+          LIST_ID="901512331541"
           PULLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           mkdir -p data
 
@@ -26,7 +26,7 @@ jobs:
 import json, urllib.request, os, sys
 
 api_key = os.environ["CLICKUP_API_KEY"]
-list_id = "8cnp5x7-4995"
+list_id = "901512331541"
 all_tasks = []
 page = 0
 
