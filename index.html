@@ -1019,8 +1019,8 @@ function renderMeta() {
   });
 
   list.sort((a, b) => {
-    const ac = a.last_7_days?.cost_per_lead ?? null;
-    const bc = b.last_7_days?.cost_per_lead ?? null;
+    const ac = (a.last_7_days?.leads > 0 && a.last_7_days?.cost_per_lead) ? a.last_7_days.cost_per_lead : null;
+    const bc = (b.last_7_days?.leads > 0 && b.last_7_days?.cost_per_lead) ? b.last_7_days.cost_per_lead : null;
     if (sort === 'worst') return cplScore(ac) - cplScore(bc);
     if (sort === 'best')  return cplScore(bc) - cplScore(ac);
     if (sort === 'spend') return (b.last_7_days?.spend || 0) - (a.last_7_days?.spend || 0);
@@ -1059,7 +1059,7 @@ function renderMeta() {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
     const active = c.status === 'active';
     const id = c.account_id;
-    const cpl7 = d7.cost_per_lead ?? null;
+    const cpl7 = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
     const cplC = cplKls(cpl7);
 
     const mkRow = ([lbl, val, cls]) =>
@@ -1151,7 +1151,7 @@ function buildDmClients() {
     if (cu) usedMaintIds.add(cu.id);
 
     const d7  = acc.last_7_days  || {};
-    const cpl = d7.cost_per_lead ?? null;
+    const cpl = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
     // Enrich with ClickUp Client Management data if available (live mode)
     const cm = clientMgmtData[id] || null;
 
