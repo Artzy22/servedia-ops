@@ -320,10 +320,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ════════════════ DAILY MAINTENANCE ════════════════ -->
 <div id="panel-maintenance" class="panel active content">
   <div id="cfgWarn" class="cfg-warn" style="display:none">
-    <div class="cfg-warn-icon">⚙</div>
-    <div>ClickUp not configured — CPB, KPI Status, Drive links and approval flags require setup.
-      <a href="#" onclick="openSettings();return false" style="color:#fbbf24;margin-left:4px">Configure →</a>
-    </div>
+    <div class="cfg-warn-icon">⏳</div>
+    <div>Maintenance data syncing — CPB, KPI status, Drive links and client details will appear once the GitHub Action completes (runs every 30 min). CPL and AI suggestions are live from Meta now.</div>
   </div>
   <div id="problemsPanel" class="problems-panel" style="display:none">
     <div class="problems-title">🚩 Flagged Problems</div>
@@ -454,6 +452,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 // ══════════════════════════════════════════════════════════════
 const BASE = 'https://raw.githubusercontent.com/Artzy22/servedia-ops/main/data';
 const CU_API = 'https://api.clickup.com/api/v2';
+const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null;
 let selectedChannel = null, taskFilter = 'all', dmFilter = 'all';
@@ -762,57 +761,70 @@ function switchMT(btn) {
 // ══════════════════════════════════════════════════════════════
 function buildDmClients() {
   const accounts = (metaData && metaData.clients) || [];
-  const tasks    = (maintData && (maintData.tasks || maintData)) || [];
+  const tasks    = (maintData && maintData.tasks) || [];
 
-  // Index ClickUp tasks by extracted Meta account ID and by name
-  const byActId = {}, byName = {};
-  (Array.isArray(tasks) ? tasks : []).forEach(t => {
-    const url = getCF(t, 'Ad Account') || getCF(t, 'ad account (url)') || '';
-    const m   = url.match(/act=(\d+)/);
-    if (m) byActId[m[1]] = t;
+  // Index maintenance tasks: prefer meta_account_id match, fallback to name match
+  const byMetaId = {}, byName = {};
+  tasks.forEach(t => {
+    if (t.meta_account_id) byMetaId[t.meta_account_id] = t;
     byName[(t.name || '').toLowerCase().trim()] = t;
   });
 
-  return accounts.map(acc => {
+  // Also build a set of maintenance task names that exist, for standalone cards
+  const maintOnlyIds = new Set(tasks.map(t => t.id));
+  const usedMaintIds = new Set();
+
+  const result = accounts.map(acc => {
     const id   = acc.account_id;
     const name = acc.account_name || '';
     const nl   = name.toLowerCase().trim();
 
-    // Find ClickUp task
-    let cu = byActId[id] || null;
+    // Find matching maintenance task
+    let cu = byMetaId[id] || null;
     if (!cu) {
+      // Fuzzy name match
       for (const [k, t] of Object.entries(byName)) {
-        if (nl.includes(k) || k.includes(nl)) { cu = t; break; }
+        if (nl.includes(k) || k.includes(nl) || wordsOverlap(nl, k)) { cu = t; break; }
       }
     }
+    if (cu) usedMaintIds.add(cu.id);
 
-    const d7    = acc.last_7_days || {};
-    const cpl   = d7.cost_per_lead ?? null;
-    const leads = d7.leads ?? 0;
+    const d7  = acc.last_7_days  || {};
+    const cpl = d7.cost_per_lead ?? null;
 
     return {
       id, name,
-      status:   acc.status,
+      status:           acc.status,
       cpl,
-      leads7:   leads,
-      spend7:   d7.spend || 0,
-      // ClickUp fields
-      cpb:              cu ? getCF(cu, 'CPB')                      : null,
-      adAccountUrl:     cu ? getCF(cu, 'Ad Account (url)')         : null,
-      kpiStatus:        cu ? getCF(cu, 'KPI (Last 7 Days)')        : null,
-      clientHappiness:  cu ? getCF(cu, 'Client Happiness')         : null,
-      requiresApproval: cu ? getCF(cu, 'Requires Ad Approval')     : null,
-      lastOptimized:    cu ? getCF(cu, 'Last Optimized')           : null,
-      checkBackDate:    cu ? getCF(cu, 'Check Back Date')          : null,
-      marketingOffers:  cu ? getCF(cu, 'Marketing Offers')         : null,
-      dosDonts:         cu ? getCF(cu, "Ad Do's")                  : null,
-      contentStatus:    cu ? getCF(cu, 'Content Status')           : null,
-      driveLink:        cu ? getCF(cu, 'link to client content')   : null,
-      statsSheet:       cu ? getCF(cu, 'Stats Sheet')              : null,
-      serviceAd:        cu ? getCF(cu, 'Service being advertised') : null,
-      cuTaskUrl:        cu ? cu.url                                : null,
+      leads7:           d7.leads  ?? 0,
+      spend7:           d7.spend  || 0,
+      // Pre-parsed fields from maintenance.json (set by GitHub Action)
+      cpb:              cu ? cu.cpb_7d             : null,
+      adAccountUrl:     cu ? cu.ad_account_url     : null,
+      kpiStatus:        cu ? cu.kpi_status         : null,
+      clientHappiness:  cu ? cu.client_happiness   : null,
+      requiresApproval: cu ? cu.requires_approval  : null,
+      lastOptimized:    cu ? cu.last_optimized      : null,
+      checkBackDate:    cu ? cu.check_back_date     : null,
+      marketingOffers:  cu ? cu.marketing_offers    : null,
+      dosDonts:         cu ? cu.dos_donts           : null,
+      contentStatus:    cu ? cu.content_status      : null,
+      driveLink:        cu ? (cu.drive_link || DRIVE_ROOT) : DRIVE_ROOT,
+      statsSheet:       cu ? cu.stats_sheet_url     : null,
+      serviceAd:        cu ? cu.service_advertised  : null,
+      optNotes:         cu ? cu.optimization_notes  : null,
+      cuTaskUrl:        cu ? cu.url                : null,
     };
   });
+
+  return result;
+}
+
+// Word overlap helper for fuzzy name matching
+function wordsOverlap(a, b) {
+  const wa = a.split(/\s+/).filter(w => w.length > 3);
+  const wb = new Set(b.split(/\s+/).filter(w => w.length > 3));
+  return wa.some(w => wb.has(w));
 }
 
 function setDmFilter(f) {
@@ -828,8 +840,8 @@ function renderMaintenance() {
   const state = getDmState();
   const search = (document.getElementById('dmSearch').value || '').toLowerCase();
 
-  // Config warning
-  document.getElementById('cfgWarn').style.display = getCfg().token ? 'none' : 'flex';
+  // Config warning — show if maintenance.json hasn't synced yet
+  document.getElementById('cfgWarn').style.display = maintData ? 'none' : 'flex';
 
   // Filter
   let list = all.filter(c => {
@@ -946,8 +958,12 @@ function renderMaintenance() {
           <span class="dmc-asset-lbl" style="margin-bottom:4px">Ad Do's &amp; Don'ts</span>
           <div class="dmc-dosdont">${esc(c.dosDonts)}</div>
         </div>` : ''}
+        ${c.optNotes ? `<div class="dmc-asset-row" style="flex-direction:column;align-items:flex-start">
+          <span class="dmc-asset-lbl" style="margin-bottom:4px">Optimization Notes</span>
+          <div class="dmc-dosdont">${esc(c.optNotes)}</div>
+        </div>` : ''}
         ${!c.driveLink && !c.statsSheet && !offerFull && !c.dosDonts
-          ? `<div style="padding:8px;color:#555;font-size:12px">No asset data — configure ClickUp to load client info.</div>` : ''}
+          ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive Root</span><a class="dmc-alink" href="${DRIVE_ROOT}" target="_blank">📂 Open Servedia Drive →</a></div>` : ''}
       </div>
     </div>`;
 
@@ -1287,43 +1303,36 @@ async function fetchCUList(listId, token) {
 }
 
 async function loadAll() {
-  const ts  = Date.now();
-  const cfg = getCfg();
+  const ts = Date.now();
   document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>Refreshing…';
 
-  const fetches = [
-    fetchJ(`${BASE}/meta.json?_=${ts}`),                                           // 0 meta
-    fetchJ(`${BASE}/clickup.json?_=${ts}`),                                        // 1 cu tasks (JSON file)
-    fetchJ(`${BASE}/slack.json?_=${ts}`),                                          // 2 slack
-    fetchJ(`${BASE}/video-editing.json?_=${ts}`),                                  // 3 video (JSON file)
-    cfg.token && cfg.adsListId   ? fetchCUList(cfg.adsListId,   cfg.token) : null, // 4 maintenance
-    cfg.token && cfg.videoListId ? fetchCUList(cfg.videoListId, cfg.token) : null, // 5 video (live)
-  ];
+  // All data comes from pre-synced JSON files written by GitHub Actions every 30 min.
+  // No API tokens needed in the browser.
+  const results = await Promise.allSettled([
+    fetchJ(`${BASE}/meta.json?_=${ts}`),          // 0 — Meta Ads
+    fetchJ(`${BASE}/clickup.json?_=${ts}`),        // 1 — Tasks (Client Mgmt list)
+    fetchJ(`${BASE}/slack.json?_=${ts}`),          // 2 — Slack
+    fetchJ(`${BASE}/video-editing.json?_=${ts}`),  // 3 — Video editing tickets
+    fetchJ(`${BASE}/maintenance.json?_=${ts}`),    // 4 — Ads Management + custom fields
+  ]);
 
-  const results = await Promise.allSettled(fetches.map(f => f || Promise.resolve(null)));
+  if (results[0].status === 'fulfilled' && results[0].value) { metaData  = results[0].value; renderMeta(); }
+  if (results[1].status === 'fulfilled' && results[1].value) { cuData    = results[1].value; renderTasks(); }
+  if (results[2].status === 'fulfilled' && results[2].value) { slData    = results[2].value; renderSlack(); }
+  if (results[3].status === 'fulfilled' && results[3].value) { vidData   = results[3].value; renderVideo(); }
+  if (results[4].status === 'fulfilled' && results[4].value) { maintData = results[4].value; }
 
-  if (results[0].status === 'fulfilled' && results[0].value) { metaData = results[0].value; renderMeta(); }
-  if (results[1].status === 'fulfilled' && results[1].value) { cuData   = results[1].value; renderTasks(); }
-  if (results[2].status === 'fulfilled' && results[2].value) { slData   = results[2].value; renderSlack(); }
-
-  // Video: prefer live ClickUp data over JSON file
-  if (results[5].status === 'fulfilled' && results[5].value) {
-    vidData = results[5].value;
-  } else if (results[3].status === 'fulfilled' && results[3].value) {
-    vidData = results[3].value;
-  }
-  if (vidData) renderVideo();
-
-  // Maintenance: from ClickUp live if available
-  if (results[4].status === 'fulfilled' && results[4].value) {
-    maintData = results[4].value;
-  }
+  // Always render maintenance — it works with just meta.json if maintenance.json isn't ready yet
   renderMaintenance();
 
   lastSyncTime = Date.now();
-  document.getElementById('syncInfo').innerHTML = `<b>Last sync</b><br>${new Date().toLocaleTimeString()}`;
+  const times = ['Meta','Tasks','Slack','Video','Maintenance'].map((n, i) =>
+    results[i].status === 'fulfilled' ? `${n} ✓` : `${n} ✗`
+  ).join(' · ');
+  document.getElementById('syncInfo').innerHTML =
+    `<b>Last sync</b><br>${new Date().toLocaleTimeString()}`;
+  document.getElementById('syncCounter').title = times;
 
-  // Log errors for debugging
   results.forEach((r, i) => {
     if (r.status === 'rejected') console.warn(`Fetch [${i}] failed:`, r.reason);
   });

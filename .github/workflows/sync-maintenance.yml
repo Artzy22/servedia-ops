@@ -1,0 +1,140 @@
+name: Sync Ads Management (Maintenance)
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull Ads Management list with custom fields
+        env:
+          CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
+        run: |
+          LIST_ID="901514441223"
+          PULLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          # Fetch page 0 (ClickUp returns max 100 per page)
+          PAGE0=$(curl -s \
+            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=false&subtasks=false&custom_fields=true&page=0" \
+            -H "Authorization: ${CLICKUP_API_KEY}")
+
+          PAGE1=$(curl -s \
+            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=false&subtasks=false&custom_fields=true&page=1" \
+            -H "Authorization: ${CLICKUP_API_KEY}")
+
+          echo "$PAGE0" > /tmp/page0.json
+          echo "$PAGE1" > /tmp/page1.json
+
+          python3 << 'PYEOF'
+import json, sys
+
+def get_cf(task, name_fragment):
+    nf = name_fragment.lower()
+    for f in task.get('custom_fields', []):
+        fname = (f.get('name') or '').lower()
+        if nf not in fname:
+            continue
+        v = f.get('value')
+        if v is None or v == '':
+            return None
+        ftype = f.get('type', '')
+        if ftype == 'drop_down':
+            opts = (f.get('type_config') or {}).get('options', [])
+            try:
+                # v might be the orderindex int OR an option object
+                if isinstance(v, dict):
+                    return v.get('name') or v.get('label')
+                idx = int(v)
+                return opts[idx]['name'] if idx < len(opts) else None
+            except Exception:
+                return str(v)
+        elif ftype in ('currency', 'number'):
+            try:
+                return float(v)
+            except Exception:
+                return None
+        elif ftype == 'date':
+            return str(v)  # unix ms timestamp as string
+        elif ftype == 'checkbox':
+            return bool(v)
+        else:
+            return str(v) if v else None
+    return None
+
+all_tasks = []
+for fname in ['/tmp/page0.json', '/tmp/page1.json']:
+    try:
+        with open(fname) as f:
+            data = json.load(f)
+        tasks = data.get('tasks', [])
+        all_tasks.extend(tasks)
+    except Exception as e:
+        print(f"Warning: could not read {fname}: {e}", file=sys.stderr)
+
+output = []
+for t in all_tasks:
+    # Extract Meta account ID from Ad Account URL
+    ad_url = get_cf(t, 'ad account') or ''
+    import re
+    m = re.search(r'act=(\d+)', ad_url)
+    meta_account_id = m.group(1) if m else None
+
+    output.append({
+        'id':                 t.get('id'),
+        'name':               t.get('name'),
+        'status':             (t.get('status') or {}).get('status'),
+        'url':                t.get('url'),
+        'meta_account_id':    meta_account_id,
+        'ad_account_url':     ad_url or None,
+        'cpl_7d':             get_cf(t, 'cpl (last 7'),
+        'cpb_7d':             get_cf(t, 'cpb (last 7'),
+        'kpi_status':         get_cf(t, 'kpi (last 7'),
+        'daily_budget':       get_cf(t, 'daily ad spend'),
+        'requires_approval':  get_cf(t, 'requires ad approval'),
+        'client_happiness':   get_cf(t, 'client happiness'),
+        'last_optimized':     get_cf(t, 'last optimized'),
+        'check_back_date':    get_cf(t, 'check back date'),
+        'marketing_offers':   get_cf(t, 'marketing offers'),
+        'dos_donts':          get_cf(t, "ad do"),
+        'content_status':     get_cf(t, 'content status'),
+        'drive_link':         get_cf(t, 'link to client content'),
+        'stats_sheet_url':    get_cf(t, 'stats sheet'),
+        'service_advertised': get_cf(t, 'service being advertised'),
+        'optimization_notes': get_cf(t, 'optimization notes'),
+        'assignees': [
+            {'id': a.get('id'), 'username': a.get('username'), 'email': a.get('email')}
+            for a in t.get('assignees', [])
+        ],
+    })
+
+import subprocess
+pulled_at = subprocess.check_output(['date','-u','+%Y-%m-%dT%H:%M:%SZ']).decode().strip()
+
+result = {
+    'tasks':      output,
+    'count':      len(output),
+    'pulled_at':  pulled_at,
+}
+
+with open('data/maintenance.json', 'w') as f:
+    json.dump(result, f, indent=2)
+
+print(f"Synced {len(output)} maintenance tasks")
+PYEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add data/maintenance.json
+          git diff --staged --quiet || git commit -m "sync maintenance [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push

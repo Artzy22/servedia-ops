@@ -19,10 +19,10 @@ jobs:
         env:
           CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
         run: |
-          LIST_ID="901512199678"
+          LIST_ID="901512199767"
 
           RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true" \
+            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true&page=0" \
             -H "Authorization: ${CLICKUP_API_KEY}")
           HTTP_CODE=$(echo "$RESPONSE" | tail -1)
           BODY=$(echo "$RESPONSE" | sed '$d')
