@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Servedia Ops Dashboard</title>
 <style>
 /* ── Reset ── */
@@ -570,6 +573,13 @@ function cplScore(v) {
   if (v > 12) return 1;
   if (v >= 10) return 2;
   return 3;
+}
+
+// Extract client name from task name pattern "New project for CLIENT_NAME (Offer)"
+function extractClientFromName(name) {
+  if (!name) return '';
+  const m = name.match(/^New project for (.+?)\s*\(/);
+  return m ? m[1].trim() : '';
 }
 
 function getClientRule(name) {
@@ -1191,7 +1201,8 @@ function renderTasks() {
         dueHtml  = `<span class="${dc}">${ds}${dl<0?' ('+Math.abs(dl)+'d ago)':''}</span>`;
       }
       const assignees = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'?').split('@')[0])).join(', ') || '—';
-      const listBadge = t.list ? `<span class="tlist-badge">${esc(t.list)}</span>` : '';
+      const listName  = typeof t.list === 'object' ? (t.list?.name || '') : (t.list || '');
+      const listBadge = listName ? `<span class="tlist-badge">${esc(listName)}</span>` : '';
       const link      = t.url  ? `<a href="${t.url}" target="_blank" class="olink">↗</a>` : '';
       return `<tr${isOverdue?' class="overdue-row"':''}>
         <td class="tname" title="${esc(t.name)}">${esc(t.name)}</td>
@@ -1368,10 +1379,13 @@ async function fetchCUListLive(listId, token, opts = {}) {
     const data = await fetchJ(url, { Authorization: token });
     const tasks = (data.tasks || []).map(t => ({
       ...t,
-      // Normalize: ClickUp live returns status/priority as objects; flatten to strings
+      // Normalize: ClickUp live returns status/priority/list/folder/space as objects; flatten to strings
       status:       typeof t.status   === 'object' ? (t.status?.status   || '') : (t.status   || ''),
       status_color: typeof t.status   === 'object' ? (t.status?.color    || '') : (t.status_color || ''),
       priority:     typeof t.priority === 'object' ? (t.priority?.priority|| null) : (t.priority || null),
+      list:         typeof t.list     === 'object' ? (t.list?.name       || '') : (t.list     || ''),
+      folder:       typeof t.folder   === 'object' ? (t.folder?.name     || '') : (t.folder   || ''),
+      space:        typeof t.space    === 'object' ? (t.space?.name      || '') : (t.space    || ''),
     }));
     allTasks = allTasks.concat(tasks);
     if (tasks.length < 100) break;
@@ -1416,7 +1430,15 @@ async function loadAll() {
         fetchCUListLive('901514441223',    cfg.token, {}),    // maintenance (custom_fields returned by default)
       ]);
 
-      if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) { vidData   = liveFetches[0].value; renderVideo(); }
+      if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) {
+        vidData = liveFetches[0].value;
+        vidData.tasks = vidData.tasks.map(t => ({
+          ...t,
+          client_name: t.client_name || getCF(t, 'client full name') || getCF(t, 'client name') || extractClientFromName(t.name) || '',
+          comment_count: t.comment_count || 0,
+        }));
+        renderVideo();
+      }
       if (liveFetches[1].status === 'fulfilled' && liveFetches[1].value) { cuData    = liveFetches[1].value; renderTasks(); }
       if (liveFetches[2].status === 'fulfilled' && liveFetches[2].value) { maintData = liveFetches[2].value; }
 
