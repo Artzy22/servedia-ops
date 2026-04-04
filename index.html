@@ -1364,7 +1364,13 @@ async function fetchCUListLive(listId, token, opts = {}) {
   while (true) {
     const url = `${CU_API}/list/${listId}/task?archived=false&include_closed=${includeClosed}&subtasks=${subtasks}&page=${page}`;
     const data = await fetchJ(url, { Authorization: token });
-    const tasks = data.tasks || [];
+    const tasks = (data.tasks || []).map(t => ({
+      ...t,
+      // Normalize: ClickUp live returns status/priority as objects; flatten to strings
+      status:       typeof t.status   === 'object' ? (t.status?.status   || '') : (t.status   || ''),
+      status_color: typeof t.status   === 'object' ? (t.status?.color    || '') : (t.status_color || ''),
+      priority:     typeof t.priority === 'object' ? (t.priority?.priority|| null) : (t.priority || null),
+    }));
     allTasks = allTasks.concat(tasks);
     if (tasks.length < 100) break;
     page++;
