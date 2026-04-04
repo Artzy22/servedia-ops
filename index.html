@@ -1315,24 +1315,23 @@ function buildDmClients() {
     };
   });
 
-  // Only show accounts assigned to Byron or Anka in their ClickUp maintenance task.
-  // If no maintenance tasks are loaded yet, fall back to showing all active accounts
-  // so the tab isn't blank while loading.
-  const hasMaintData = tasks.length > 0;
-  if (hasMaintData) {
-    return result.filter(c => {
-      // Assigned via maintenance task
-      if (c._cuTask && isByronOrAnkaTask(c._cuTask)) return true;
-      // Assigned via Client Management "team" field
-      if (c.team) {
-        const t = c.team.toLowerCase();
-        if (t.includes('byron') || t.includes('vale') || t.includes('anka') || t.includes('anca') ||
-            t.includes('alemparo') || t.includes('elamparo')) return true;
-      }
-      return false;
-    });
-  }
-  // No maintenance data — show all active Meta accounts as fallback
+  // Filter to accounts assigned to Byron or Anka.
+  // Priority: maintenance task assignees → CM team field → has a maintenance task → active account
+  const byronAnka = result.filter(c => {
+    if (c._cuTask && isByronOrAnkaTask(c._cuTask)) return true;
+    if (c.team) {
+      const t = c.team.toLowerCase();
+      if (t.includes('byron') || t.includes('vale') || t.includes('anka') || t.includes('anca') ||
+          t.includes('alemparo') || t.includes('elamparo')) return true;
+    }
+    return false;
+  });
+  // If we found assigned accounts, return those
+  if (byronAnka.length) return byronAnka;
+  // Fallback: tasks exist but none have assignees — show all that have a maintenance task
+  const withTask = result.filter(c => c._cuTask);
+  if (withTask.length) return withTask;
+  // Last resort: show all active Meta accounts
   return result.filter(c => c.status === 'active');
 }
 
