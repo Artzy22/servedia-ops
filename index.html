@@ -1081,10 +1081,14 @@ function expandOffer(id) {
 // ══════════════════════════════════════════════════════════════
 function isByronOrAnka(t) {
   const assignees = t.assignees || [];
+  // Media Tickets list is Byron's list — show all tasks, or match by name/ID
+  if (!assignees.length) return true;
   return assignees.some(a => {
-    const n = (typeof a === 'string' ? a : (a.username || a.email || '')).toLowerCase();
-    return n.includes('byron') || n.includes('vale') || n.includes('anka') ||
-           n.includes('alemparo') || n.includes('elamparo');
+    const id  = typeof a === 'object' ? String(a.id || '') : '';
+    const n   = (typeof a === 'string' ? a : (a.username || a.email || '')).toLowerCase();
+    return id === '204101467' ||
+           n.includes('byron') || n.includes('vale') || n.includes('anka') ||
+           n.includes('alemparo') || n.includes('elamparo') || n.includes('gpota');
   });
 }
 
@@ -1097,14 +1101,18 @@ function setTaskFilter(f) {
 }
 
 function renderTasks() {
-  if (!cuData) return;
+  if (!cuData) {
+    document.getElementById('cuGroups').innerHTML = '<div class="no-data">⏳ Loading tasks… If this persists, open ⚙ Config and confirm your ClickUp token is saved.</div>';
+    return;
+  }
   const tasks  = cuData.tasks || [];
   const search = (document.getElementById('cuSearch').value || '').toLowerCase();
   const sort   = document.getElementById('cuSort').value;
   const now    = Date.now();
 
-  // Only show Byron + Anka's tasks
-  const mine = tasks.filter(isByronOrAnka);
+  // Show Byron + Anka tasks; fall back to all if filter returns nothing (list is already scoped)
+  let mine = tasks.filter(isByronOrAnka);
+  if (!mine.length && tasks.length) mine = tasks;
 
   let list = mine.filter(t => {
     if (search && !(t.name || '').toLowerCase().includes(search)) return false;
@@ -1194,7 +1202,7 @@ function renderTasks() {
 function renderVideo() {
   const board = document.getElementById('videoBoard');
   if (!vidData) {
-    board.innerHTML = '<div class="no-data" style="grid-column:1/-1">Video editing data not loaded yet.</div>';
+    board.innerHTML = '<div class="no-data" style="grid-column:1/-1">⏳ Loading video editing tasks… If this persists, open ⚙ Config and confirm your ClickUp token is saved.</div>';
     return;
   }
   const tasks  = vidData.tasks || [];
@@ -1434,6 +1442,8 @@ setInterval(() => {
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   switchTab('maintenance');
+  renderTasks();   // show loading placeholder immediately
+  renderVideo();   // show loading placeholder immediately
   loadAll();
 });
 </script>
