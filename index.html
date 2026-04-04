@@ -279,8 +279,27 @@ const DRIVE_MAP = [
   {keys:['iconic laser'], id:'1Iti9zzkPuSSnAK0_br5YHZkFNwNHyZ7C'},
   {keys:['image wellness boutique'], id:'1-Z2m_l2IKvB-_4vRnJMJBre0mbD_3i0Q'},
   {keys:['jule'], id:'1ZkAeiSQJaDqo1vcy-Bto8a6dSO3gHHoa'},
-  {keys:['beauty and wellness med spa','beautyandwellness'], id:'14b7NI6MHtR3x8fpNCMtmL8dSUgGJGnxg'},
+  {keys:['beauty and wellness med spa','beautyandwellness','beautyandwellnesscenter'], id:'14b7NI6MHtR3x8fpNCMtmL8dSUgGJGnxg'},
   {keys:['delray laser'], id:'1MKkW5DUZ0w1FcHW5KUA5LmD5Stm8pX8V'},
+  {keys:['nunova'], id:''},
+  {keys:['body slim'], id:'1R3WJv7hjU9r0Fmkqi_ESToVlqbqDZl21'},
+  {keys:['dr. michelle','michelle zubair'], id:''},
+  {keys:['healthpreneur'], id:''},
+  {keys:['ideal weightloss','ideal weight'], id:''},
+  {keys:['luminous laser'], id:''},
+  {keys:['mla ad'], id:''},
+  {keys:['mcquiston'], id:''},
+  {keys:['michel medspa'], id:''},
+  {keys:['precision weight'], id:''},
+  {keys:['prestige laser'], id:''},
+  {keys:['skinholic'], id:''},
+  {keys:['skinsation'], id:''},
+  {keys:['the mac okc','mac okc'], id:''},
+  {keys:['thorpe wellness'], id:''},
+  {keys:['transformations esthetics','transformative wellness'], id:''},
+  {keys:['vital life'], id:''},
+  {keys:['wellness herbal'], id:''},
+  {keys:['wilmarwell'], id:''},
 ];
 
 function getDriveLink(name) {
@@ -324,19 +343,19 @@ function getSuggestions(c) {
   if (d.cpc !== undefined && parseFloat(d.cpc) > 5) tips.push('High CPC ($' + d.cpc + ') \u2014 review targeting or bid strategy');
   if (d.frequency !== undefined && parseFloat(d.frequency) > 3.5) tips.push('High frequency (' + d.frequency + 'x) \u2014 refresh creative or expand audience');
   if (d.spend && (!d.leads || d.leads === 0) && d.spend > 500) tips.push('$' + Math.round(d.spend) + ' spend with 0 leads \u2014 check conversion events');
-  if (d.cpl !== undefined && parseFloat(d.cpl) > 200) tips.push('CPL above $200 \u2014 consider pausing high-cost ad sets');
+  if (d.cost_per_lead !== undefined && parseFloat(d.cost_per_lead) > 200) tips.push('CPL above $200 \u2014 consider pausing high-cost ad sets');
   if (!d.spend || d.spend === 0) tips.push('No spend this period \u2014 check budget & campaign schedule');
-  if (d.impressions !== undefined && d.impressions < 500) tips.push('Very low impressions \u2014 check audience size or daily budget');
+  if (d.impress)ons !== undefined && d.impressions < 500) tips.push('Very low impressions \u2014 check audience size or daily budget');
   if (tips.length === 0) tips.push('Metrics look healthy \u2014 keep monitoring');
   return tips;
 }
 
 function maintHTML(c) {
-  const aid = c.id;
+  const aid = c.account_id;
   const ms = getMaintState()[aid] || {};
   const note = (getMaintNotes()[aid] || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   const reviewed = !!ms.reviewed, flagged = !!ms.flagged;
-  const driveLink = getDriveLink(c.name);
+  const driveLink = getDriveLink(c.account_name);
   const adsLink = 'https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=' + aid;
   const suggs = getSuggestions(c).map(s => '<li>' + s + '</li>').join('');
   const revCls = 'maint-btn' + (reviewed ? ' rev-active' : '');
@@ -448,7 +467,7 @@ function renderMeta() {
   const ms = getMaintState();
 
   let filtered = clients.filter(c => {
-    if (search && !c.name.toLowerCase().includes(search)) return false;
+    if (search && !(c.account_name||'').toLowerCase().includes(search)) return false;
     if (filter === 'active' && c.status !== 'active') return false;
     if (filter === 'no_data' && c.status === 'active') return false;
     return true;
@@ -458,9 +477,9 @@ function renderMeta() {
     if (sort === 'spend7') return (b.last_7_days?.spend || 0) - (a.last_7_days?.spend || 0);
     if (sort === 'spend30') return (b.last_30_days?.spend || 0) - (a.last_30_days?.spend || 0);
     if (sort === 'leads') return (b.last_7_days?.leads || 0) - (a.last_7_days?.leads || 0);
-    if (sort === 'cpl') return (a.last_7_days?.cpl || 99999) - (b.last_7_days?.cpl || 99999);
-    if (sort === 'flagged') return (ms[b.id]?.flagged ? 1 : 0) - (ms[a.id]?.flagged ? 1 : 0);
-    return a.name.localeCompare(b.name);
+    if (sort === 'cpl') return (a.last_7_days?.cost_per_lead || 99999) - (b.last_7_days?.cost_per_lead || 99999);
+    if (sort === 'flagged') return (ms[b.account_id]?.flagged ? 1 : 0) - (ms[a.account_id]?.flagged ? 1 : 0);
+    return (a.account_name||'').localeCompare(b.account_name||'');
   });
 
   let totSpend7 = 0, totSpend30 = 0, totLeads7 = 0, totImpr = 0, activeCount = 0;
@@ -490,7 +509,7 @@ function renderMeta() {
   grid.innerHTML = filtered.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
     const isActive = c.status === 'active';
-    const aid = c.id;
+    const aid = c.account_id;
     const cst = ms[aid] || {};
     let cardCls = 'account-card';
     if (cst.flagged) cardCls += ' flagged';
@@ -499,7 +518,7 @@ function renderMeta() {
     const g7 = isActive ? (
       '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">$' + fmtCurrency(d7.spend||0) + '</div></div>' +
       '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">' + (d7.leads||0) + '</div></div>' +
-      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d7.cpl ? '$'+fmtCurrency(d7.cpl) : 'N/A') + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d7.cost_per_lead ? '$'+fmtCurrency(d7.cost_per_lead) : 'N/A') + '</div></div>' +
       '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">' + ((d7.impressions||0) > 1000 ? Math.round(d7.impressions/1000)+'K' : fmtNum(d7.impressions||0)) + '</div></div>' +
       '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">' + fmtNum(d7.clicks||0) + '</div></div>' +
       '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">' + (d7.ctr ? d7.ctr+'%' : 'N/A') + '</div></div>'
@@ -508,15 +527,16 @@ function renderMeta() {
     const g30 = isActive ? (
       '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">$' + fmtCurrency(d30.spend||0) + '</div></div>' +
       '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">' + (d30.leads||0) + '</div></div>' +
-      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d30.cpl ? '$'+fmtCurrency(d30.cpl) : 'N/A') + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d30.cost_per_lead ? '$'+fmtCurrency(d30.cost_per_lead) : 'N/A') + '</div></div>' +
       '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">' + ((d30.impressions||0) > 1000 ? Math.round(d30.impressions/1000)+'K' : fmtNum(d30.impressions||0)) + '</div></div>' +
       '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">' + fmtNum(d30.clicks||0) + '</div></div>' +
       '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">' + (d30.ctr ? d30.ctr+'%' : 'N/A') + '</div></div>'
     ) : '<div class="status-nodata">No data for this period</div>';
 
+    const nameDisplay = (c.account_name||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     return '<div class="' + cardCls + '">' +
       '<div class="account-header">' +
-        '<div class="account-name" title="' + c.name + '">' + c.name + '</div>' +
+        '<div class="account-name" title="' + nameDisplay + '">' + nameDisplay + '</div>' +
         '<span class="account-status ' + (isActive ? 'status-active' : 'status-nodata') + '">' + (isActive ? 'Active' : 'No Data') + '</span>' +
       '</div>' +
       '<div class="metrics-tabs" id="mt-' + aid + '">' +
@@ -557,7 +577,7 @@ function renderClickUp() {
   }
 
   let filtered = tasks.filter(t => {
-    if (search && !(t.name||'').toLowerCase().includes(search) && !(t.list_name||'').toLowerCase().includes(search)) return false;
+    if (search && !(t.name||'').toLowerCase().includes(search) && !(t.list||'').toLowerCase().includes(search)) return false;
     if (statusF !== 'all' && (t.status||'').toLowerCase() !== statusF.toLowerCase()) return false;
     if (priorityF !== 'all' && (t.priority||'').toLowerCase() !== priorityF.toLowerCase()) return false;
     if (assigneeF === 'me') {
@@ -605,8 +625,8 @@ function renderClickUp() {
         const dc = dl < 0 ? 'due-overdue' : dl < 3 ? 'due-soon' : 'due-ok';
         dueHtml = '<span class="' + dc + '">' + ds + (dl < 0 ? ' (' + Math.abs(dl) + 'd ago)' : '') + '</span>';
       }
-      const assignees = (t.assignees||[]).map(a => (a.username || (a.email||'?').split('@')[0])).join(', ') || '\u2014';
-      const listB = t.list_name ? '<span class="task-list-badge">' + t.list_name + '</span>' : '';
+      const assignees = (t.assignees||[]).map(a => typeof a === 'string' ? a : (a.username || (a.email||'?').split('@')[0])).join(', ') || '\u2014';
+      const listB = t.list ? '<span class="task-list-badge">' + t.list + '</span>' : '';
       const link = t.url ? '<a href="' + t.url + '" target="_blank" class="open-link">\u2197</a>' : '';
       const upd = t.date_updated ? fmtTime(new Date(Number(t.date_updated)).toISOString()) : '\u2014';
       const nameEsc = (t.name||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -675,24 +695,25 @@ function renderVideo() {
   const filtered = tasks.filter(t => !search || (t.client_name||'').toLowerCase().includes(search) || (t.name||'').toLowerCase().includes(search));
 
   const STATUS_GROUPS = [
-    {key:'done', label:'\u2705 Done', cls:'done', match: s => s && (s.toLowerCase().includes('done') || s.toLowerCase().includes('complet'))},
     {key:'approval', label:'\uD83D\uDC40 Needs Approval', cls:'needs-approval', match: s => s && s.toLowerCase().includes('approval')},
+    {key:'waiting', label:'\u23F3 Waiting On', cls:'not-started', match: s => s && s.toLowerCase().includes('waiting')},
     {key:'progress', label:'\u26A1 In Progress', cls:'in-progress', match: s => s && s.toLowerCase().includes('progress')},
-    {key:'other', label:'\u23F3 Not Started / Other', cls:'not-started', match: () => true},
+    {key:'todo', label:'\uD83D\uDCCB To Do', cls:'not-started', match: s => s && (s.toLowerCase().includes('to do') || s.toLowerCase().includes('todo') || s.toLowerCase() === 'open' || s.toLowerCase() === 'new')},
+    {key:'done', label:'\u2705 Done', cls:'done', match: s => s && (s.toLowerCase().includes('done') || s.toLowerCase().includes('complet'))},
+    {key:'other', label:'\u2753 Other', cls:'not-started', match: () => true},
   ];
 
-  const grouped = {done:[],approval:[],progress:[],other:[]};
+  const grouped = {approval:[],waiting:[],progress:[],todo:[],done:[],other:[]};
   filtered.forEach(t => {
     const s = t.status || '';
-    let placed = false;
-    for (const g of STATUS_GROUPS) { if (g.match(s)) { grouped[g.key].push(t); placed = true; break; } }
+    for (const g of STATUS_GROUPS) { if (g.match(s)) { grouped[g.key].push(t); break; } }
   });
 
   document.getElementById('vidTotal').textContent = tasks.length;
   document.getElementById('vidDone').textContent = grouped.done.length;
   document.getElementById('vidApproval').textContent = grouped.approval.length;
   document.getElementById('vidInProgress').textContent = grouped.progress.length;
-  document.getElementById('vidNotStarted').textContent = grouped.other.length;
+  document.getElementById('vidNotStarted').textContent = grouped.waiting.length + grouped.todo.length + grouped.other.length;
   document.getElementById('vidUpdated').textContent = fmtTime(vidData.pulled_at);
   document.getElementById('videoBadge').textContent = tasks.length;
 
