@@ -1,0 +1,546 @@
+{
+  "tasks": [
+    {
+      "id": "86c955edb",
+      "name": "New project for Tulsa Body Sculpting (Non-Surgical Booty Lift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Tulsa Body Sculpting",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1775089560000",
+      "date_updated": "1775215044244",
+      "url": "https://app.clickup.com/t/86c955edb"
+    },
+    {
+      "id": "86c94aygp",
+      "name": "New project for Mon Petit (Rejuvenate & Glow - CO2 Peel)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Mon Petit",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774987200000",
+      "date_updated": "1775063277356",
+      "url": "https://app.clickup.com/t/86c94aygp"
+    },
+    {
+      "id": "86c94buv2",
+      "name": "New ads for Central Lakes (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Central Lakes",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774987200000",
+      "date_updated": "1775069159745",
+      "url": "https://app.clickup.com/t/86c94buv2"
+    },
+    {
+      "id": "86c94caw5",
+      "name": "New project for Generations Wellness Center (Bye Bye Hollow Face)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Generations Wellness Center",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774987200000",
+      "date_updated": "1775123832337",
+      "url": "https://app.clickup.com/t/86c94caw5"
+    },
+    {
+      "id": "86c94fg9e",
+      "name": "New ads for Maryland Trim (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Maryland Trim",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774987200000",
+      "date_updated": "1775140718400",
+      "url": "https://app.clickup.com/t/86c94fg9e"
+    },
+    {
+      "id": "86c93k20n",
+      "name": "New project for Spa Matrix (Non-Surgical Facelift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Spa Matrix",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774900800000",
+      "date_updated": "1774972875857",
+      "url": "https://app.clickup.com/t/86c93k20n"
+    },
+    {
+      "id": "86c91gfy4",
+      "name": "New ads for HEC Wellness (Non-Surgical Lower Facelift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "HEC Wellness",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774555200000",
+      "date_updated": "1774637910702",
+      "url": "https://app.clickup.com/t/86c91gfy4"
+    },
+    {
+      "id": "86c91gnfk",
+      "name": "New ads for HEC Wellness (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "HEC Wellness",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1774555200000",
+      "date_updated": "1774639018148",
+      "url": "https://app.clickup.com/t/86c91gnfk"
+    },
+    {
+      "id": "86c8x1wyn",
+      "name": "New ads for Longevity (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Longevity",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1773864000000",
+      "date_updated": "1773903649551",
+      "url": "https://app.clickup.com/t/86c8x1wyn"
+    },
+    {
+      "id": "86c8vp44z",
+      "name": "New ads for BluSonil ( DETOX+ GLOW RITUAL)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "BluSonil",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1773691200000",
+      "date_updated": "1773961997768",
+      "url": "https://app.clickup.com/t/86c8vp44z"
+    },
+    {
+      "id": "86c8tvv3q",
+      "name": "New ads for Next Level Med (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Next Level Med Solutions LLC",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1773345600000",
+      "date_updated": "1773396296058",
+      "url": "https://app.clickup.com/t/86c8tvv3q"
+    },
+    {
+      "id": "86c8tw0ea",
+      "name": "New Project for The Modern Woman (Non-Surgical Booty Lift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "The Modern Woman",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1773345600000",
+      "date_updated": "1773399443134",
+      "url": "https://app.clickup.com/t/86c8tw0ea"
+    },
+    {
+      "id": "86c8trve9",
+      "name": "New Project for Delray Laser and Medical Spa (BBL)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Delray Laser and Medical Spa",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "urgent",
+      "due_date": "1773345600000",
+      "date_updated": "1773470204994",
+      "url": "https://app.clickup.com/t/86c8trve9"
+    },
+    {
+      "id": "86c94df4a",
+      "name": "New Ads for Bella Medspa (Double Chin Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Bella Medspa",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1774987200000",
+      "date_updated": "1775151283264",
+      "url": "https://app.clickup.com/t/86c94df4a"
+    },
+    {
+      "id": "86c9060q3",
+      "name": "New project for Vital Life (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Vital Life",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1774382400000",
+      "date_updated": "1774937252913",
+      "url": "https://app.clickup.com/t/86c9060q3"
+    },
+    {
+      "id": "86c8zgxmn",
+      "name": "New project for Uplift Aesthetic (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Uplift Aesthetic",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1774319580000",
+      "date_updated": "1774340360126",
+      "url": "https://app.clickup.com/t/86c8zgxmn"
+    },
+    {
+      "id": "86c8zgxxc",
+      "name": "New project for Uplift Aesthetic (Double Chin Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Uplift Aesthetic",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1774296000000",
+      "date_updated": "1774352640606",
+      "url": "https://app.clickup.com/t/86c8zgxxc"
+    },
+    {
+      "id": "86c8xzu7q",
+      "name": "New Podcast Style B2B Ads",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1774234800000",
+      "date_updated": "1774469622655",
+      "url": "https://app.clickup.com/t/86c8xzu7q"
+    },
+    {
+      "id": "86c8vn4p1",
+      "name": "New UGC content for My Body Works Well (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "My Body Works Well",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1773691200000",
+      "date_updated": "1773739013405",
+      "url": "https://app.clickup.com/t/86c8vn4p1"
+    },
+    {
+      "id": "86c8vp6p7",
+      "name": "New ads for HEC Wellness (Non-Surgical Jawlift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "HEC Wellness",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1773691200000",
+      "date_updated": "1774318743072",
+      "url": "https://app.clickup.com/t/86c8vp6p7"
+    },
+    {
+      "id": "86c8trn2r",
+      "name": "New Project for Citrus Aesthetics (Double Chin Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Citrus Aesthetics",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1773345600000",
+      "date_updated": "1773862948161",
+      "url": "https://app.clickup.com/t/86c8trn2r"
+    },
+    {
+      "id": "86c8pmwb3",
+      "name": "New ads for Transformation Esthetics (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Transformation Esthetics",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1773181800000",
+      "date_updated": "1773161734298",
+      "url": "https://app.clickup.com/t/86c8pmwb3"
+    },
+    {
+      "id": "86c8rxwa5",
+      "name": "New UGC ads for My Body Works Well (Mommy Tummy Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "My Body Works Well",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1773172800000",
+      "date_updated": "1773709826783",
+      "url": "https://app.clickup.com/t/86c8rxwa5"
+    },
+    {
+      "id": "86c8my5gt",
+      "name": "New ads for Skinsation (Non-Surgical Jawlift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Skinsation Aesthetics",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": "1772654400000",
+      "date_updated": "1773092161958",
+      "url": "https://app.clickup.com/t/86c8my5gt"
+    },
+    {
+      "id": "86c8vp9gm",
+      "name": "New ads for Maryland Trim Clinic (Bye Bye Stubborn Fat)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Maryland Trim Clinic",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "normal",
+      "due_date": "1773691200000",
+      "date_updated": "1773716042813",
+      "url": "https://app.clickup.com/t/86c8vp9gm"
+    },
+    {
+      "id": "86c8rbpp4",
+      "name": "New ads for Trim Tactics (Double Chin Rescue)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Trim Tactics",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "normal",
+      "due_date": "1773259200000",
+      "date_updated": "1773295609082",
+      "url": "https://app.clickup.com/t/86c8rbpp4"
+    },
+    {
+      "id": "86c90tff2",
+      "name": "New ads for Natural Beauty and Rejuvenation (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "Natural Beauty and Rejuvenation",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": null,
+      "due_date": "1774468800000",
+      "date_updated": "1774524416972",
+      "url": "https://app.clickup.com/t/86c90tff2"
+    },
+    {
+      "id": "86c8zgz4d",
+      "name": "New Project for The Lamkin Clinic (Non-Surgical Lipo)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "The Lamkin Clinic",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": null,
+      "due_date": "1774296000000",
+      "date_updated": "1774361068572",
+      "url": "https://app.clickup.com/t/86c8zgz4d"
+    },
+    {
+      "id": "86c8pbacx",
+      "name": "New Ads for Precision Wellness Center (Non-Surgical Facelift)",
+      "status": "needs approval",
+      "status_color": "#ee5e99",
+      "client_name": "",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": null,
+      "due_date": "1773172800000",
+      "date_updated": "1773008410613",
+      "url": "https://app.clickup.com/t/86c8pbacx"
+    },
+    {
+      "id": "86c95u1w9",
+      "name": "New Project for Cosmetico (Non-Surgical Face Lift)",
+      "status": "waiting on",
+      "status_color": "#e16b16",
+      "client_name": "",
+      "assignees": [
+        {
+          "id": 94750419,
+          "username": "Saquib shaikh",
+          "email": "saquibshaikh113@gmail.com"
+        }
+      ],
+      "priority": "high",
+      "due_date": null,
+      "date_updated": "1775243150343",
+      "url": "https://app.clickup.com/t/86c95u1w9"
+    }
+  ],
+  "count": 30,
+  "pulled_at": "2026-04-04T01:01:50Z"
+}
