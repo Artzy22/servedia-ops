@@ -367,6 +367,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ci-btn{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;cursor:pointer;font-family:inherit}
 .ci-btn:hover{background:#2d2b55;color:#c4b5fd;border-color:#7c3aed}
 
+/* ══════════ CLICKUP SYNC BUTTON ══════════ */
+.dmc-cu-sync{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:5px 11px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;transition:all .15s;display:inline-flex;align-items:center;gap:5px;font-family:inherit}
+.dmc-cu-sync:hover{background:#2d2b55;border-color:#7c3aed;color:#c4b5fd}
+.dmc-cu-sync:disabled{opacity:.5;cursor:not-allowed}
+.dmc-cu-status{font-size:10px;min-height:14px;margin-top:3px;transition:color .2s}
+.dmc-note-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
+
 /* ══════════ UI POLISH ══════════ */
 .header{background:linear-gradient(135deg,#0f0f1a 0%,#111 100%);border-bottom:1px solid #1a1a2e}
 .logo{letter-spacing:-.3px}
@@ -1171,6 +1178,7 @@ function buildDmClients() {
       serviceAd:         cu ? cu.service_advertised: null,
       optNotes:          cu ? cu.optimization_notes: null,
       cuTaskUrl:         cm?.taskUrl          || (cu ? cu.url              : null),
+      cuTaskId:          cm?.taskId           || null,
       // Enriched ClickUp CM fields
       contactName:       cm?.contactName      || null,
       phone:             cm?.phone            || null,
@@ -1392,9 +1400,10 @@ function renderMaintenance() {
         </div>
       </div>
       <div class="dmc-assets-bd" id="asset-bd-${c.id}">
-        ${c.driveLink   ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive Folder</span><a class="dmc-alink" href="${esc(c.driveLink)}" target="_blank">📂 Open Google Drive →</a></div>` : ''}
-        ${c.statsSheet  ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Stats Sheet</span><a class="dmc-alink" href="${esc(c.statsSheet)}" target="_blank">📊 Open Stats Sheet →</a></div>` : ''}
-        ${c.serviceAd   ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Service</span><span class="dmc-asset-val">${esc(c.serviceAd)}</span></div>` : ''}
+        ${c.dailyBudget  ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Daily Budget</span><span class="dmc-asset-val" style="color:#a78bfa;font-weight:700;font-size:14px">💵 ${fmtCur(c.dailyBudget)}/day</span></div>` : ''}
+        ${c.driveLink    ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive Folder</span><a class="dmc-alink" href="${esc(c.driveLink)}" target="_blank">📂 Open Google Drive →</a></div>` : ''}
+        ${c.statsSheet   ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Stats Sheet</span><a class="dmc-alink" href="${esc(c.statsSheet)}" target="_blank">📊 Open Stats Sheet →</a></div>` : ''}
+        ${c.serviceAd    ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Service</span><span class="dmc-asset-val">${esc(c.serviceAd)}</span></div>` : ''}
         ${offerFull ? `<div class="dmc-asset-row" style="flex-direction:column;align-items:flex-start">
           <span class="dmc-asset-lbl" style="margin-bottom:4px">Marketing Offer</span>
           <div class="dmc-offer-text" id="offer-${c.id}">${esc(offerShort)}</div>
@@ -1408,7 +1417,7 @@ function renderMaintenance() {
           <span class="dmc-asset-lbl" style="margin-bottom:4px">Optimization Notes</span>
           <div class="dmc-dosdont">${esc(c.optNotes)}</div>
         </div>` : ''}
-        ${!c.driveLink && !c.statsSheet && !offerFull && !c.dosDonts
+        ${!c.dailyBudget && !c.driveLink && !c.statsSheet && !offerFull && !c.dosDonts
           ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive</span><a class="dmc-alink" href="${getDriveFolder(c.name)}" target="_blank">📂 ${driveData ? 'Open Folder →' : 'Open Servedia Drive →'}</a></div>` : ''}
       </div>
     </div>`;
@@ -1449,12 +1458,19 @@ function renderMaintenance() {
       <div class="dmc-notes-row">
         <div class="dmc-note-wrap">
           <div class="dmc-note-lbl">Changes Made Today</div>
-          <textarea class="dmc-ta" placeholder="What did you change today?" oninput="saveDmChangesLS('${c.id}', this.value)">${changesVal}</textarea>
+          <textarea class="dmc-ta" id="dmc-changes-${c.id}" placeholder="What did you change today?" oninput="saveDmChangesLS('${c.id}', this.value)">${changesVal}</textarea>
+          <div class="dmc-note-footer">
+            <div class="dmc-save-hint" id="dmchg-hint-${c.id}"></div>
+            ${c.cuTaskId ? `<button class="dmc-cu-sync" onclick="syncNoteToClickUp('${c.cuTaskId}','${c.id}','changes',this)">📋 Send to ClickUp</button>` : ''}
+          </div>
         </div>
         <div class="dmc-note-wrap">
           <div class="dmc-note-lbl">Notes (persists)</div>
-          <textarea class="dmc-ta" placeholder="Notes, observations..." oninput="saveDmNotesLS('${c.id}', this.value)">${notesVal}</textarea>
-          <div class="dmc-save-hint" id="dmhint-${c.id}"></div>
+          <textarea class="dmc-ta" id="dmc-notes-${c.id}" placeholder="Notes, observations..." oninput="saveDmNotesLS('${c.id}', this.value)">${notesVal}</textarea>
+          <div class="dmc-note-footer">
+            <div class="dmc-save-hint" id="dmhint-${c.id}"></div>
+            ${c.cuTaskId ? `<button class="dmc-cu-sync" onclick="syncNoteToClickUp('${c.cuTaskId}','${c.id}','notes',this)">📋 Send to ClickUp</button>` : ''}
+          </div>
         </div>
       </div>
     </div>`;
@@ -2438,6 +2454,53 @@ function renderClientModalContent(accountId, d) {
     </div>
   </div>
   ${offerHtml}${dosDontsHtml}${rulesHtml}${linksHtml}${commentsHtml}${rawHtml}${parseWarnHtml}`;
+}
+
+async function syncNoteToClickUp(taskId, clientId, type, btn) {
+  const cfg = getCfg();
+  if (!cfg.token) {
+    alert('Set your ClickUp API token in ⚙ Config first.');
+    return;
+  }
+
+  const taEl   = document.getElementById(type === 'changes' ? `dmc-changes-${clientId}` : `dmc-notes-${clientId}`);
+  const hintEl = document.getElementById(type === 'changes' ? `dmchg-hint-${clientId}` : `dmhint-${clientId}`);
+  const text   = taEl ? taEl.value.trim() : '';
+
+  if (!text) {
+    if (hintEl) { hintEl.style.color='#fbbf24'; hintEl.textContent='Nothing to send — write something first.'; setTimeout(()=>{if(hintEl)hintEl.textContent='';},2500); }
+    return;
+  }
+
+  const dateStr = new Date().toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
+  const label   = type === 'changes' ? 'Changes Made Today' : 'Notes';
+  const comment = `[Dashboard] ${label} — ${dateStr}\n\n${text}`;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Sending…';
+
+  try {
+    const resp = await fetch(`${CU_API}/task/${taskId}/comment`, {
+      method:  'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ comment_text: comment, notify_all: false }),
+    });
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.err || `HTTP ${resp.status}`);
+    }
+    btn.textContent = '✅ Sent!';
+    if (hintEl) { hintEl.style.color='#34d399'; hintEl.textContent='Posted to ClickUp ✓'; }
+    setTimeout(() => {
+      btn.disabled = false;
+      btn.textContent = '📋 Send to ClickUp';
+      if (hintEl) hintEl.textContent = '';
+    }, 3000);
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = '📋 Send to ClickUp';
+    if (hintEl) { hintEl.style.color='#f87171'; hintEl.textContent='Failed: ' + e.message; setTimeout(()=>{if(hintEl)hintEl.textContent='';},4000); }
+  }
 }
 
 function closeClientModal() {
