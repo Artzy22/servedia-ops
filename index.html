@@ -668,6 +668,7 @@ const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null;
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
+let clientMgmtByName = {};    // normalized client name → enriched client record (fallback lookup)
 let clientMgmtAllTasks = [];  // all tasks from Client Management list (for Retention tab)
 let selectedChannel = null, taskFilter = 'all', taskAssignee = 'all', dmFilter = 'all';
 let lastSyncTime = null;
@@ -887,6 +888,7 @@ async function loadClientMgmtData() {
       const c = JSON.parse(raw);
       if (Date.now() - c.ts < 3600000) {
         clientMgmtData = c.data || {};
+        clientMgmtByName = c.byName || {};
         clientMgmtAllTasks = c.allTasks || [];
         return;
       }
@@ -898,22 +900,60 @@ async function loadClientMgmtData() {
 
   clientMgmtAllTasks = result.tasks;
   clientMgmtData = {};
+  clientMgmtByName = {};
 
   for (const task of result.tasks) {
     const rec = buildCMRecord(task);
-    // Index by ad account ID extracted from the "Ad Account" URL
+    // Primary index: ad account ID extracted from the "Ad Account" URL
     if (rec.adAccountUrl) {
-      const m = String(rec.adAccountUrl).match(/act=?(\d+)/);
+      const m = String(rec.adAccountUrl).match(/act[_=]?(\d+)/);
       if (m) clientMgmtData[m[1]] = rec;
+    }
+    // Secondary index: normalized task name (for fuzzy matching when Ad Account URL is missing)
+    const normName = normalizeName(task.name);
+    if (normName) clientMgmtByName[normName] = rec;
+    // Also index by contactName if different
+    if (rec.contactName) {
+      const normContact = normalizeName(rec.contactName);
+      if (normContact && normContact !== normName) clientMgmtByName[normContact] = rec;
     }
   }
 
   // Cache
   try {
     localStorage.setItem('cu_client_mgmt_cache', JSON.stringify({
-      ts: Date.now(), data: clientMgmtData, allTasks: clientMgmtAllTasks
+      ts: Date.now(), data: clientMgmtData, byName: clientMgmtByName, allTasks: clientMgmtAllTasks
     }));
   } catch {}
+}
+
+// Normalize a name for fuzzy matching (lowercase, strip punctuation/LLC/medspa/etc.)
+function normalizeName(s) {
+  if (!s) return '';
+  return s.toLowerCase()
+    .replace(/\b(llc|inc|corp|medspa|med spa|spa|clinic|studio|aesthetics|wellness|beauty|center|centre)\b/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Find a clientMgmtData record by Meta account name (fuzzy fallback)
+function findCMRecByName(metaAccountName) {
+  if (!metaAccountName) return null;
+  const target = normalizeName(metaAccountName);
+  if (!target) return null;
+  // Exact match
+  if (clientMgmtByName[target]) return clientMgmtByName[target];
+  // Partial match: target words appear in a CU name
+  const words = target.split(' ').filter(w => w.length > 2);
+  if (!words.length) return null;
+  let bestScore = 0, bestRec = null;
+  for (const [cuName, rec] of Object.entries(clientMgmtByName)) {
+    const matched = words.filter(w => cuName.includes(w)).length;
+    const score = matched / words.length;
+    if (score > bestScore && score >= 0.6) { bestScore = score; bestRec = rec; }
+  }
+  return bestRec;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2381,19 +2421,158 @@ function openClientModal(accountId, accountName) {
   ov.classList.add('open');
   document.addEventListener('keydown', _cmEsc);
 
-  fetchClientInfo(accountId, false).then(data => {
-    if (data._error === 'no_token') {
-      body.innerHTML = `<div class="cm-err"><h3>Token Required</h3><p>Set your ClickUp API token in ⚙ Config to load client details.</p></div>`;
-    } else if (data._error === 'unmapped') {
-      body.innerHTML = `<div class="cm-err"><h3>Client Not Linked</h3><p>This Meta account isn't mapped to a ClickUp task yet.</p><p>Add it to <code>data/client-map.json</code> and push to GitHub.</p></div>`;
-    } else if (data._error === 'clickup_unavailable') {
-      body.innerHTML = `<div class="cm-err"><h3>ClickUp Unavailable</h3><p>Could not reach ClickUp API. ${esc(data.msg||'')}</p><button class="cm-retry" onclick="openClientModal('${esc(accountId)}','${esc(accountName)}')">↻ Retry</button></div>`;
-    } else {
-      body.innerHTML = renderClientModalContent(accountId, data);
+  // Primary path: use already-loaded clientMgmtData (in-memory, no extra API call)
+  // Try by account ID first, then by client name as fallback
+  const rec = clientMgmtData[accountId] || findCMRecByName(accountName);
+  if (rec) {
+    body.innerHTML = renderCMModalContent(accountId, accountName, rec);
+    return;
+  }
+
+  // No token — can't do anything
+  const cfg = getCfg();
+  if (!cfg.token) {
+    body.innerHTML = `<div class="cm-err"><h3>Token Required</h3><p>Set your ClickUp API token in ⚙ Config to load client details.</p></div>`;
+    return;
+  }
+
+  // clientMgmtData not loaded yet — try fetching live (works even without list ID if cache exists)
+  if (cfg.clientMgmtListId || Object.keys(clientMgmtByName).length === 0) {
+    body.innerHTML = '<div class="cm-loading">Searching ClickUp for client data…</div>';
+    loadClientMgmtData().then(() => {
+      const recRetry = clientMgmtData[accountId] || findCMRecByName(accountName);
+      if (recRetry) {
+        body.innerHTML = renderCMModalContent(accountId, accountName, recRetry);
+      } else {
+        const hasCMData = Object.keys(clientMgmtData).length > 0 || Object.keys(clientMgmtByName).length > 0;
+        body.innerHTML = `<div class="cm-err">
+          <h3>Client Not Linked</h3>
+          <p>Could not find a ClickUp record for <strong>${esc(accountName)}</strong> (Meta ID: ${esc(accountId)}).</p>
+          ${hasCMData
+            ? `<p>To link this client, fill in the <strong>Ad Account</strong> URL field on their ClickUp task:<br>
+               <code style="font-size:11px;word-break:break-all">https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${esc(accountId)}</code></p>`
+            : `<p>Configure your <strong>Client Management List ID</strong> in ⚙ Settings to enable auto-linking.</p>`
+          }
+          <button class="cm-retry" onclick="(()=>{localStorage.removeItem('cu_client_mgmt_cache');openClientModal('${esc(accountId)}','${esc(accountName)}')})()">↻ Retry</button>
+        </div>`;
+      }
+    }).catch(e => {
+      body.innerHTML = `<div class="cm-err"><h3>Error</h3><p>${esc(String(e))}</p></div>`;
+    });
+    return;
+  }
+
+  // No Client Management List ID configured at all
+  body.innerHTML = `<div class="cm-err"><h3>Client Not Linked</h3>
+    <p>Configure your <strong>Client Management List ID</strong> in ⚙ Settings to enable auto-linking.</p>
+    <p>Or fill in the <strong>Ad Account</strong> URL field in ClickUp for this client.</p></div>`;
+}
+
+function renderCMModalContent(accountId, accountName, rec) {
+  const fmtDate = ms => ms ? new Date(ms).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+  const fmtMoney = v => (v && !isNaN(Number(v))) ? '$' + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}) : (v || '—');
+  const hl = v => v ? esc(String(v)) : '<span style="opacity:.45">—</span>';
+
+  // Happiness badge
+  const hap = (rec.clientHappiness||'').toLowerCase();
+  const hapColor = hap==='happy' ? '#34d399' : hap==='unhappy' ? '#f87171' : hap==='not happy' ? '#fbbf24' : '#9ca3af';
+  const hapLabel = hap ? rec.clientHappiness : 'Unknown';
+  const hapBadge = `<span style="background:${hapColor}22;color:${hapColor};border:1px solid ${hapColor}44;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600">${esc(hapLabel)}</span>`;
+
+  // Refund warning
+  const refundBanner = rec.refundNeeded
+    ? `<div style="background:#fef2f2;border:1px solid #fca5a5;color:#dc2626;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:13px;font-weight:600">⚠ Refund Requested</div>`
+    : '';
+
+  // Renewal urgency
+  let renewalBanner = '';
+  if (rec.renewalDate) {
+    const daysLeft = Math.round((rec.renewalDate - Date.now()) / 86400000);
+    if (daysLeft <= 14) {
+      const urgColor = daysLeft <= 7 ? '#dc2626' : '#d97706';
+      renewalBanner = `<div style="background:${urgColor}11;border:1px solid ${urgColor}44;color:${urgColor};padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:13px;font-weight:600">🔔 Renewal in ${daysLeft} day${daysLeft!==1?'s':''} — ${fmtDate(rec.renewalDate)}</div>`;
     }
-  }).catch(e => {
-    body.innerHTML = `<div class="cm-err"><h3>Error</h3><p>${esc(String(e))}</p></div>`;
-  });
+  }
+
+  // Status chip
+  const statusChip = rec.lifecycleStatus
+    ? `<span class="cm-status">${esc(rec.lifecycleStatus)}</span>` : '';
+
+  // Build field rows helper
+  const row = (label, val) => `<div class="dmc-hrow"><span class="dmc-hlabel">${label}</span><span class="dmc-hval">${val}</span></div>`;
+
+  // Contact section
+  const phoneHtml = rec.phone
+    ? `<a href="tel:${esc(rec.phone)}" style="color:#60a5fa">${esc(rec.phone)}</a>`
+    : '<span style="opacity:.45">—</span>';
+  const contactSection = `<div class="cm-section cm-section-hl">
+    <div class="cm-slabel" style="margin-bottom:8px">Contact</div>
+    <div class="cm-row2">
+      <div>${row('Name', hl(rec.contactName))}${row('Phone', phoneHtml)}</div>
+      <div>${row('Team', hl(rec.team))}${row('Ad Status', hl(rec.adStatus))}</div>
+    </div>
+  </div>`;
+
+  // Business section
+  const businessSection = `<div class="cm-section">
+    <div class="cm-slabel" style="margin-bottom:8px">Business</div>
+    <div class="cm-row2">
+      <div>
+        ${row('Offer / Niche', hl(rec.offer || rec.niche))}
+        ${row('Daily Budget', rec.dailyBudget ? fmtMoney(rec.dailyBudget) : '<span style="opacity:.45">—</span>')}
+        ${row('Monthly', rec.monthly ? fmtMoney(rec.monthly) : '<span style="opacity:.45">—</span>')}
+        ${row('LTV', rec.ltv ? fmtMoney(rec.ltv) : '<span style="opacity:.45">—</span>')}
+      </div>
+      <div>
+        ${row('Agreement', hl(rec.agreement))}
+        ${row('Billing', hl(rec.billingType))}
+        ${row('Launch', fmtDate(rec.launchDate))}
+        ${row('Renewal', rec.renewalDate ? `<span style="color:${(Math.round((rec.renewalDate-Date.now())/86400000)<=14)?'#fbbf24':'inherit'}">${fmtDate(rec.renewalDate)}</span>` : '<span style="opacity:.45">—</span>')}
+      </div>
+    </div>
+  </div>`;
+
+  // Performance section
+  const daysSinceOpt = rec.lastOptimized ? Math.round((Date.now()-rec.lastOptimized)/86400000) : null;
+  const perfSection = `<div class="cm-section">
+    <div class="cm-slabel" style="margin-bottom:8px">Performance & Health</div>
+    <div class="cm-row2">
+      <div>
+        ${row('Happiness', hapBadge)}
+        ${row('ABR (Last 7d)', hl(rec.abrLast7 ? rec.abrLast7+'%' : null))}
+        ${row('Bookings (7d)', hl(rec.bookingsLast7))}
+      </div>
+      <div>
+        ${row('Last Optimized', daysSinceOpt !== null ? `${fmtDate(rec.lastOptimized)} <span style="opacity:.6;font-size:11px">(${daysSinceOpt}d ago)</span>` : '<span style="opacity:.45">—</span>')}
+        ${row('Check Back', fmtDate(rec.checkBackDate))}
+        ${row('Onboarding', hl(rec.onboardingDuration))}
+      </div>
+    </div>
+  </div>`;
+
+  // Ad Rules section
+  let adRulesHtml = '';
+  if (rec.adDosDonts) {
+    adRulesHtml = `<div class="cm-section"><div class="cm-slabel" style="margin-bottom:6px">Ad Do's / Don'ts</div><div class="cm-rules" style="white-space:pre-wrap;font-size:12px;line-height:1.6">${esc(rec.adDosDonts)}</div></div>`;
+  }
+
+  // SOP
+  const sopHtml = rec.sop
+    ? `<div class="cm-section"><div class="cm-slabel" style="margin-bottom:4px">SOP</div><div class="cm-rules" style="white-space:pre-wrap;font-size:12px">${esc(rec.sop)}</div></div>`
+    : '';
+
+  // Links
+  const linksArr = [];
+  if (rec.taskUrl) linksArr.push(`<a class="cm-link" href="${esc(rec.taskUrl)}" target="_blank" rel="noopener">📋 ClickUp Task</a>`);
+  if (rec.adAccountUrl) linksArr.push(`<a class="cm-link" href="${esc(rec.adAccountUrl)}" target="_blank" rel="noopener">📈 Ads Manager</a>`);
+  const linksHtml = linksArr.length ? `<div class="cm-section"><div class="cm-links">${linksArr.join('')}</div></div>` : '';
+
+  return `<div class="cm-head">
+    <div class="cm-title">${esc(rec.taskName || accountName)}</div>
+    <div class="cm-subtitle">${statusChip}${rec.team ? `<span class="cm-assignee">👥 ${esc(rec.team)}</span>` : ''}<span class="cm-updated">Meta ID: ${esc(accountId)}</span></div>
+  </div>
+  ${refundBanner}${renewalBanner}
+  ${contactSection}${businessSection}${perfSection}${adRulesHtml}${sopHtml}${linksHtml}`;
 }
 
 function renderClientModalContent(accountId, d) {
