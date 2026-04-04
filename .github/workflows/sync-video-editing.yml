@@ -1,0 +1,89 @@
+name: Sync Video Editing Tasks
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pull ClickUp Video Editing tasks
+        env:
+          CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
+        run: |
+          LIST_ID="8cnp5x7-4995"
+          RESPONSE=$(curl -s -w "\n%{http_code}" \
+            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true&page=0" \
+            -H "Authorization: ${CLICKUP_API_KEY}")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "List endpoint failed ($HTTP_CODE), trying view endpoint..."
+            RESPONSE=$(curl -s -w "\n%{http_code}" \
+              "https://api.clickup.com/api/v2/view/${LIST_ID}/task" \
+              -H "Authorization: ${CLICKUP_API_KEY}")
+            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
+          fi
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "ERROR: Both endpoints failed. HTTP $HTTP_CODE"
+            echo "$BODY"
+            exit 1
+          fi
+          PULLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "$BODY" | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+tasks = data.get('tasks', [])
+
+def get_cf(t, name):
+    for cf in t.get('custom_fields', []):
+        if cf.get('name', '').lower() == name.lower():
+            return cf.get('value') or cf.get('value_richtext', '') or ''
+    return ''
+
+output = {
+    'tasks': [
+        {
+            'id': t.get('id'),
+            'name': t.get('name'),
+            'status': t.get('status', {}).get('status'),
+            'status_color': t.get('status', {}).get('color'),
+            'client_name': get_cf(t, 'Client Full Name'),
+            'assignees': [
+                {
+                    'id': a.get('id'),
+                    'username': a.get('username'),
+                    'email': a.get('email')
+                }
+                for a in t.get('assignees', [])
+            ],
+            'priority': t.get('priority', {}).get('priority') if t.get('priority') else None,
+            'due_date': t.get('due_date'),
+            'date_updated': t.get('date_updated'),
+            'url': t.get('url')
+        }
+        for t in tasks
+    ],
+    'count': len(tasks),
+    'pulled_at': '$PULLED_AT'
+}
+print(json.dumps(output, indent=2))
+" > data/video-editing.json
+          echo "Synced $(python3 -c "import json; d=json.load(open('data/video-editing.json')); print(d['count'])") tasks"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase orin main
+          git add data/video-editing.json
+          git diff --staged --quiet || git commit -m "sync video editing [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push
