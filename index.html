@@ -443,7 +443,7 @@ async function loadAll() {
 
 function fmtTime(iso) {
   if (!iso) return '\u2014';
-  const d = new Date(iso), now = new Date(), diff = Math.floor((now - d) / 60000);
+  const raw = iso, d = /^[0-9]+\.[0-9]+$/.test(String(raw)) ? new Date(parseFloat(raw)*1000) : new Date(raw), now = new Date(), diff = Math.floor((now - d) / 60000);
   if (diff < 1) return 'just now';
   if (diff < 60) return diff + 'm ago';
   if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
