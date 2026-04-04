@@ -7,260 +7,497 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
-.header{background:#111;border-bottom:1px solid #222;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo{font-size:20px;font-weight:700;letter-spacing:-0.5px}
-.logo span{color:#7c3aed}
-.sync-info{font-size:11px;color:#666;text-align:right}
-.sync-info b{color:#aaa}
-.refresh-btn{background:#1e1e2e;border:1px solid #333;color:#ccc;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;transition:all .2s}
-.refresh-btn:hover{background:#7c3aed;border-color:#7c3aed;color:#fff}
-.header-meta{display:flex;align-items:center;gap:16px}
-.tabs{background:#111;border-bottom:1px solid #222;padding:0 24px;display:flex;gap:4px}
-.tab{padding:12px 20px;cursor:pointer;font-size:13px;font-weight:500;color:#666;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px}
+.header{background:#111;border-bottom:1px solid #222;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:700;color:#fff}.logo span{color:#7c3aed}
+.header-meta{display:flex;align-items:center;gap:14px}
+.sync-info{font-size:11px;color:#555;line-height:1.5;text-align:right}
+.refresh-btn{background:#1a1a1a;border:1px solid #333;color:#ccc;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
+.refresh-btn:hover{border-color:#7c3aed;color:#fff}
+.tabs{display:flex;gap:0;border-bottom:1px solid #1e1e1e;padding:0 24px;background:#111}
+.tab{padding:12px 18px;cursor:pointer;color:#666;font-size:13px;font-weight:600;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px}
 .tab:hover{color:#ccc}
 .tab.active{color:#fff;border-bottom-color:#7c3aed}
 .tab-badge{background:#7c3aed;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
 .tab-badge.green{background:#059669}
 .tab-badge.orange{background:#d97706}
-.content{padding:24px;max-width:1400px;margin:0 auto}
-.panel{display:none}
-.panel.active{display:block}
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.stat-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 20px}
-.stat-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px}
-.stat-value{font-size:26px;font-weight:700;color:#fff;line-height:1}
-.stat-value.purple{color:#a78bfa}
-.stat-value.green{color:#34d399}
-.stat-value.blue{color:#60a5fa}
-.stat-value.yellow{color:#fbbf24}
-.stat-value.red{color:#f87171}
+.tab-badge.blue{background:#2563eb}
+.content{padding:20px 24px}
+.panel{display:none}.panel.active{display:block}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.stat-card{background:#111;border:1px solid #1e1e1e;border-radius:10px;padding:12px 14px}
+.stat-label{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.stat-value{font-size:20px;font-weight:700;color:#e0e0e0}
+.stat-value.purple{color:#a78bfa}.stat-value.green{color:#34d399}.stat-value.blue{color:#60a5fa}.stat-value.yellow{color:#fbbf24}.stat-value.red{color:#f87171}
 .filters{display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap;align-items:center}
 .filter-input{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;flex:1;min-width:200px}
 .filter-input:focus{outline:none;border-color:#7c3aed}
 .filter-select{background:#111;border:1px solid #333;color:#ccc;padding:8px 12px;border-radius:8px;font-size:13px;cursor:pointer}
-.filter-select:focus{outline:none;border-color:#7c3aed}
-.section-title{font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px}
-.status-group{margin-bottom:24px}
-.status-group-header{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;font-weight:600;font-size:13px}
-.status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
-.task-table{width:100%;border-collapse:collapse}
-.task-table th{text-align:left;font-size:11px;color:#555;text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;border-bottom:1px solid #1e1e1e;font-weight:600}
-.task-table td{padding:10px 12px;border-bottom:1px solid #1a1a1a;font-size:13px;vertical-align:middle}
-.task-table tr:hover td{background:#111}
-.task-name-cell{color:#ddd;font-weight:500;max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.task-name-cell a{color:inherit;text-decoration:none}
-.task-name-cell a:hover{color:#a78bfa}
-.priority-badge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;text-transform:uppercase}
-.priority-urgent{background:#3b0000;color:#f87171;border:1px solid #7f1d1d}
-.priority-high{background:#431407;color:#fb923c;border:1px solid #7c2d12}
-.priority-normal{background:#1e3a5f;color:#60a5fa;border:1px solid #1e40af}
-.priority-low{background:#1a2e1a;color:#86efac;border:1px solid #166534}
-.open-link{color:#7c3aed;font-size:11px;text-decoration:none;padding:3px 8px;border:1px solid #4c1d95;border-radius:4px;transition:all .15s}
-.open-link:hover{background:#7c3aed;color:#fff}
-.due-overdue{color:#f87171}
-.due-soon{color:#fbbf24}
-.due-ok{color:#555}
-.task-list-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:2px 8px;border-radius:4px;font-size:10px}
+.section-title{font-size:12px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px}
 .meta-account-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:14px}
-.account-card{background:#111;border:1px solid #222;border-radius:12px;padding:16px 18px}
-.account-card.active{border-left:3px solid #059669}
-.account-card.no-data{border-left:3px solid #374151;opacity:0.7}
+.account-card{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:16px}
+.account-card.flagged{border-color:#ef4444 !important;border-width:2px !important}
+.account-card.reviewed{border-color:#059669}
 .account-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.account-name{font-size:13px;font-weight:600;color:#e0e0e0;flex:1;margin-right:8px}
-.account-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;flex-shrink:0}
+.account-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
+.account-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .status-active{background:#064e3b;color:#34d399}
-.status-nodata{background:#1f2937;color:#6b7280}
+.status-nodata{background:#1e1e1e;color:#555}
+.metrics-tabs{display:flex;gap:4px;margin-bottom:10px}
+.metrics-tab-btn{background:#0d0d0d;border:1px solid #222;color:#555;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600}
+.metrics-tab-btn.active{background:#1e1b33;border-color:#7c3aed;color:#a78bfa}
 .metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.metric{background:#0d0d0d;border-radius:6px;padding:8px 10px}
+.metric{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:8px 10px}
 .metric-label{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px}
 .metric-value{font-size:15px;font-weight:700;color:#e0e0e0}
-.metrics-tabs{display:flex;gap:4px;margin-bottom:10px}
-.metrics-tab-btn{background:#0d0d0d;border:1px solid #222;color:#666;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer}
-.metrics-tab-btn.active{background:#2d1b69;border-color:#7c3aed;color:#a78bfa}
-.error-banner{background:#1c0505;border:1px solid #7f1d1d;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#f87171}
-.slack-layout{display:grid;grid-template-columns:260px 1fr;gap:16px}
-.channel-list{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden}
-.channel-list-header{padding:12px 14px;border-bottom:1px solid #222;font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.5px}
-.channel-item{padding:10px 14px;border-bottom:1px solid #1a1a1a;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:space-between}
-.channel-item:hover{background:#1a1a1a}
-.channel-item.active-channel{background:#1e1b33}
-.channel-name{font-size:13px;color:#ccc}
-.channel-count{background:#1e1e2e;color:#7c3aed;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700}
-.messages-panel{background:#111;border:1px solid #222;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
-.messages-header{padding:12px 16px;border-bottom:1px solid #222}
-.messages-title{font-size:14px;font-weight:600;color:#e0e0e0}
-.messages-body{padding:12px 16px;flex:1;overflow-y:auto;max-height:600px}
-.message-item{padding:10px 0;border-bottom:1px solid #1a1a1a;display:flex;gap:12px}
-.message-item:last-child{border-bottom:none}
-.msg-avatar{width:32px;height:32px;border-radius:8px;background:#2d1b69;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#a78bfa;flex-shrink:0}
-.msg-content{flex:1;min-width:0}
-.msg-header{display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap}
-.msg-user{font-size:12px;font-weight:600;color:#a78bfa}
-.msg-channel{font-size:10px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:4px}
-.msg-time{font-size:10px;color:#444;margin-left:auto}
-.msg-text{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word;white-space:pre-wrap}
-.msg-thread{font-size:11px;color:#7c3aed;margin-top:4px}
-.empty{text-align:center;padding:60px 20px;color:#444}
-.empty-icon{font-size:48px;margin-bottom:12px}
-.empty-text{font-size:14px;color:#555}
-.no-results{padding:20px;text-align:center;color:#555;font-size:13px}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:#0d0d0d}
-::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.no-data{text-align:center;padding:20px;color:#555;font-size:13px}
+.status-nodata{color:#555;font-size:12px;padding:10px 0}
+.maint-section{margin-top:12px;border-top:1px solid #1a1a1a;padding-top:10px}
+.maint-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:4px 0;user-select:none}
+.maint-title{font-size:11px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:0.5px}
+.maint-badges{display:flex;gap:5px;align-items:center;flex:1;padding:0 8px}
+.maint-badge{font-size:10px;padding:1px 6px;border-radius:6px}
+.maint-badge.mbrev{background:#064e3b;color:#34d399}
+.maint-badge.mbflag{background:#450a0a;color:#ef4444}
+.maint-chevron{font-size:10px;color:#555}
+.maint-body{padding-top:10px}
+.maint-links{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.maint-link{font-size:11px;padding:5px 10px;border-radius:6px;text-decoration:none;display:inline-flex;align-items:center;gap:4px;font-weight:600}
+.maint-link:hover{opacity:.8}
+.maint-link.ads{background:#1e1b33;color:#a78bfa;border:1px solid #2d2b55}
+.maint-link.drive{background:#052e16;color:#34d399;border:1px solid #065f46}
+.maint-suggestions{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;color:#888}
+.maint-suggestions strong{color:#fbbf24;display:block;margin-bottom:6px}
+.maint-suggestions li{list-style:none;padding:2px 0;border-bottom:1px solid #111}
+.maint-suggestions li:last-child{border:none}
+.maint-suggestions li::before{content:"• ";color:#7c3aed}
+.maint-controls{display:flex;gap:8px;margin-top:10px}
+.maint-btn{font-size:11px;padding:5px 12px;border:none;cursor:pointer;border-radius:6px;transition:opacity .2s}
+.maint-btn.rev{background:#064e3b22;color:#34d399}
+.maint-btn.flag{background:#450a0a22;color:#ef4444}
+.maint-btn:hover{opacity:.7}
+.maint-notes{width:100%;background:#0d0d0d;border:none;color:#ccc;padding:8px;font-size:11px;resize:vertical}
+.maint-notes:focus{outline:none;border-color:#7c3aed}
+.notes-saved{font-size:9px;color:#34d399;margin-top:2px}
+.vid-kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-items:start}
+.vid-col{background:#111;border:1px solid #1a1a1a;border-radius:10px;padding:12px;min-height:200px}
+.vid-col-header{font-size:11px;font-weight:700;color:#fff;padding:8px;border-bottom:1px solid #1a1a1a;margin-bottom:8px}
+.vid-card{background:#191919;border:1px solid #222;border-radius:8px;padding:10px;font-size:11px}
+.vid-card:hover{border-color:#7c3aed}
+.vid-card-client{font-weight:700;color:#fff;font-size:11px;margin-bottom:4px}
+.vid-card-task{font-size:12px;color:#e0e0e0;margin-bottom:6px;line-height:1.4}
+.vid-card-meta{font-size:10px;color:#666;margin-top:4px}
+.vid-status{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:600;color:#ccc}
+.vid-status-color{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:4px}
+.vid-link{font-size:11px;color:#7c3aed;text-decoration:none}
+.vid-link:hover{text-decoration:underline}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="logo"><span>Servedia</span> Ops Dashboard</div>
+  <div class="logo">Servedia Ops <span>Dashboard</span></div>
   <div class="header-meta">
     <div class="sync-info" id="syncInfo">Loading...</div>
-    <button class="refresh-btn" onclick="loadAll()">&#8635; Refresh</button>
+    <button class="refresh-btn" onclick="loadAll()">â³ Refresh</button>
   </div>
 </div>
 <div class="tabs">
-  <div class="tab active" onclick="switchTab('meta')">&#128202; Meta Ads <span class="tab-badge green" id="metaBadge">&#8212;</span></div>
-  <div class="tab" onclick="switchTab('clickup')">&#9989; ClickUp Tasks <span class="tab-badge" id="clickupBadge">&#8212;</span></div>
-  <div class="tab" onclick="switchTab('slack')">&#128172; Slack Activity <span class="tab-badge orange" id="slackBadge">&#8212;</span></div>
+  <div class="tab active" onclick="switchTab('meta')">
+    Meta Ads <span class="tab-badge green" id="metaCount">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('cu')">
+    ClickUp Tasks <span class="tab-badge orange" id="cuCount">0</span>
+  </div>
+  <div class="tab" onclick="switchTab('slack')">
+    Slack Activity
+  </div>
+  <div class="tab" onclick="switchTab('video')">
+    Video Editing <span class="tab-badge blue" id="vidCount">0</span>
+  </div>
 </div>
 <div class="content">
-  <div class="panel active" id="panel-meta">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Active Accounts</div><div class="stat-value purple" id="mActiveAccts">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Total Spend (7d)</div><div class="stat-value green" id="mSpend7">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Total Spend (30d)</div><div class="stat-value green" id="mSpend30">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Total Leads (7d)</div><div class="stat-value blue" id="mLeads7">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Avg CPL (7d)</div><div class="stat-value yellow" id="mCPL">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Impressions (7d)</div><div class="stat-value" id="mImpressions">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Clicks (7d)</div><div class="stat-value" id="mClicks">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="mErrors">&#8212;</div></div>
-    </div>
-    <div id="metaErrorBanner"></div>
-    <div class="filters">
-      <input class="filter-input" id="metaSearch" placeholder="Search account name..." oninput="renderMeta()">
-      <select class="filter-select" id="metaFilter" onchange="renderMeta()">
-        <option value="all">All Accounts</option>
-        <option value="active">Active Only</option>
-        <option value="no_data">No Data</option>
-      </select>
-      <select class="filter-select" id="metaSort" onchange="renderMeta()">
-        <option value="spend7">Sort: Spend (7d)</option>
-        <option value="spend30">Sort: Spend (30d)</option>
-        <option value="leads">Sort: Leads</option>
-        <option value="cpl">Sort: CPL</option>
-        <option value="name">Sort: Name A-Z</option>
-      </select>
-    </div>
-    <div class="section-title" id="metaCount">Loading...</div>
-    <div class="meta-account-grid" id="metaGrid"></div>
-  </div>
-
-  <div class="panel" id="panel-clickup">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value purple" id="cuTotal">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value red" id="cuUrgent">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value red" id="cuHighPri">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value red" id="cuOverdue">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">No Due Date</div><div class="stat-value yellow" id="cuNoDue">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="cuUpdated">&#8212;</div></div>
-    </div>
-    <div class="filters">
-      <input class="filter-input" id="cuSearch" placeholder="Search tasks..." oninput="renderClickUp()">
-      <select class="filter-select" id="cuStatus" onchange="renderClickUp()"><option value="all">All Statuses</option></select>
-      <select class="filter-select" id="cuPriority" onchange="renderClickUp()">
-        <option value="all">All Priorities</option>
-        <option value="urgent">Urgent</option>
-        <option value="high">High</option>
-        <option value="normal">Normal</option>
-        <option value="low">Low</option>
-      </select>
-      <select class="filter-select" id="cuSort" onchange="renderClickUp()">
-        <option value="updated">Sort: Recently Updated</option>
-        <option value="due">Sort: Due Date</option>
-        <option value="priority">Sort: Priority</option>
-        <option value="name">Sort: Name A-Z</option>
-      </select>
-    </div>
-    <div id="clickupGroups"></div>
-  </div>
-
-  <div class="panel" id="panel-slack">
-    <div class="stat-grid">
-      <div class="stat-card"><div class="stat-label">Messages (recent)</div><div class="stat-value purple" id="slTotal">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Active Channels</div><div class="stat-value green" id="slActive">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Channels Monitored</div><div class="stat-value" id="slTotal2">&#8212;</div></div>
-      <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="slErrors">&#8212;</div></div>
-    </div>
-    <div class="filters">
-      <input class="filter-input" id="slSearch" placeholder="Search messages..." oninput="renderSlack()">
-      <select class="filter-select" id="slChanFilter" onchange="filterByChannelSelect()">
-        <option value="">All Channels</option>
-      </select>
-    </div>
-    <div class="slack-layout">
-      <div class="channel-list">
-        <div class="channel-list-header">Channels</div>
-        <div id="channelList"></div>
-      </div>
-      <div class="messages-panel">
-        <div class="messages-header"><div class="messages-title" id="messagesTitle">Recent Messages</div></div>
-        <div class="messages-body" id="messagesFeed"></div>
-      </div>
-    </div>
-  </div>
+<div id="metaPanel" class="panel active">
+<div class="section-title">Account Performance (Last 7 Days)</div>
+<div class="filters">
+  <input class="filter-input" type="text" id="metaSearch" placeholder="Search accounts..." oninput="renderMeta()">
+  <select class="filter-select" id="metaFilter" onchange="renderMeta()">
+    <option value="all">All Accounts</option>
+    <option value="active">Active Only</option>
+  </select>
 </div>
-
+<div id="metaAccounts"></div>
+</div>
+<div id="cuPanel" class="panel">
+<div class="section-title">ClickUp Tasks</div>
+<div class="filters">
+  <input class="filter-input" type="text" id="cuSearch" placeholder="Search tasks..." oninput="renderCU()">
+  <select class="filter-select" id="cuFilter" onchange="renderCU()">
+    <option value="all">All Lists</option>
+    <option value="me">Me (Byron / Anka)</option>
+    <option value="list">By List</option>
+  </select>
+</div>
+<div id="cuTasks"></div>
+</div>
+<div id="slackPanel" class="panel">
+<div class="section-title">Slack Activity</div>
+<div class="filters">
+  <select class="filter-select" id="slackChannel" onchange="renderSlack()">
+    <option value="all">All Channels</option>
+  </select>
+</div>
+<div id="slackContent"></div>
+</div>
+<div id="videoPanel" class="panel">
+<div class="section-title">Video Editing</div>
+<div class="filters">
+  <input class="filter-input" type="text" id="vidSearch" placeholder="Search tasks..." oninput="renderVideo()">
+</div>
+<div id="videoContent"></div>
+</div>
+</div>
 <script>
 const REPO = 'Artzy22/servedia-ops';
 const BASE = 'https://raw.githubusercontent.com/' + REPO + '/main/data';
-let metaData = null, cuData = null, slData = null, selectedChannel = null;
+let metaData = null, cuData = null, slData = null, selectedChannel = null, vidData = null;
+const DRIVE_MAP = [
+  {keys:['avu collective','ac - avu'], id:'1DnXWXW0qQebja-9rnkexFBAulQHVarFk'},
+  {keys:['beyond vitaliti'], id:'1C3nEjWBhFg9qEocHf8jVOrTNVlY9rH4A'},
+  {keys:['body slim'], id:'1R3WJv7hjU9r0Fmkqi_ESToVlqbqDZl21'},
+  {keys:['body by lily'], id:'1DoF729UK35u8xzjkwSxPbDo74fsB8280'},
+  {keys:['celebrity bod'], id:'1Rv-GGwgtU5NKGMqDd7b4du4igy1jp-LJ'},
+  {keys:['cloud chiropract'], id:'1KERRazayayUEc8quY_vN5E0Ch8quY_TW'},
+  {keys:['cosmetic surgery of new york'], id:'1kI7b2qsxAJTH3hR6XMgOAjLRl8W7DHoy'},
+  {keys:['cosmetico'], id:'169q66vwyG4Yj70Ccam4kbgoz9j3WrU'},
+  {keys:['dailey aesthetics'], id:'1OIgkXu2GGqPX8jScHVuLFbJmdrE2Nl0a'},
+  {keys:['ensoul'], id:'1DfturiBvl5SN9_K02owIaHUn7mney8'},
+  {keys:['gencore'], id:'1zeYxCMxmmngiKiWqA-MkIgUdA4HQObyg'},
+  {keys:['golden health'], id:'1NvdJJq3uNZMQitLv3ECVBtR98IeRUtl'},
+  {keys:['hec wellness'], id:'1vY7PA8sXaAma2aU2DlX-e7dsdPlasEN'},
+  {keys:['heritage wellness'], id:'1SrGuKYkoDdrpo66TQQRLiTlrTqxD4ZN'},
+  {keys:['iconic laser'], id:'1Iti9zzkPSSnAK0A2K0APUSSnAk0A2K0Aw'},
+  {keys:['image wellness boutique'], id:'1-Z2m_l2IKvB-_Bre0mbD_3i0Q'},
+  {keys:['jule'], id:'1ZkAeiSQJaDqo1vcy1To-To-To-To-To-To'},
+  {keys:['beauty and wellness med spa','beautyandwellness'], id:'14b7NI6MHtR3x8fpNCMtmL8dSUgGJGnxg'},
+  {keys:['delray laser'], id:'1MKkW5DUZ0w1FcHW5KUA5LmD5Stm8pX8V'}
+];
+5,255,.1);border-radius:8px;padding:10px 12px;font-size:11px;color:#666}
+.maint-notes-saved{font-size:9px;color:#34d399;margin-top:2px}
+
+function findDriveFolder(name) {
+  const nm = name.lower().trim();
+  for (const ent of DRIVE_MAP) {
+    if (ent.keys.some(k => nm.includes(k) || k.includes(nm))) return ent.id;
+  }
+  return null;
+}
+function getDriveLink(name) {
+  const id = findDriveFolder(name);
+  if (id) return `https://drive.google.com/drive/folders/${id}`;
+  return `https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr?q=${encodeURIComponent(name)}`;
+}
+function getSuggestions(c) {
+  const suggs = [];
+  const m = c.metrics || {};
+  if (m.ctr != null && m.ctr < 1) suggs.push(`â	¢ Low CTR (${m.ctr.toFixed(2)}%) alert your creatives`);
+  if (m.cpc != null && m.cpc > 5) suggs.push(`ð¸ High CPC (${m.cpc.toFixed(2)}) analyze audience`);
+  if (m.freq != null && m.freq > 3.5) suggs.push(`ðº High Freq (${m.freq.toFixed(1)}x) - refresh ads`);
+  if (m.spend > 500 && (m.leads||0) < 1) suggs.push(`ð $${m.spend.toFixed(2)} spent with 0 leads`);
+  if (m.cpl != null && m.cpl > 200) suggs.push(`ð¨ High CPL (${m.cpl.toFixed(2)}) switch campaign messaging`);
+  if (m.spend === 0) suggs.push(`â¹ Zero spend - is the account active?`);
+  if (m.impressions != null && m.impressions < 500) suggs.push(`ð Low impressions (${m.impressions}) - expand audience`);
+  return suggs;
+}
+function maintHTML(c) {
+  if (!c) return '';
+  const key = c.id;
+  const state = JSON.parse(localStorage.getItem('maint_state') || '{}');
+  const notes = localStorage.getItem(`maint_notes_${key}`) || '';
+  const isReviewed = state[key] === 'rev';
+  const isFlagged = state[key] === 'flag';
+  const suggs = getSuggestions(c);
+  const adsLink = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id.replace(/[^\d]/g,'')}`;
+  const driveLink = getDriveLink(c.name);
+  return `
+  <div class="maint-section" data-key="${key}">
+    <div class="maint-header" onclick="this.closest('.maint-body').toggle('hidden')">
+      <span class="maint-chevron">â¼</span>
+      <span class="maint-title">DAILY MAINTENANCE</span>
+      <div class="maint-badges">
+        <span class="maint-badge ${isReviewed?'mbrev':''}" onclick="toggleMaintState('${key}','rev')">â Reviewed</span>
+        <span class="maint-badge ${isFlagged?'mbflag':''}" onclick="toggleMaintState('${key}','flag')">ð© Flag Issue</span>
+      </div>
+    </div>
+    <div class="maint-body">
+      <div class="maint-links">
+        <a href="${adsLink}" target="_blank" class="maint-link ads">ð Ads Mgr</a>
+        <a href="${driveLink}" target="_blank" class="maint-link drive">ð Drive</a>
+      </div>
+      ${suggs.length > 0 ? `<div class="maint-suggestions"><strong>Suggestions:</strong><ul>${suggs.map(s => `<li>${s}</li>`).join('')}</ul></div>` : ''}
+      <textarea class="maint-notes" placeholder="Notes/change log..." oninput="saveNotes('${key}',this.value)">${notes}</textarea>
+      ${notes ? `<span class="maint-notes-saved">Saved</span>` : ''}
+      <div class="maint-controls">
+        <button class="maint-btn rev" onclick="toggleMaintState('${key}','rev')">â</button>
+        <button class="maint-btn flag" onclick="toggleMaintState('${key}','flag')">ð©</button>
+      </div>
+    </div>
+  </div>
+`;
+}
+function toggleMaintState(key, newState) {
+  const state = JSON.parse(localStorage.getItem('maint_state') || '{}');
+  if (state[key] === newState) delete state[key];
+  else state[key] = newState;
+  localStorage.setItem('maint_state', JSON.stringify(state));
+  renderMeta();
+}
+function saveNotes(key, val) {
+  if (val) localStorage.setItem(`maint_notes_${key}`, val);
+  else localStorage.removeItem(`maint_notes_${key}`);
+  const ta = document.querySelector(`[data-key="${key}"] .maint-notes-saved`);
+  if (ta) {
+    ta.style.display = val ? '' : 'none';
+  }
+}
+function loadAll() {
+  const ts = Date.now();
+  document.getElementById('syncInfo').textContent = 'Loading...';
+  Promise.allSettled([
+    fetch(BASE + '/meta.json?_=' + ts),
+    fetch(BASE + '/clickup.json?_=' + ts),
+    fetch(BASE + '/slack.json?_=' + ts),
+    fetch(BASE + '/video-editing.json?_=' + ts)Urgent</option>
+      <option value="high">High</option>
+      <option value="normal">Normal</option>
+      <option value="low">Low</option>
+    </select>
+    <select class="filter-select" id="cuAssignee" onchange="renderClickUp()">
+      <option value="all">All Assignees</option>
+      <option value="me">Me (Byron / Anka)</option>
+    </select>
+    <select class="filter-select" id="cuSort" onchange="renderClickUp()">
+      <option value="updated">Sort: Updated</option>
+      <option value="due">Sort: Due Date</option>
+      <option value="priority">Sort: Priority</option>
+      <option value="name">Sort: Name</option>
+    </select>
+  </div>
+  <div id="clickupGroups"></div>
+</div>
+
+<div id="panel-slack" class="panel">
+  <div class="filters">
+    <input class="filter-input" id="slSearch" placeholder="Search messages..." oninput="renderSlack()">
+  </div>
+  <div class="slack-layout">
+    <div class="channel-list">
+      <div class="channel-list-header">Channels</div>
+      <div id="channelList"></div>
+    </div>
+    <div class="messages-panel">
+      <div class="messages-header">
+        <div class="messages-title" id="messagesTitle">All Messages</div>
+      </div>
+      <div class="messages-body" id="messagesBody"></div>
+    </div>
+  </div>
+</div>
+
+<div id="panel-video" class="panel">
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value blue" id="vidTotal">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Done</div><div class="stat-value green" id="vidDone">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value yellow" id="vidApproval">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value purple" id="vidInProgress">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Not Started</div><div class="stat-value" id="vidNotStarted">&#8211;</div></div>
+    <div class="stat-card"><div class="stat-label">Last Synced</div><div class="stat-value" style="font-size:13px" id="vidUpdated">&#8211;</div></div>
+  </div>
+  <div class="filters">
+    <input class="filter-input" id="vidSearch" placeholder="Search clients or tasks..." oninput="renderVideo()">
+  </div>
+  <div class="video-board" id="videoBoard"></div>
+</div>
+
+</div>
+<script>
+const REPO = 'Artzy22/servedia-ops';
+const BASE = 'https://raw.githubusercontent.com/' + REPO + '/main/data';
+let metaData = null, cuData = null, slData = null, selectedChannel = null, vidData = null;
+
+const DRIVE_MAP = [
+  {keys:['avu collective','ac - avu'], id:'1DnXWXW0qQebja-9rnkexFBAulQHVarFk'},
+  {keys:['beyond vitaliti'], id:'1C3nEjWBhFg9qEocHf8jVOrTNVlY9rH4A'},
+  {keys:['body slim'], id:'1R3WJv7hjU9r0Fmkqi_ESToVlqbqDZl21'},
+  {keys:['body by lily'], id:'1DoF729UK35u8xzjkwSxPbDo74fsB8280'},
+  {keys:['celebrity bod'], id:'1Rv-GGwgtU5NKGMqDd7b4du4igy1jp-LJ'},
+  {keys:['cloud chiropract'], id:'1KERFRazayUEc8mPm-vgN5E0Ch8quY_TW'},
+  {keys:['cosmetic surgery of new york'], id:'1kI7b2qsxAJTH3hR6XMgOAjLRl8W7DHoy'},
+  {keys:['cosmetico'], id:'169q66vwyG4wIj70cCam4kbgoz9jg3WrU'},
+  {keys:['dailey aesthetics'], id:'1OIgkXu2gGqPX8jScHVuLFbJmdrE2Nl0a'},
+  {keys:['ensoul'], id:'1DfturiBvl5fSN9_K02owIaHUBn7mney8'},
+  {keys:['gencore'], id:'1zeYxCMxmmngiKiWqA-MkIgUDa4HQbOyg'},
+  {keys:['golden health'], id:'1NvdJJq3uNZMQitLv3ECJVBtT98IeRUtl'},
+  {keys:['hec wellness'], id:'1vY7PA8sXaAmMa2aU2DlX-e7dsdPlasEN'},
+  {keys:['heritage wellness'], id:'1SrGuQKYkoDdrpo66TQQrLiTlrfQxD4ZN'},
+  {keys:['iconic laser'], id:'1Iti9zzkPuSSnAK0_br5YHZkFNwNHyZ7C'},
+  {keys:['image wellness boutique'], id:'1-Z2m_l2IKvB-_4vRnJMJBre0mbD_3i0Q'},
+  {keys:['jule'], id:'1ZkAeiSQJaDqo1vcy-Bto8a6dSO3gHHoa'},
+  {keys:['beauty and wellness med spa','beautyandwellness'], id:'14b7NI6MHtR3x8fpNCMtmL8dSUgGJGnxg'},
+  {keys:['delray laser'], id:'1MKkW5DUZ0w1FcHW5KUA5LmD5Stm8pX8V'},
+];
+
+function getDriveLink(name) {
+  const n = (name || '').toLowerCase();
+  for (const e of DRIVE_MAP) {
+    if (e.keys.some(k => n.includes(k))) return 'https://drive.google.com/drive/folders/' + e.id;
+  }
+  return 'https://drive.google.com/drive/search?q=' + encodeURIComponent(name);
+}
+
+function getMaintState() { try { return JSON.parse(localStorage.getItem('maint_state') || '{}'); } catch(e) { return {}; } }
+function saveMaintState(s) { localStorage.setItem('maint_state', JSON.stringify(s)); }
+function getMaintNotes() { try { return JSON.parse(localStorage.getItem('maint_notes') || '{}'); } catch(e) { return {}; } }
+function saveMaintNotes(n) { localStorage.setItem('maint_notes', JSON.stringify(n)); }
+
+function toggleMaint(aid) {
+  const b = document.getElementById('mb-' + aid);
+  if (!b) return;
+  const isOpen = b.style.display === 'block';
+  b.style.display = isOpen ? 'none' : 'block';
+  const chev = document.getElementById('mc-' + aid);
+  if (chev) chev.textContent = isOpen ? '\u25BC' : '\u25B2';
+}
+
+function toggleReviewed(aid) {
+  const s = getMaintState(); s[aid] = s[aid] || {}; s[aid].reviewed = !s[aid].reviewed; saveMaintState(s); renderMeta();
+}
+function toggleFlagged(aid) {
+  const s = getMaintState(); s[aid] = s[aid] || {}; s[aid].flagged = !s[aid].flagged; saveMaintState(s); renderMeta();
+}
+function saveNote(aid, text) {
+  const n = getMaintNotes(); n[aid] = text; saveMaintNotes(n);
+  const h = document.getElementById('nh-' + aid);
+  if (h) { h.textContent = 'Saved'; setTimeout(() => { if(h) h.textContent = ''; }, 1200); }
+}
+
+function getSuggestions(c) {
+  const d = c.last_7_days || {};
+  const tips = [];
+  if (d.ctr !== undefined && parseFloat(d.ctr) < 1.0) tips.push('Low CTR (' + d.ctr + '%) \u2014 test new creative or copy');
+  if (d.cpc !== undefined && parseFloat(d.cpc) > 5) tips.push('High CPC ($' + d.cpc + ') \u2014 review targeting or bid strategy');
+  if (d.frequency !== undefined && parseFloat(d.frequency) > 3.5) tips.push('High frequency (' + d.frequency + 'x) \u2014 refresh creative or expand audience');
+  if (d.spend && (!d.leads || d.leads === 0) && d.spend > 500) tips.push('$' + Math.round(d.spend) + ' spend with 0 leads \u2014 check conversion events');
+  if (d.cpl !== undefined && parseFloat(d.cpl) > 200) tips.push('CPL above $200 \u2014 consider pausing high-cost ad sets');
+  if (!d.spend || d.spend === 0) tips.push('No spend this period \u2014 check budget & campaign schedule');
+  if (d.impressions !== undefined && d.impressions < 500) tips.push('Very low impressions \u2014 check audience size or daily budget');
+  if (tips.length === 0) tips.push('Metrics look healthy \u2014 keep monitoring');
+  return tips;
+}
+
+function maintHTML(c) {
+  const aid = c.id;
+  const ms = getMaintState()[aid] || {};
+  const note = (getMaintNotes()[aid] || '').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const reviewed = !!ms.reviewed, flagged = !!ms.flagged;
+  const driveLink = getDriveLink(c.name);
+  const adsLink = 'https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=' + aid;
+  const suggs = getSuggestions(c).map(s => '<li>' + s + '</li>').join('');
+  const revCls = 'maint-btn' + (reviewed ? ' rev-active' : '');
+  const flagCls = 'maint-btn' + (flagged ? ' flag-active' : '');
+  const revBadge = reviewed ? '<span class="maint-badge mbrev">\u2705 Reviewed</span>' : '';
+  const flagBadge = flagged ? '<span class="maint-badge mbflag">\uD83D\uDEA9 Flagged</span>' : '';
+
+  return '<div class="maint-section">' +
+    '<div class="maint-header" onclick="toggleMaint(\'' + aid + '\')">' +
+      '<span class="maint-title">\uD83D\uDD27 Daily Maintenance</span>' +
+      '<span class="maint-badges">' + revBadge + flagBadge + '</span>' +
+      '<span class="maint-chevron" id="mc-' + aid + '">\u25BC</span>' +
+    '</div>' +
+    '<div class="maint-body" id="mb-' + aid + '" style="display:none">' +
+      '<div class="maint-links">' +
+        '<a class="maint-link ads" href="' + adsLink + '" target="_blank">\uD83D\uDCC8 Ads Manager</a>' +
+        '<a class="maint-link drive" href="' + driveLink + '" target="_blank">\uD83D\uDCC1 Drive Folder</a>' +
+      '</div>' +
+      '<div class="maint-suggestions"><strong>\uD83D\uDCA1 Suggestions</strong><ul>' + suggs + '</ul></div>' +
+      '<div class="maint-controls">' +
+        '<button class="' + revCls + '" onclick="toggleReviewed(\'' + aid + '\')">\u2705 Mark Reviewed</button>' +
+        '<button class="' + flagCls + '" onclick="toggleFlagged(\'' + aid + '\')">\uD83D\uDEA9 Flag Problem</button>' +
+      '</div>' +
+      '<textarea class="maint-notes" placeholder="Change log / notes for today..." oninput="saveNote(\'' + aid + '\',this.value)">' + note + '</textarea>' +
+      '<div class="maint-hint" id="nh-' + aid + '"></div>' +
+    '</div>' +
+  '</div>';
+}
+
+async function pushNotesToGitHub() {
+  let pat = localStorage.getItem('gh_pat');
+  if (!pat) {
+    pat = prompt('Enter GitHub Personal Access Token (repo write scope):\nStored in localStorage only.');
+    if (!pat) return;
+    localStorage.setItem('gh_pat', pat);
+  }
+  const payload = { notes: getMaintNotes(), state: getMaintState(), updated_at: new Date().toISOString() };
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+  const headers = { Authorization: 'token ' + pat, 'Content-Type': 'application/json' };
+  let sha = null;
+  try {
+    const ex = await fetch('https://api.github.com/repos/' + REPO + '/contents/data/maintenance.json', { headers });
+    if (ex.ok) { const d = await ex.json(); sha = d.sha; }
+  } catch(e) {}
+  const body = { message: 'Update maintenance notes', content };
+  if (sha) body.sha = sha;
+  const r = await fetch('https://api.github.com/repos/' + REPO + '/contents/data/maintenance.json', {
+    method: 'PUT', headers, body: JSON.stringify(body)
+  });
+  if (r.ok) { alert('\u2705 Notes saved to GitHub!'); }
+  else { const err = await r.json().catch(() => ({})); alert('\u274C Failed: ' + (err.message || r.status) + '\n\nPAT may be expired. Clear it and retry.'); localStorage.removeItem('gh_pat'); }
+}
 
 function switchTab(t) {
-  const tabs = document.querySelectorAll('.tab');
-  const panels = document.querySelectorAll('.panel');
-  const names = ['meta', 'clickup', 'slack'];
-  tabs.forEach((el, i) => el.classList.toggle('active', names[i] === t));
-  panels.forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(el => el.classList.remove('active'));
+  document.querySelector('.tab[onclick*="switchTab(\'' + t + '\')"]').classList.add('active');
   document.getElementById('panel-' + t).classList.add('active');
 }
 
 async function loadAll() {
-  document.getElementById('syncInfo').innerHTML = 'Refreshing...';
+  document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>Refreshing...';
   try {
-    const [m, c, s] = await Promise.all([
-      fetch(BASE + '/meta.json?_=' + Date.now()).then(r => r.json()),
-      fetch(BASE + '/clickup.json?_=' + Date.now()).then(r => r.json()),
-      fetch(BASE + '/slack.json?_=' + Date.now()).then(r => r.json())
+    const ts = Date.now();
+    const results = await Promise.allSettled([
+      fetch(BASE + '/meta.json?_=' + ts).then(r => r.json()),
+      fetch(BASE + '/clickup.json?_=' + ts).then(r => r.json()),
+      fetch(BASE + '/slack.json?_=' + ts).then(r => r.json()),
+      fetch(BASE + '/video-editing.json?_=' + ts).then(r => r.json()),
     ]);
-    metaData = m; cuData = c; slData = s;
-    renderMeta(); renderClickUp(); renderSlack();
-    const times = [
-      m.pulled_at ? 'Meta: ' + fmtTime(m.pulled_at) : '',
-      c.pulled_at ? 'CU: ' + fmtTime(c.pulled_at) : '',
-      s.pulled_at ? 'Slack: ' + fmtTime(s.pulled_at) : ''
-    ].filter(Boolean).join(' &middot; ');
-    document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>' + times;
+    if (results[0].status === 'fulfilled') { metaData = results[0].value; renderMeta(); }
+    if (results[1].status === 'fulfilled') { cuData = results[1].value; renderClickUp(); }
+    if (results[2].status === 'fulfilled') { slData = results[2].value; renderSlack(); }
+    if (results[3].status === 'fulfilled') { vidData = results[3].value; renderVideo(); }
+    const mT = metaData ? fmtTime(metaData.pulled_at) : 'err';
+    const cT = cuData ? fmtTime(cuData.pulled_at) : 'err';
+    const sT = slData ? fmtTime(slData.pulled_at) : 'err';
+    const vT = vidData ? fmtTime(vidData.pulled_at) : 'no sync yet';
+    document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>Meta: ' + mT + ' &middot; CU: ' + cT + ' &middot; Slack: ' + sT + ' &middot; Vid: ' + vT;
   } catch(e) {
-    document.getElementById('syncInfo').textContent = 'Error loading data';
+    document.getElementById('syncInfo').innerHTML = '<span style="color:#f87171">Error loading data</span>';
     console.error(e);
   }
 }
 
 function fmtTime(iso) {
-  if (!iso) return '—';
+  if (!iso) return '\u2014';
   const d = new Date(iso), now = new Date(), diff = Math.floor((now - d) / 60000);
   if (diff < 1) return 'just now';
   if (diff < 60) return diff + 'm ago';
   if (diff < 1440) return Math.floor(diff / 60) + 'h ago';
   return d.toLocaleDateString();
 }
-
 function fmtCurrency(n) {
-  if (n === null || n === undefined || isNaN(n)) return '$0.00';
-  return '$' + Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  if (n === undefined || n === null || isNaN(n)) return '0.00';
+  return Number(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
 }
-
 function fmtNum(n) {
-  if (n === null || n === undefined || isNaN(n)) return '0';
+  if (n === undefined || n === null || isNaN(n)) return '0';
   return Number(n).toLocaleString();
 }
 
@@ -270,101 +507,100 @@ function renderMeta() {
   const search = document.getElementById('metaSearch').value.toLowerCase();
   const filter = document.getElementById('metaFilter').value;
   const sort = document.getElementById('metaSort').value;
-  const active = clients.filter(c => c.status === 'active');
-  const totalSpend7 = active.reduce((s, c) => s + (c.last_7_days?.spend || 0), 0);
-  const totalSpend30 = active.reduce((s, c) => s + (c.last_30_days?.spend || 0), 0);
-  const totalLeads7 = active.reduce((s, c) => s + (c.last_7_days?.leads || 0), 0);
-  const totalClicks7 = active.reduce((s, c) => s + (c.last_7_days?.clicks || 0), 0);
-  const totalImpr7 = active.reduce((s, c) => s + (c.last_7_days?.impressions || 0), 0);
-  const avgCPL = totalLeads7 > 0 ? totalSpend7 / totalLeads7 : 0;
-  const errors = (metaData.errors || []).length;
-
-  document.getElementById('mActiveAccts').textContent = active.length + '/' + clients.length;
-  document.getElementById('mSpend7').textContent = fmtCurrency(totalSpend7);
-  document.getElementById('mSpend30').textContent = fmtCurrency(totalSpend30);
-  document.getElementById('mLeads7').textContent = fmtNum(totalLeads7);
-  document.getElementById('mCPL').textContent = totalLeads7 > 0 ? fmtCurrency(avgCPL) : '—';
-  document.getElementById('mImpressions').textContent = totalImpr7 > 1000 ? Math.round(totalImpr7/1000) + 'K' : fmtNum(totalImpr7);
-  document.getElementById('mClicks').textContent = fmtNum(totalClicks7);
-  document.getElementById('mErrors').textContent = errors;
-  document.getElementById('metaBadge').textContent = active.length;
-  document.getElementById('metaErrorBanner').innerHTML = errors > 0
-    ? `<div class="error-banner">&#9888;&#65039; ${errors} account(s) had errors during sync.</div>` : '';
+  const ms = getMaintState();
 
   let filtered = clients.filter(c => {
-    if (search && !(c.account_name || '').toLowerCase().includes(search)) return false;
+    if (search && !c.name.toLowerCase().includes(search)) return false;
     if (filter === 'active' && c.status !== 'active') return false;
     if (filter === 'no_data' && c.status === 'active') return false;
     return true;
   });
+
   filtered.sort((a, b) => {
     if (sort === 'spend7') return (b.last_7_days?.spend || 0) - (a.last_7_days?.spend || 0);
     if (sort === 'spend30') return (b.last_30_days?.spend || 0) - (a.last_30_days?.spend || 0);
     if (sort === 'leads') return (b.last_7_days?.leads || 0) - (a.last_7_days?.leads || 0);
-    if (sort === 'cpl') {
-      const cA = a.last_7_days?.cost_per_lead || 0, cB = b.last_7_days?.cost_per_lead || 0;
-      if (!cA) return 1; if (!cB) return -1; return cA - cB;
-    }
-    if (sort === 'name') return (a.account_name || '').localeCompare(b.account_name || '');
-    return 0;
+    if (sort === 'cpl') return (a.last_7_days?.cpl || 99999) - (b.last_7_days?.cpl || 99999);
+    if (sort === 'flagged') return (ms[b.id]?.flagged ? 1 : 0) - (ms[a.id]?.flagged ? 1 : 0);
+    return a.name.localeCompare(b.name);
   });
 
+  let totSpend7 = 0, totSpend30 = 0, totLeads7 = 0, totImpr = 0, activeCount = 0;
+  filtered.forEach(c => {
+    if (c.status === 'active') {
+      totSpend7 += (c.last_7_days?.spend || 0);
+      totSpend30 += (c.last_30_days?.spend || 0);
+      totLeads7 += (c.last_7_days?.leads || 0);
+      totImpr += (c.last_7_days?.impressions || 0);
+      activeCount++;
+    }
+  });
+
+  document.getElementById('mActiveAccts').textContent = activeCount + '/' + filtered.length;
+  document.getElementById('mSpend7').textContent = '$' + fmtCurrency(totSpend7);
+  document.getElementById('mSpend30').textContent = '$' + fmtCurrency(totSpend30);
+  document.getElementById('mLeads7').textContent = totLeads7;
+  document.getElementById('mCPL').textContent = (totSpend7 && totLeads7) ? '$' + (totSpend7/totLeads7).toFixed(2) : 'N/A';
+  document.getElementById('mImpres').textContent = totImpr > 1000000 ? (totImpr/1000000).toFixed(1)+'M' : Math.round(totImpr/1000)+'K';
+  document.getElementById('mUpdated').textContent = fmtTime(metaData.pulled_at);
+  document.getElementById('metaBadge').textContent = activeCount;
   document.getElementById('metaCount').textContent = filtered.length + ' accounts';
+
   const grid = document.getElementById('metaGrid');
-  if (!filtered.length) { grid.innerHTML = '<div class="no-results">No accounts match filters</div>'; return; }
+  if (!filtered.length) { grid.innerHTML = '<div class="no-data">No accounts match filters</div>'; return; }
 
   grid.innerHTML = filtered.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
     const isActive = c.status === 'active';
-    const spend7 = d7.spend || 0, spend30 = d30.spend || 0;
-    const leads7 = d7.leads || 0, leads30 = d30.leads || 0;
-    const cpl7 = leads7 > 0 ? spend7 / leads7 : 0;
-    const impr7 = d7.impressions || 0, clicks7 = d7.clicks || 0;
-    const aid = c.account_id;
-    return `<div class="account-card ${isActive ? 'active' : 'no-data'}">
-      <div class="account-header">
-        <div class="account-name" title="${c.account_name || ''}">${c.account_name || c.account_id}</div>
-        <span class="account-status ${isActive ? 'status-active' : 'status-nodata'}">${isActive ? 'Active' : 'No Data'}</span>
-      </div>
-      <div class="metrics-tabs" id="mt-${aid}">
-        <button class="metrics-tab-btn active" data-id="${aid}" data-p="7d" onclick="switchMT(this)">7 Days</button>
-        <button class="metrics-tab-btn" data-id="${aid}" data-p="30d" onclick="switchMT(this)">30 Days</button>
-      </div>
-      <div id="mg-${aid}-7d" class="metrics-grid">
-        <div class="metric"><div class="metric-label">Spend</div><div class="metric-value">${fmtCurrency(spend7)}</div></div>
-        <div class="metric"><div class="metric-label">Leads</div><div class="metric-value">${fmtNum(leads7)}</div></div>
-        <div class="metric"><div class="metric-label">CPL</div><div class="metric-value">${cpl7 > 0 ? fmtCurrency(cpl7) : '—'}</div></div>
-        <div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">${impr7 > 1000 ? Math.round(impr7/1000)+'K' : fmtNum(impr7)}</div></div>
-        <div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">${fmtNum(clicks7)}</div></div>
-        <div class="metric"><div class="metric-label">CTR</div><div class="metric-value">${d7.ctr ? d7.ctr.toFixed(2)+'%' : '—'}</div></div>
-        <div class="metric"><div class="metric-label">CPM</div><div class="metric-value">${d7.cpm ? fmtCurrency(d7.cpm) : '—'}</div></div>
-        <div class="metric"><div class="metric-label">Reach</div><div class="metric-value">${(d7.reach||0) > 1000 ? Math.round(d7.reach/1000)+'K' : fmtNum(d7.reach||0)}</div></div>
-        <div class="metric"><div class="metric-label">CPC</div><div class="metric-value">${d7.cpc ? fmtCurrency(d7.cpc) : '—'}</div></div>
-      </div>
-      <div id="mg-${aid}-30d" class="metrics-grid" style="display:none">
-        <div class="metric"><div class="metric-label">Spend</div><div class="metric-value">${fmtCurrency(spend30)}</div></div>
-        <div class="metric"><div class="metric-label">Leads</div><div class="metric-value">${fmtNum(leads30)}</div></div>
-        <div class="metric"><div class="metric-label">CPL</div><div class="metric-value">${leads30 > 0 ? fmtCurrency(spend30/leads30) : '—'}</div></div>
-        <div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">${(d30.impressions||0) > 1000 ? Math.round(d30.impressions/1000)+'K' : fmtNum(d30.impressions||0)}</div></div>
-        <div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">${fmtNum(d30.clicks||0)}</div></div>
-        <div class="metric"><div class="metric-label">CTR</div><div class="metric-value">${d30.ctr ? d30.ctr.toFixed(2)+'%' : '—'}</div></div>
-        <div class="metric"><div class="metric-label">CPM</div><div class="metric-value">${d30.cpm ? fmtCurrency(d30.cpm) : '—'}</div></div>
-        <div class="metric"><div class="metric-label">Reach</div><div class="metric-value">${(d30.reach||0) > 1000 ? Math.round(d30.reach/1000)+'K' : fmtNum(d30.reach||0)}</div></div>
-        <div class="metric"><div class="metric-label">CPC</div><div class="metric-value">${d30.cpc ? fmtCurrency(d30.cpc) : '—'}</div></div>
-      </div>
-    </div>`;
+    const aid = c.id;
+    const cst = ms[aid] || {};
+    let cardCls = 'account-card';
+    if (cst.flagged) cardCls += ' flagged';
+    else if (cst.reviewed) cardCls += ' reviewed';
+
+    const g7 = isActive ? (
+      '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">$' + fmtCurrency(d7.spend||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">' + (d7.leads||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d7.cpl ? '$'+fmtCurrency(d7.cpl) : 'N/A') + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">' + ((d7.impressions||0) > 1000 ? Math.round(d7.impressions/1000)+'K' : fmtNum(d7.impressions||0)) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">' + fmtNum(d7.clicks||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">' + (d7.ctr ? d7.ctr+'%' : 'N/A') + '</div></div>'
+    ) : '<div class="status-nodata">No data for this period</div>';
+
+    const g30 = isActive ? (
+      '<div class="metric"><div class="metric-label">Spend</div><div class="metric-value">$' + fmtCurrency(d30.spend||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Leads</div><div class="metric-value">' + (d30.leads||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CPL</div><div class="metric-value">' + (d30.cpl ? '$'+fmtCurrency(d30.cpl) : 'N/A') + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Impressions</div><div class="metric-value">' + ((d30.impressions||0) > 1000 ? Math.round(d30.impressions/1000)+'K' : fmtNum(d30.impressions||0)) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Clicks</div><div class="metric-value">' + fmtNum(d30.clicks||0) + '</div></div>' +
+      '<div class="metric"><div class="metric-label">CTR</div><div class="metric-value">' + (d30.ctr ? d30.ctr+'%' : 'N/A') + '</div></div>'
+    ) : '<div class="status-nodata">No data for this period</div>';
+
+    return '<div class="' + cardCls + '">' +
+      '<div class="account-header">' +
+        '<div class="account-name" title="' + c.name + '">' + c.name + '</div>' +
+        '<span class="account-status ' + (isActive ? 'status-active' : 'status-nodata') + '">' + (isActive ? 'Active' : 'No Data') + '</span>' +
+      '</div>' +
+      '<div class="metrics-tabs" id="mt-' + aid + '">' +
+        '<button class="metrics-tab-btn active" data-id="' + aid + '" data-p="7d" onclick="switchMT(this)">7 Days</button>' +
+        '<button class="metrics-tab-btn" data-id="' + aid + '" data-p="30d" onclick="switchMT(this)">30 Days</button>' +
+      '</div>' +
+      '<div id="mg-' + aid + '-7d" class="metrics-grid">' + g7 + '</div>' +
+      '<div id="mg-' + aid + '-30d" class="metrics-grid" style="display:none">' + g30 + '</div>' +
+      maintHTML(c) +
+    '</div>';
   }).join('');
 }
 
 function switchMT(btn) {
   const aid = btn.dataset.id, p = btn.dataset.p;
-  const container = document.getElementById('mt-' + aid);
-  container.querySelectorAll('.metrics-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.p === p));
+  const cont = document.getElementById('mt-' + aid);
+  if (!cont) return;
+  cont.querySelectorAll('.metrics-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   document.getElementById('mg-' + aid + '-7d').style.display = p === '7d' ? 'grid' : 'none';
   document.getElementById('mg-' + aid + '-30d').style.display = p === '30d' ? 'grid' : 'none';
 }
-
-const PRI_ORDER = {urgent:0, high:1, normal:2, low:3};
 
 function renderClickUp() {
   if (!cuData) return;
@@ -372,40 +608,44 @@ function renderClickUp() {
   const search = document.getElementById('cuSearch').value.toLowerCase();
   const statusF = document.getElementById('cuStatus').value;
   const priorityF = document.getElementById('cuPriority').value;
-  const sort = document.getElementById('cuSort').value;
+  const assigneeF = document.getElementById('cuAssignee').value;
+  const sortF = document.getElementById('cuSort').value;
   const now = Date.now();
 
-  const statuses = [...new Set(tasks.map(t => t.status || ''))].sort();
-  const sel = document.getElementById('cuStatus');
-  if (sel.options.length <= 1) {
-    statuses.forEach(s => {
-      const o = document.createElement('option');
-      o.value = s; o.textContent = s || '(none)';
-      sel.appendChild(o);
-    });
+  const statSel = document.getElementById('cuStatus');
+  if (statSel.options.length <= 1) {
+    const stats = [...new Set(tasks.map(t => t.status).filter(Boolean))].sort();
+    stats.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s.charAt(0).toUpperCase() + s.slice(1); statSel.appendChild(o); });
   }
+
+  let filtered = tasks.filter(t => {
+    if (search && !(t.name||'').toLowerCase().includes(search) && !(t.list_name||'').toLowerCase().includes(search)) return false;
+    if (statusF !== 'all' && (t.status||'').toLowerCase() !== statusF.toLowerCase()) return false;
+    if (priorityF !== 'all' && (t.priority||'').toLowerCase() !== priorityF.toLowerCase()) return false;
+    if (assigneeF === 'me') {
+      const isMe = (t.assignees||[]).some(a => {
+        const u = ((a.username||'') + (a.email||'')).toLowerCase();
+        return u.includes('byron') || u.includes('anka') || u.includes('vale') || u.includes('elamparo');
+      });
+      if (!isMe) return false;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    if (sortF === 'due') return (a.due_date ? Number(a.due_date) : 9e15) - (b.due_date ? Number(b.due_date) : 9e15);
+    if (sortF === 'priority') { const o = {urgent:0,high:1,normal:2,low:3}; return (o[a.priority||'normal']||2) - (o[b.priority||'normal']||2); }
+    if (sortF === 'name') return (a.name||'').localeCompare(b.name||'');
+    return (Number(b.date_updated)||0) - (Number(a.date_updated)||0);
+  });
 
   document.getElementById('cuTotal').textContent = tasks.length;
   document.getElementById('cuUrgent').textContent = tasks.filter(t => t.priority === 'urgent').length;
-  document.getElementById('cuHighPri').textContent = tasks.filter(t => t.priority === 'high').length;
+  document.getElementById('cuHighPri').textContent = tasks.filter(t => t.priority === 'high' || t.priority === 'urgent').length;
   document.getElementById('cuOverdue').textContent = tasks.filter(t => t.due_date && Number(t.due_date) < now).length;
   document.getElementById('cuNoDue').textContent = tasks.filter(t => !t.due_date).length;
-  document.getElementById('clickupBadge').textContent = tasks.length;
-  if (cuData.pulled_at) document.getElementById('cuUpdated').textContent = fmtTime(cuData.pulled_at);
-
-  let filtered = tasks.filter(t => {
-    if (search && !(t.name || '').toLowerCase().includes(search)) return false;
-    if (statusF !== 'all' && t.status !== statusF) return false;
-    if (priorityF !== 'all' && t.priority !== priorityF) return false;
-    return true;
-  });
-  filtered.sort((a, b) => {
-    if (sort === 'updated') return Number(b.date_updated||0) - Number(a.date_updated||0);
-    if (sort === 'due') { if (!a.due_date) return 1; if (!b.due_date) return -1; return Number(a.due_date) - Number(b.due_date); }
-    if (sort === 'priority') return (PRI_ORDER[a.priority]||4) - (PRI_ORDER[b.priority]||4);
-    if (sort === 'name') return (a.name||'').localeCompare(b.name||'');
-    return 0;
-  });
+  document.getElementById('cuUpdated').textContent = fmtTime(cuData.pulled_at);
+  document.getElementById('clickupBadge').textContent = filtered.length;
 
   const groups = {};
   filtered.forEach(t => {
@@ -415,130 +655,124 @@ function renderClickUp() {
   });
 
   const container = document.getElementById('clickupGroups');
-  if (!filtered.length) { container.innerHTML = '<div class="no-results">No tasks match filters.</div>'; return; }
+  if (!filtered.length) { container.innerHTML = '<div class="no-data">No tasks match filters</div>'; return; }
 
-  container.innerHTML = Object.entries(groups).map(([status, grp]) => {
-    const rows = grp.tasks.map(t => {
+  container.innerHTML = Object.entries(groups).map(([status, group]) => {
+    const rows = group.tasks.map(t => {
       const pri = t.priority || 'normal';
-      const priCls = pri === 'urgent' ? 'priority-urgent' : pri === 'high' ? 'priority-high' : pri === 'low' ? 'priority-low' : 'priority-normal';
-      let dueHtml = '';
+      let dueHtml = '\u2014';
       if (t.due_date) {
-        const d = new Date(Number(t.due_date)), daysLeft = Math.ceil((d - now) / 86400000);
-        const cls = daysLeft < 0 ? 'due-overdue' : daysLeft <= 3 ? 'due-soon' : 'due-ok';
-        const lbl = daysLeft < 0 ? `Overdue ${Math.abs(daysLeft)}d` : daysLeft === 0 ? 'Due today' : daysLeft === 1 ? 'Due tomorrow' : `Due in ${daysLeft}d`;
-        dueHtml = `<span class="${cls}" style="font-size:11px">${lbl} (${d.toLocaleDateString()})</span>`;
-      } else {
-        dueHtml = '<span style="color:#444;font-size:11px">No due date</span>';
+        const d = new Date(Number(t.due_date)), dl = Math.ceil((d - now) / 86400000);
+        const ds = d.toLocaleDateString('en-US', {month:'short', day:'numeric'});
+        const dc = dl < 0 ? 'due-overdue' : dl < 3 ? 'due-soon' : 'due-ok';
+        dueHtml = '<span class="' + dc + '">' + ds + (dl < 0 ? ' (' + Math.abs(dl) + 'd ago)' : '') + '</span>';
       }
-      const assignees = (t.assignees || []).map(a => a.username || a.email || '?').join(', ');
-      const upd = t.date_updated ? fmtTime(new Date(Number(t.date_updated)).toISOString()) : '';
-      const url = t.url || '#';
-      return `<tr>
-        <td class="task-name-cell"><a href="${url}" target="_blank">${t.name || 'Untitled'}</a></td>
-        <td>${dueHtml}</td>
-        <td>${assignees ? `<span style="font-size:12px;color:#aaa">${assignees}</span>` : '<span style="color:#444">—</span>'}</td>
-        <td>${t.list ? `<span class="task-list-badge">${t.list}</span>` : ''}</td>
-        <td><span class="priority-badge ${priCls}">${pri}</span></td>
-        <td style="font-size:11px;color:#555">${upd}</td>
-        <td><a class="open-link" href="${url}" target="_blank">&#8599; Open</a></td>
-      </tr>`;
+      const assignees = (t.assignees||[]).map(a => (a.username || (a.email||'?').split('@')[0])).join(', ') || '\u2014';
+      const listB = t.list_name ? '<span class="task-list-badge">' + t.list_name + '</span>' : '';
+      const link = t.url ? '<a href="' + t.url + '" target="_blank" class="open-link">\u2197</a>' : '';
+      const upd = t.date_updated ? fmtTime(new Date(Number(t.date_updated)).toISOString()) : '\u2014';
+      const nameEsc = (t.name||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return '<tr><td class="task-name-cell" title="' + nameEsc + '">' + nameEsc + '</td>' +
+        '<td>' + dueHtml + '</td>' +
+        '<td style="color:#888;font-size:12px">' + assignees + '</td>' +
+        '<td>' + listB + '</td>' +
+        '<td><span class="priority-badge priority-' + pri + '">' + pri + '</span></td>' +
+        '<td style="color:#555;font-size:11px">' + upd + '</td>' +
+        '<td>' + link + '</td></tr>';
     }).join('');
-
-    return `<div class="status-group">
-      <div class="status-group-header" style="background:${grp.color}18;border-left:3px solid ${grp.color}">
-        <div class="status-dot" style="background:${grp.color}"></div>
-        <span style="color:${grp.color}">${status.toUpperCase()}</span>
-        <span style="color:#555;font-weight:400;font-size:12px">${grp.tasks.length} task${grp.tasks.length !== 1 ? 's' : ''}</span>
-      </div>
-      <table class="task-table">
-        <thead><tr>
-          <th>Task</th><th>Due</th><th>Assignee</th><th>List</th><th>Priority</th><th>Updated</th><th></th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>`;
+    return '<div class="status-group">' +
+      '<div class="status-group-header"><div class="status-dot" style="background:' + group.color + '"></div>' +
+      '<span>' + status + '</span><span style="color:#555;font-size:11px">(' + group.tasks.length + ')</span></div>' +
+      '<table class="task-table"><thead><tr><th>Task</th><th>Due</th><th>Assignee</th><th>List</th><th>Priority</th><th>Updated</th><th></th></tr></thead>' +
+      '<tbody>' + rows + '</tbody></table></div>';
   }).join('');
 }
 
 function renderSlack() {
   if (!slData) return;
-  const msgs = slData.messages || [], channels = slData.channels || [];
+  const msgs = slData.messages || [];
   const search = document.getElementById('slSearch').value.toLowerCase();
-
-  document.getElementById('slTotal').textContent = msgs.length;
-  document.getElementById('slActive').textContent = channels.filter(c => c.message_count_24h > 0).length;
-  document.getElementById('slTotal2').textContent = slData.member_channels || 0;
-  document.getElementById('slErrors').textContent = (slData.errors || []).length;
   document.getElementById('slackBadge').textContent = msgs.length;
 
-  // Populate channel filter dropdown
-  const sel = document.getElementById('slChanFilter');
-  if (sel.options.length <= 1) {
-    channels.forEach(ch => {
-      const o = document.createElement('option');
-      o.value = ch.channel; o.textContent = '#' + ch.channel + ' (' + ch.message_count_24h + ')';
-      sel.appendChild(o);
-    });
-  }
+  const chanMap = {};
+  msgs.forEach(m => { chanMap[m.channel] = (chanMap[m.channel]||0)+1; });
+  document.getElementById('channelList').innerHTML =
+    '<div class="channel-item' + (!selectedChannel ? ' active-channel' : '') + '" onclick="filterByChannel(null)">' +
+    '<span class="channel-name"># All Channels</span><span class="channel-count">' + msgs.length + '</span></div>' +
+    Object.entries(chanMap).sort((a,b) => b[1]-a[1]).map(([ch, cnt]) =>
+      '<div class="channel-item' + (selectedChannel===ch ? ' active-channel' : '') + '" onclick="filterByChannel(\'' + ch.replace(/\\/g,'\\\\').replace(/'/g,"\\'") + '\')">' +
+      '<span class="channel-name">#' + ch + '</span><span class="channel-count">' + cnt + '</span></div>'
+    ).join('');
 
-  const sorted = [...channels].sort((a, b) => b.message_count_24h - a.message_count_24h);
-  const clEl = document.getElementById('channelList');
-  if (!channels.length) {
-    clEl.innerHTML = '<div style="padding:20px;color:#555;font-size:12px;text-align:center">No channels. Invite bot to channels in Slack.</div>';
-  } else {
-    clEl.innerHTML = `<div class="channel-item ${selectedChannel === null ? 'active-channel' : ''}" onclick="filterByChannel(null)">
-      <span class="channel-name">All channels</span><span class="channel-count">${msgs.length}</span>
-    </div>` + sorted.map(ch => `<div class="channel-item ${selectedChannel === ch.channel ? 'active-channel' : ''}" onclick="filterByChannel('${ch.channel}')">
-      <span class="channel-name">${ch.is_private ? '&#128274;' : '#'} ${ch.channel}</span>
-      <span class="channel-count">${ch.message_count_24h}</span>
-    </div>`).join('');
-  }
+  let fm = msgs;
+  if (selectedChannel) fm = fm.filter(m => m.channel === selectedChannel);
+  if (search) fm = fm.filter(m => (m.text||'').toLowerCase().includes(search) || (m.user_name||'').toLowerCase().includes(search) || (m.channel||'').toLowerCase().includes(search));
 
-  let filteredMsgs = msgs;
-  if (selectedChannel) filteredMsgs = msgs.filter(m => m.channel === selectedChannel);
-  if (search) filteredMsgs = filteredMsgs.filter(m =>
-    (m.text || '').toLowerCase().includes(search) ||
-    (m.channel || '').toLowerCase().includes(search) ||
-    (m.user || '').toLowerCase().includes(search)
-  );
-  filteredMsgs = [...filteredMsgs].sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
-
-  document.getElementById('messagesTitle').textContent =
-    (selectedChannel ? '#' + selectedChannel : 'All Recent Messages') + ' (' + filteredMsgs.length + ')';
-
-  const feed = document.getElementById('messagesFeed');
-  if (!filteredMsgs.length) {
-    feed.innerHTML = `<div class="empty"><div class="empty-icon">&#128172;</div><div class="empty-text">${
-      msgs.length ? 'No messages match filters.' : 'No messages yet. Invite the bot to more Slack channels.'
-    }</div></div>`;
-    return;
-  }
-
-  feed.innerHTML = filteredMsgs.slice(0, 200).map(m => {
-    const initials = (m.user || '?').slice(0, 2).toUpperCase();
-    const ts = m.ts ? new Date(Number(m.ts) * 1000) : null;
-    const timeStr = ts ? ts.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : '';
-    const dateStr = ts ? ts.toLocaleDateString([], {month:'short', day:'numeric'}) : '';
-    const text = (m.text || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return `<div class="message-item">
-      <div class="msg-avatar">${initials}</div>
-      <div class="msg-content">
-        <div class="msg-header">
-          <span class="msg-user">${m.user || 'Unknown'}</span>
-          ${!selectedChannel ? `<span class="msg-channel">#${m.channel}</span>` : ''}
-          <span class="msg-time">${dateStr} ${timeStr}${m.reactions > 0 ? ' &middot; ' + m.reactions + ' rxn' : ''}</span>
-        </div>
-        <div class="msg-text">${text || '<em style="color:#444">(empty)</em>'}</div>
-        ${m.reply_count > 0 ? `<div class="msg-thread">&#8617; ${m.reply_count} repl${m.reply_count === 1 ? 'y' : 'ies'}</div>` : ''}
-      </div>
-    </div>`;
+  document.getElementById('messagesTitle').textContent = selectedChannel ? '#' + selectedChannel : 'All Messages';
+  const body = document.getElementById('messagesBody');
+  if (!fm.length) { body.innerHTML = '<div class="no-data">No messages found</div>'; return; }
+  body.innerHTML = fm.map(m => {
+    const init = (m.user_name||'?').slice(0,2).toUpperCase();
+    const threadHtml = m.reply_count ? '<div class="msg-thread">\uD83D\uDCAC ' + m.reply_count + ' replies</div>' : '';
+    const txt = (m.text||'').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return '<div class="message-item"><div class="msg-avatar">' + init + '</div>' +
+      '<div class="msg-content"><div class="msg-header">' +
+        '<span class="msg-user">' + (m.user_name||'Unknown') + '</span>' +
+        '<span class="msg-channel">#' + (m.channel||'?') + '</span>' +
+        '<span class="msg-time">' + fmtTime(m.ts_iso || m.ts) + '</span>' +
+      '</div><div class="msg-text">' + txt + '</div>' + threadHtml + '</div></div>';
   }).join('');
 }
 
 function filterByChannel(ch) { selectedChannel = ch; renderSlack(); }
-function filterByChannelSelect() {
-  const v = document.getElementById('slChanFilter').value;
-  filterByChannel(v || null);
+
+function renderVideo() {
+  const board = document.getElementById('videoBoard');
+  if (!vidData) {
+    board.innerHTML = '<div class="no-data" style="grid-column:1/-1">Video editing data not loaded yet.<br>Run the sync-video-editing workflow to generate data/video-editing.json</div>';
+    return;
+  }
+  const tasks = vidData.tasks || [];
+  const search = document.getElementById('vidSearch').value.toLowerCase();
+  const filtered = tasks.filter(t => !search || (t.client_name||'').toLowerCase().includes(search) || (t.name||'').toLowerCase().includes(search));
+
+  const STATUS_GROUPS = [
+    {key:'done', label:'\u2705 Done', cls:'done', match: s => s && (s.toLowerCase().includes('done') || s.toLowerCase().includes('complete))},
+    {key:'approval', label:'\uD83D\uDC40 Needs Approval', cls:'needs-approval', match: s => s && s.toLowerCase().includes('approval')},
+    {key:'progress', label:'\u26A1 In Progress', cls:'in-progress', match: s => s && s.toLowerCase().includes('progress')},
+    {key:'other', label:'\u23F3 Not Started / Other', cls:'not-started', match: () => true},
+  ];
+
+  const grouped = {done:[],approval:[],progress:[],other:[]};
+  filtered.forEach(t => {
+    const s = t.status || '';
+    let placed = false;
+    for (const g of STATUS_GROUPS) { if (g.match(s)) { grouped[g.key].push(t); placed = true; break; } }
+  });
+
+  document.getElementById('vidTotal').textContent = tasks.length;
+  document.getElementById('vidDone').textContent = grouped.done.length;
+  document.getElementById('vidApproval').textContent = grouped.approval.length;
+  document.getElementById('vidInProgress').textContent = grouped.progress.length;
+  document.getElementById('vidNotStarted').textContent = grouped.other.length;
+  document.getElementById('vidUpdated').textContent = fmtTime(vidData.pulled_at);
+  document.getElementById('videoBadge').textContent = tasks.length;
+
+  board.innerHTML = STATUS_GROUPS.map(g => {
+    const items = grouped[g.key];
+    const cards = items.length ? items.map(t => {
+      const assignees = (t.assignees||[]).map(a => a.username || (a.email||'?').split('@')[0]).join(', ') || '\u2014';
+      let dueHtml = '';
+      if (t.due_date) { const d = new Date(Number(t.due_date)); dueHtml = '<span class="video-due">' + d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + '</span>'; }
+      const link = t.url ? '<a href="' + t.url + '" target="_blank" class="video-link">\u2197</a>' : '';
+      const clientDisplay = (t.client_name || '(No client name)').replace(/</g,'&lt;');
+      const taskName = (t.name||'Untitled').replace(/</g,'&lt;');
+      return '<div class="video-card"><div class="video-client">' + clientDisplay + '</div>' +
+        '<div class="video-task">' + taskName + '</div>' +
+        '<div class="video-meta"><span class="video-assignee">' + assignees + '</span>' + dueHtml + link + '</div></div>';
+    }).join('') : '<div style="padding:12px;color:#555;font-size:12px;text-align:center">None</div>';
+    return '<div class="video-col"><div class="video-col-header ' + g.cls + '"><span>' + g.label + '</span><span class="video-count">' + items.length + '</span></div><div class="video-cards">' + cards + '</div></div>';
+  }).join('');
 }
 
 loadAll();
