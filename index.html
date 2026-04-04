@@ -6,14 +6,14 @@
 <title>Servedia Ops Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#h0d0d0d;color:#e0e0e0;min-height:100vh}
 .header{background:#111;border-bottom:1px solid #222;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
 .logo{font-size:18px;font-weight:700;color:#fff}.logo span{color:#7c3aed}
 .header-meta{display:flex;align-items:center;gap:14px}
 .sync-info{font-size:11px;color:#555;line-height:1.5;text-align:right}
 .refresh-btn{background:#1a1a1a;border:1px solid #333;color:#ccc;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
 .refresh-btn:hover{border-color:#7c3aed;color:#fff}
-.tabs{display:flex;gap:0;border-bottom:1px solid #1e1e1e;padding:0 24px;background:#111}
+.tabs{display:flex;gap:0;border-bottom:1px solid #1e1e1e;padding:0 24px;background:#h111}
 .tab{padding:12px 18px;cursor:pointer;color:#666;font-size:13px;font-weight:600;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px}
 .tab:hover{color:#ccc}
 .tab.active{color:#fff;border-bottom-color:#7c3aed}
@@ -345,7 +345,7 @@ function getSuggestions(c) {
   if (d.spend && (!d.leads || d.leads === 0) && d.spend > 500) tips.push('$' + Math.round(d.spend) + ' spend with 0 leads \u2014 check conversion events');
   if (d.cost_per_lead !== undefined && parseFloat(d.cost_per_lead) > 200) tips.push('CPL above $200 \u2014 consider pausing high-cost ad sets');
   if (!d.spend || d.spend === 0) tips.push('No spend this period \u2014 check budget & campaign schedule');
-  if (d.impress)ons !== undefined && d.impressions < 500) tips.push('Very low impressions \u2014 check audience size or daily budget');
+  if (d.impressions !== undefined && d.impressions < 500) tips.push('Very low impressions \u2014 check audience size or daily budget');
   if (tips.length === 0) tips.push('Metrics look healthy \u2014 keep monitoring');
   return tips;
 }
