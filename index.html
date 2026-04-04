@@ -416,9 +416,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="modal-close" onclick="closeSettings()">✕</button>
     </div>
     <div class="mfield">
-      <label class="mlabel">ClickUp API Token</label>
+      <label class="mlabel">ClickUp API Token <span style="color:#34d399;font-size:10px">— enables LIVE mode (30s refresh)</span></label>
       <input class="minput" id="cfToken" type="password" placeholder="pk_xxxxxxxxxxxxxxxxxxxxxxxx">
-      <div class="mhint">ClickUp → Settings → Apps → API Token. Stored in localStorage only — never sent anywhere except ClickUp.</div>
+      <div class="mhint">ClickUp → Settings → Apps → API Token. Stored in localStorage only. Without this, dashboard uses cached JSON files (synced every 15–30 min by GitHub Actions).</div>
     </div>
     <div class="mfield">
       <label class="mlabel">Ads Management List ID</label>
@@ -1325,60 +1325,106 @@ async function fetchJ(url, headers) {
   return r.json();
 }
 
-async function fetchCUList(listId, token) {
+// ══════════════════════════════════════════════════════════════
+// CLICKUP LIVE FETCH — fetches all pages from a list
+// ══════════════════════════════════════════════════════════════
+async function fetchCUListLive(listId, token, opts = {}) {
   if (!listId || !token) return null;
-  const url = `${CU_API}/list/${listId}/task?include_closed=false&subtasks=true&custom_fields=true&page=0`;
-  return fetchJ(url, { Authorization: token });
-}
-
-async function loadAll() {
-  const ts = Date.now();
-  document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br>Refreshing…';
-
-  // All data comes from pre-synced JSON files written by GitHub Actions every 30 min.
-  // No API tokens needed in the browser.
-  const results = await Promise.allSettled([
-    fetchJ(`${BASE}/meta.json?_=${ts}`),           // 0 — Meta Ads
-    fetchJ(`${BASE}/clickup.json?_=${ts}`),         // 1 — Tasks (Client Mgmt list)
-    fetchJ(`${BASE}/slack.json?_=${ts}`),           // 2 — Slack
-    fetchJ(`${BASE}/video-editing.json?_=${ts}`),   // 3 — Video editing tickets
-    fetchJ(`${BASE}/maintenance.json?_=${ts}`),     // 4 — Ads Management + custom fields
-    fetchJ(`${BASE}/drive-folders.json?_=${ts}`),   // 5 — Google Drive folder map
-  ]);
-
-  if (results[0].status === 'fulfilled' && results[0].value) { metaData   = results[0].value; renderMeta(); }
-  if (results[1].status === 'fulfilled' && results[1].value) { cuData     = results[1].value; renderTasks(); }
-  if (results[2].status === 'fulfilled' && results[2].value) { slData     = results[2].value; renderSlack(); }
-  if (results[3].status === 'fulfilled' && results[3].value) { vidData    = results[3].value; renderVideo(); }
-  if (results[4].status === 'fulfilled' && results[4].value) { maintData  = results[4].value; }
-  if (results[5].status === 'fulfilled' && results[5].value) { driveData  = results[5].value; }
-
-  // Always render maintenance — works with just meta.json if other files aren't ready yet
-  renderMaintenance();
-
-  lastSyncTime = Date.now();
-  const times = ['Meta','Tasks','Slack','Video','Maintenance'].map((n, i) =>
-    results[i].status === 'fulfilled' ? `${n} ✓` : `${n} ✗`
-  ).join(' · ');
-  document.getElementById('syncInfo').innerHTML =
-    `<b>Last sync</b><br>${new Date().toLocaleTimeString()}`;
-  document.getElementById('syncCounter').title = times;
-
-  results.forEach((r, i) => {
-    if (r.status === 'rejected') console.warn(`Fetch [${i}] failed:`, r.reason);
-  });
+  const { customFields = false, includeClosed = true } = opts;
+  let allTasks = [], page = 0;
+  while (true) {
+    const url = `${CU_API}/list/${listId}/task?archived=false&include_closed=${includeClosed}&subtasks=false&custom_fields=${customFields}&page=${page}`;
+    const data = await fetchJ(url, { Authorization: token });
+    const tasks = data.tasks || [];
+    allTasks = allTasks.concat(tasks);
+    if (tasks.length < 100) break;
+    page++;
+    if (page > 20) break;
+  }
+  return { tasks: allTasks, count: allTasks.length, pulled_at: new Date().toISOString(), source: 'live' };
 }
 
 // ══════════════════════════════════════════════════════════════
-// AUTO-REFRESH — 60-second setInterval + live countdown
+// LOAD ALL — smart: live API when token set, JSON fallback otherwise
+// ══════════════════════════════════════════════════════════════
+let isRefreshing = false;
+
+async function loadAll() {
+  if (isRefreshing) return;
+  isRefreshing = true;
+
+  const ts  = Date.now();
+  const cfg = getCfg();
+  const hasToken = !!cfg.token;
+
+  document.getElementById('syncInfo').innerHTML = `<b>Last sync</b><br>${hasToken ? '🟢 Live' : '🟡 Cached'}`;
+
+  try {
+    // Always fetch static sources from JSON
+    const staticFetches = await Promise.allSettled([
+      fetchJ(`${BASE}/meta.json?_=${ts}`),          // 0 — Meta Ads (GitHub Actions)
+      fetchJ(`${BASE}/slack.json?_=${ts}`),          // 1 — Slack
+      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),  // 2 — Drive folders
+    ]);
+
+    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData  = staticFetches[0].value; renderMeta(); }
+    if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData    = staticFetches[1].value; renderSlack(); }
+    if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData = staticFetches[2].value; }
+
+    if (hasToken) {
+      // LIVE MODE — fetch directly from ClickUp API
+      const liveFetches = await Promise.allSettled([
+        fetchCUListLive('8cnp5x7-4995',   cfg.token, { includeClosed: true }),   // video editing
+        fetchCUListLive('901512199767',    cfg.token, { includeClosed: true }),   // tasks
+        fetchCUListLive('901514441223',    cfg.token, { customFields: true }),    // maintenance
+      ]);
+
+      if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) { vidData   = liveFetches[0].value; renderVideo(); }
+      if (liveFetches[1].status === 'fulfilled' && liveFetches[1].value) { cuData    = liveFetches[1].value; renderTasks(); }
+      if (liveFetches[2].status === 'fulfilled' && liveFetches[2].value) { maintData = liveFetches[2].value; }
+
+      liveFetches.forEach((r, i) => {
+        if (r.status === 'rejected') console.warn(`Live fetch [${i}] failed:`, r.reason);
+      });
+    } else {
+      // FALLBACK — use pre-synced JSON files from GitHub Actions
+      const jsonFetches = await Promise.allSettled([
+        fetchJ(`${BASE}/video-editing.json?_=${ts}`),
+        fetchJ(`${BASE}/clickup.json?_=${ts}`),
+        fetchJ(`${BASE}/maintenance.json?_=${ts}`),
+      ]);
+      if (jsonFetches[0].status === 'fulfilled' && jsonFetches[0].value) { vidData   = jsonFetches[0].value; renderVideo(); }
+      if (jsonFetches[1].status === 'fulfilled' && jsonFetches[1].value) { cuData    = jsonFetches[1].value; renderTasks(); }
+      if (jsonFetches[2].status === 'fulfilled' && jsonFetches[2].value) { maintData = jsonFetches[2].value; }
+    }
+
+    renderMaintenance();
+
+    lastSyncTime = Date.now();
+    const t = new Date().toLocaleTimeString();
+    document.getElementById('syncInfo').innerHTML =
+      `<b>Last sync</b><br><span style="color:${hasToken?'#34d399':'#fbbf24'}">${hasToken ? '🟢 Live' : '🟡 Cached'}</span> ${t}`;
+
+  } catch(e) {
+    console.error('loadAll error:', e);
+    document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br><span style="color:#f87171">⚠ Error</span>';
+  } finally {
+    isRefreshing = false;
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-REFRESH — 30s when live, 60s when cached. Live countdown.
 // ══════════════════════════════════════════════════════════════
 setInterval(() => {
   if (!lastSyncTime) return;
-  const elapsed = Math.floor((Date.now() - lastSyncTime) / 1000);
-  const remaining = Math.max(0, 60 - elapsed);
-  document.getElementById('syncCounter').textContent = `Next refresh in ${remaining}s`;
-  if (remaining === 0) {
-    lastSyncTime = Date.now(); // prevent double-trigger
+  const cfg      = getCfg();
+  const interval = cfg.token ? 30 : 60;
+  const elapsed  = Math.floor((Date.now() - lastSyncTime) / 1000);
+  const remaining = Math.max(0, interval - elapsed);
+  document.getElementById('syncCounter').textContent = `Refresh in ${remaining}s`;
+  if (remaining === 0 && !isRefreshing) {
+    lastSyncTime = Date.now();
     loadAll();
   }
 }, 1000);
@@ -1388,15 +1434,6 @@ setInterval(() => {
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
   switchTab('maintenance');
-
-  // Prompt config if not set
-  const cfg = getCfg();
-  if (!cfg.token) {
-    setTimeout(() => {
-      document.getElementById('cfgWarn').style.display = 'flex';
-    }, 300);
-  }
-
   loadAll();
 });
 </script>
