@@ -1215,6 +1215,26 @@ function switchMT(btn) {
 // ══════════════════════════════════════════════════════════════
 // ══ DAILY MAINTENANCE ══
 // ══════════════════════════════════════════════════════════════
+// Returns true if a ClickUp task (raw or maintenance format) is assigned to Byron or Anka
+function isByronOrAnkaTask(t) {
+  const assignees = t.assignees || [];
+  if (!assignees.length) return false;
+  return assignees.some(a => {
+    const id = typeof a === 'object' ? String(a.id || '') : '';
+    const n  = (typeof a === 'string' ? a : (a.username || a.email || '')).toLowerCase();
+    return id === '204101467' ||
+           n.includes('byron') || n.includes('vale') ||
+           n.includes('anka') || n.includes('anca') ||
+           n.includes('alemparo') || n.includes('elamparo') || n.includes('gpota');
+  });
+}
+
+// Replace Anka/Anca name variants with "Me" for display
+function displayMe(s) {
+  if (!s) return s;
+  return String(s).replace(/\bAnca?\b|\bAnka\b|\bAlemparo\b|\bElamparo\b/gi, 'Me').replace(/\bMe\s+Me\b/gi, 'Me').trim();
+}
+
 function buildDmClients() {
   const accounts = (metaData && metaData.clients) || [];
   const tasks    = (maintData && maintData.tasks) || [];
@@ -1290,10 +1310,30 @@ function buildDmClients() {
       lifecycleStatus:   cm?.lifecycleStatus  || null,
       abrLast7:          cm?.abrLast7         || null,
       bookingsLast7:     cm?.bookingsLast7    || null,
+      // The ClickUp maintenance task itself (for assignee filtering)
+      _cuTask:           cu || null,
     };
   });
 
-  return result;
+  // Only show accounts assigned to Byron or Anka in their ClickUp maintenance task.
+  // If no maintenance tasks are loaded yet, fall back to showing all active accounts
+  // so the tab isn't blank while loading.
+  const hasMaintData = tasks.length > 0;
+  if (hasMaintData) {
+    return result.filter(c => {
+      // Assigned via maintenance task
+      if (c._cuTask && isByronOrAnkaTask(c._cuTask)) return true;
+      // Assigned via Client Management "team" field
+      if (c.team) {
+        const t = c.team.toLowerCase();
+        if (t.includes('byron') || t.includes('vale') || t.includes('anka') || t.includes('anca') ||
+            t.includes('alemparo') || t.includes('elamparo')) return true;
+      }
+      return false;
+    });
+  }
+  // No maintenance data — show all active Meta accounts as fallback
+  return result.filter(c => c.status === 'active');
 }
 
 // Word overlap helper for fuzzy name matching
@@ -1457,7 +1497,7 @@ function renderMaintenance() {
         dayProgress       ? ['📅', 'Launch', `${fmtDate(c.launchDate)} · ${dayProgress}`, launchDays>75?'hv-orange':''] : null,
         (c.ltv||c.monthly)? ['💰', 'Value', `${c.ltv ? 'LTV '+fmtCur(c.ltv) : ''}${c.ltv&&c.monthly?' · ':''}${c.monthly ? fmtCur(c.monthly)+'/mo' : ''}`, ''] : null,
         c.niche           ? ['🎯', 'Niche', c.niche, ''] : null,
-        c.team            ? ['👥', 'Team', c.team, ''] : null,
+        c.team            ? ['👥', 'Team', displayMe(c.team), ''] : null,
         c.agreement       ? ['📋', 'Agreement', c.agreement, ''] : null,
         c.sop             ? ['📝', 'SOP', c.sop, ''] : null,
         c.dailyBudget     ? ['💵', 'Daily Budget', fmtCur(c.dailyBudget), ''] : null,
@@ -1772,7 +1812,7 @@ function renderTasks() {
   document.getElementById('cuOverdue').textContent = mine.filter(t => t.due_date && Number(t.due_date) < now).length;
   document.getElementById('cuApproval').textContent = approvalCount;
   document.getElementById('cuWaiting').textContent  = waitingCount;
-  document.getElementById('cuUpdated').textContent  = cuData.pulled_at ? 'Synced ' + fmtTime(cuData.pulled_at) + ' · Byron + Anka tasks' : '';
+  document.getElementById('cuUpdated').textContent  = cuData.pulled_at ? 'Synced ' + fmtTime(cuData.pulled_at) + ' · Byron + Me tasks' : '';
 
   const urgentCount = mine.filter(t => t.priority === 'urgent').length;
   document.getElementById('tasksBadge').textContent = urgentCount || mine.length;
@@ -2665,7 +2705,7 @@ function renderCMModalContent(accountId, accountName, rec) {
     <div class="cm-slabel" style="margin-bottom:8px">Contact</div>
     <div class="cm-row2">
       <div>${row('Name', hl(rec.contactName))}${row('Phone', phoneHtml)}</div>
-      <div>${row('Team', hl(rec.team))}${row('Ad Status', hl(rec.adStatus))}</div>
+      <div>${row('Team', hl(displayMe(rec.team)))}${row('Ad Status', hl(rec.adStatus))}</div>
     </div>
   </div>`;
 
@@ -2725,7 +2765,7 @@ function renderCMModalContent(accountId, accountName, rec) {
 
   return `<div class="cm-head">
     <div class="cm-title">${esc(rec.taskName || accountName)}</div>
-    <div class="cm-subtitle">${statusChip}${rec.team ? `<span class="cm-assignee">👥 ${esc(rec.team)}</span>` : ''}<span class="cm-updated">Meta ID: ${esc(accountId)}</span></div>
+    <div class="cm-subtitle">${statusChip}${rec.team ? `<span class="cm-assignee">👥 ${esc(displayMe(rec.team))}</span>` : ''}<span class="cm-updated">Meta ID: ${esc(accountId)}</span></div>
   </div>
   ${refundBanner}${renewalBanner}
   ${contactSection}${businessSection}${perfSection}${adRulesHtml}${sopHtml}${linksHtml}`;
