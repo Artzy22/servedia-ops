@@ -237,6 +237,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .msg-txt{font-size:13px;color:#ccc;line-height:1.5;word-break:break-word}
 .msg-thread{font-size:11px;color:#7c3aed;margin-top:4px}
 
+/* ══════════ MORNING BRIEFING ══════════ */
+.bfire-card{background:#150505;border:1px solid #7f1d1d;border-radius:10px;padding:14px;transition:all .15s}
+.bfire-card:hover{border-color:#ef4444}
+.bfire-name{font-size:14px;font-weight:700;color:#fca5a5;margin-bottom:6px}
+.bfire-reason{font-size:12px;color:#888;line-height:1.4;margin-bottom:8px}
+.bfire-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.bfire-action{color:#a78bfa;cursor:pointer;text-decoration:none;font-weight:600;font-size:11px}
+.bfire-action:hover{color:#c4b5fd}
+.bvid-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#111;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:6px}
+.bvid-item:hover{border-color:#7c3aed}
+.bvid-client{font-size:12px;font-weight:700;color:#fb923c;min-width:140px}
+.bvid-name{font-size:12px;color:#ccc;flex:1}
+.bvid-link{color:#555;text-decoration:none;font-size:14px}.bvid-link:hover{color:#a78bfa}
+.btask-item{display:flex;align-items:center;gap:12px;padding:9px 14px;background:#111;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:5px}
+.btask-item.overdue{border-color:#7f1d1d;background:#120505}
+.btask-name{font-size:12px;color:#ccc;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bslack-item{padding:10px 14px;background:#111;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:6px}
+.bslack-item:hover{border-color:#7c3aed}
+.bslack-hd{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.bslack-user{font-size:12px;font-weight:600;color:#a78bfa}
+.bslack-chan{font-size:10px;color:#555;background:#1a1a1a;padding:1px 6px;border-radius:4px}
+.bslack-time{font-size:10px;color:#444;margin-left:auto}
+.bslack-txt{font-size:12px;color:#999;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+/* ══════════ TASK CREATOR ══════════ */
+.tc-form{background:#111;border:1px solid #7c3aed;border-radius:10px;padding:14px;margin-top:8px;display:flex;flex-direction:column;gap:8px}
+.tc-form input,.tc-form select,.tc-form textarea{background:#0d0d0d;border:1px solid #333;color:#e0e0e0;padding:7px 10px;border-radius:6px;font-size:12px;font-family:inherit}
+.tc-form input:focus,.tc-form select:focus,.tc-form textarea:focus{outline:none;border-color:#7c3aed}
+.tc-row{display:flex;gap:8px}
+.tc-submit{background:#7c3aed;border:none;color:#fff;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700}
+.tc-submit:hover{background:#6d28d9}
+.tc-cancel{background:none;border:1px solid #333;color:#888;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:12px}
 /* ══════════ SETTINGS MODAL ══════════ */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-ov.open{display:flex}
@@ -284,8 +315,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 <!-- ════════════════ TABS ════════════════ -->
 <div class="tabs">
+  <div class="tab active" id="tab-briefing" onclick="switchTab('briefing')">☀️ Morning Briefing <span class="tab-badge red" id="briefBadge">–</span></div>
   <div class="tab" id="tab-meta" onclick="switchTab('meta')">📊 Meta Ads <span class="tab-badge green" id="metaBadge">–</span></div>
-  <div class="tab active" id="tab-maintenance" onclick="switchTab('maintenance')">✅ Daily Maintenance <span class="tab-badge red" id="maintBadge">–</span></div>
+  <div class="tab" id="tab-maintenance" onclick="switchTab('maintenance')">✅ Daily Maintenance <span class="tab-badge red" id="maintBadge">–</span></div>
   <div class="tab" id="tab-tasks" onclick="switchTab('tasks')">☑ Tasks <span class="tab-badge orange" id="tasksBadge">–</span></div>
   <div class="tab" id="tab-video" onclick="switchTab('video')">🎬 Video Editing <span class="tab-badge blue" id="videoBadge">–</span></div>
   <div class="tab" id="tab-slack" onclick="switchTab('slack')">💬 Slack <span class="tab-badge orange" id="slackBadge">–</span></div>
@@ -321,7 +353,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <!-- ════════════════ DAILY MAINTENANCE ════════════════ -->
-<div id="panel-maintenance" class="panel active content">
+<!-- ════════════════ MORNING BRIEFING ════════════════ -->
+<div id="panel-briefing" class="panel active content">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-size:22px;font-weight:800;color:#fff">Good morning, Byron ☀️</div>
+      <div style="font-size:13px;color:#555;margin-top:4px" id="briefDate"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="stat-card" style="text-align:center;min-width:80px"><div class="stat-label">Reviewed</div><div class="stat-value green" id="bDone">0</div></div>
+      <div class="stat-card" style="text-align:center;min-width:80px"><div class="stat-label">Remaining</div><div class="stat-value orange" id="bRemain">–</div></div>
+    </div>
+  </div>
+  <div id="bFireSection" style="margin-bottom:20px">
+    <div class="section-title" style="color:#f87171;margin-bottom:10px">🔥 NEEDS ATTENTION NOW</div>
+    <div id="bFireGrid" class="meta-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
+  </div>
+  <div id="bVideoSection" style="margin-bottom:20px">
+    <div class="section-title" style="color:#fb923c;margin-bottom:10px">🎬 VIDEO TICKETS READY FOR YOU</div>
+    <div id="bVideoList"></div>
+  </div>
+  <div id="bTaskSection" style="margin-bottom:20px">
+    <div class="section-title" style="color:#fbbf24;margin-bottom:10px">☑️ URGENT &amp; OVERDUE TASKS</div>
+    <div id="bTaskList"></div>
+  </div>
+  <div id="bSlackSection" style="margin-bottom:20px">
+    <div class="section-title" style="color:#a78bfa;margin-bottom:10px">💬 SLACK — NEEDS YOUR RESPONSE</div>
+    <div id="bSlackList"></div>
+  </div>
+  <div id="bAllClear" style="display:none;text-align:center;padding:40px">
+    <div style="font-size:40px;margin-bottom:12px">🎉</div>
+    <div style="font-size:18px;font-weight:700;color:#34d399">All clear! Nothing urgent right now.</div>
+    <div style="font-size:13px;color:#555;margin-top:6px">Head to Daily Maintenance to start your reviews.</div>
+  </div>
+</div>
+
+<div id="panel-maintenance" class="panel content">
   <div id="cfgWarn" class="cfg-warn" style="display:none">
     <div class="cfg-warn-icon">⏳</div>
     <div>Maintenance data syncing — CPB, KPI status, Drive links and client details will appear once the GitHub Action completes (runs every 30 min). CPL and AI suggestions are live from Meta now.</div>
@@ -1350,12 +1417,223 @@ function renderSlack() {
         </div>
         <div class="msg-txt">${esc(m.text || '')}</div>
         ${m.reply_count ? `<div class="msg-thread">💬 ${m.reply_count} replies</div>` : ''}
+        <button class="dmc-btn" style="margin-top:6px;font-size:10px" onclick="openCreateTask(this,${JSON.stringify(m.text||'')},${JSON.stringify(uname)},${JSON.stringify('#'+(m.channel||''))})">📋 Create ClickUp Task</button>
       </div>
     </div>`;
   }).join('');
 }
 
 function filterChan(ch) { selectedChannel = ch; renderSlack(); }
+
+// ══════════════════════════════════════════════════════════════
+// ══ MORNING BRIEFING ══
+// ══════════════════════════════════════════════════════════════
+function renderBriefing() {
+  const now = Date.now();
+  const state = getDmState();
+
+  document.getElementById('briefDate').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+
+  // ═══ 1. FIRE ITEMS ═══
+  const allClients = buildDmClients();
+  const fireItems = [];
+  allClients.forEach(c => {
+    const cs = state[c.id] || {};
+    if (cs.complete) return;
+    const reasons = [];
+    if (c.cpl !== null && c.cpl > 20)  reasons.push(`CPL ${fmtCur(c.cpl)} — over $20 threshold`);
+    if (c.cpb !== null && c.cpb > 100) reasons.push(`CPB ${fmtCur(c.cpb)} — booking funnel issue`);
+    if (c.leads7 === 0 && c.status === 'active') reasons.push('Zero leads this week');
+    if (cs.flagged) reasons.push('Manually flagged');
+    if (c.checkBackDate && Number(c.checkBackDate) < now) reasons.push('Check-back date overdue');
+    if ((c.requiresApproval || '').toLowerCase().includes('yes')) reasons.push('Needs ad approval');
+    if (reasons.length) fireItems.push({ ...c, reasons, severity: reasons.length });
+  });
+  fireItems.sort((a, b) => b.severity - a.severity);
+
+  const fireGrid = document.getElementById('bFireGrid');
+  const fireSection = document.getElementById('bFireSection');
+  if (fireItems.length) {
+    fireSection.style.display = '';
+    fireGrid.innerHTML = fireItems.map(c => {
+      const cplB = c.cpl !== null ? `<span class="kbadge ${cplKls(c.cpl)}">CPL ${fmtCur(c.cpl)}</span>` : '';
+      const cpbB = c.cpb !== null ? `<span class="kbadge ${cpbKls(c.cpb)}">CPB ${fmtCur(c.cpb)}</span>` : '';
+      const adsUrl = c.adAccountUrl || `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id}`;
+      const safeName = esc(c.name).replace(/'/g,"\\'");
+      return `<div class="bfire-card">
+        <div class="bfire-name">${esc(c.name)}</div>
+        <div class="bfire-badges">${cplB}${cpbB}</div>
+        <div class="bfire-reason">${c.reasons.map(r => '• ' + esc(r)).join('<br>')}</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a class="bfire-action" href="${esc(adsUrl)}" target="_blank">📈 Ads Manager</a>
+          <a class="bfire-action" href="#" onclick="switchTab('maintenance');document.getElementById('dmSearch').value='${safeName}';renderMaintenance();return false;">→ Maintenance</a>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    fireSection.style.display = 'none';
+  }
+
+  // ═══ 2. VIDEO APPROVALS ═══
+  const vidSection = document.getElementById('bVideoSection');
+  const vidList    = document.getElementById('bVideoList');
+  const approvalTickets = (vidData && vidData.tasks || []).filter(t => {
+    const s = (typeof t.status === 'object' ? (t.status?.status||'') : (t.status||'')).toLowerCase();
+    return /approv|review|feedback|revision/.test(s);
+  });
+  if (approvalTickets.length) {
+    vidSection.style.display = '';
+    const priOrd = { urgent:0, high:1, normal:2, low:3 };
+    approvalTickets.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
+    const priColors = { urgent:'#f87171', high:'#fb923c', normal:'#818cf8', low:'#4ade80' };
+    vidList.innerHTML = approvalTickets.slice(0, 8).map(t => {
+      const clientName = t.client_name || extractClientFromName(t.name) || '(Unknown)';
+      const pri = t.priority || 'normal';
+      return `<div class="bvid-item">
+        <span class="vpri" style="background:${priColors[pri]}22;color:${priColors[pri]};border:1px solid ${priColors[pri]}44">${pri}</span>
+        <span class="bvid-client">${esc(clientName)}</span>
+        <span class="bvid-name">${esc(t.name)}</span>
+        ${t.url ? `<a class="bvid-link" href="${t.url}" target="_blank">↗</a>` : ''}
+      </div>`;
+    }).join('') +
+    (approvalTickets.length > 8 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('video');return false;">View all ${approvalTickets.length} tickets →</a></div>` : '');
+  } else {
+    vidSection.style.display = 'none';
+  }
+
+  // ═══ 3. URGENT & OVERDUE TASKS ═══
+  const taskSection = document.getElementById('bTaskSection');
+  const taskList    = document.getElementById('bTaskList');
+  let allTasks = (cuData && cuData.tasks || []).filter(isByronOrAnka);
+  if (!allTasks.length && cuData) allTasks = cuData.tasks || [];
+  const urgentTasks = allTasks.filter(t => {
+    const isUrgent  = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) === 'urgent';
+    const isOverdue = t.due_date && Number(t.due_date) < now;
+    const isDone    = /done|complet|closed/i.test(typeof t.status === 'object' ? (t.status?.status||'') : (t.status||''));
+    return (isUrgent || isOverdue) && !isDone;
+  });
+  if (urgentTasks.length) {
+    taskSection.style.display = '';
+    const priOrd = { urgent:0, high:1, normal:2, low:3 };
+    urgentTasks.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
+    taskList.innerHTML = urgentTasks.slice(0, 10).map(t => {
+      const pri = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) || 'normal';
+      const isOverdue = t.due_date && Number(t.due_date) < now;
+      let dueHtml = '';
+      if (t.due_date) {
+        const d = new Date(Number(t.due_date));
+        const dl = Math.ceil((d - now) / 86400000);
+        dueHtml = `<span class="${dl<0?'due-overdue':'due-soon'}" style="font-size:11px">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dl<0?' ('+Math.abs(dl)+'d ago)':''}</span>`;
+      }
+      return `<div class="btask-item${isOverdue?' overdue':''}">
+        <span class="pbadge p-${pri}">${pri}</span>
+        <span class="btask-name" title="${esc(t.name)}">${esc(t.name)}</span>
+        ${dueHtml}
+        ${t.url ? `<a class="olink" href="${t.url}" target="_blank">↗</a>` : ''}
+      </div>`;
+    }).join('') +
+    (urgentTasks.length > 10 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('tasks');return false;">View all ${urgentTasks.length} urgent tasks →</a></div>` : '');
+  } else {
+    taskSection.style.display = 'none';
+  }
+
+  // ═══ 4. SLACK ALERTS ═══
+  const slackSection = document.getElementById('bSlackSection');
+  const slackList    = document.getElementById('bSlackList');
+  const alertWords   = /urgent|asap|revision|issue|problem|help|fix|broken|wrong|mistake|redo|priority/i;
+  const slackMsgs    = (slData && slData.messages || []).filter(m => alertWords.test(m.text || ''));
+  if (slackMsgs.length) {
+    slackSection.style.display = '';
+    slackList.innerHTML = slackMsgs.slice(0, 6).map(m => {
+      const uname = m.user_name || m.user || 'Unknown';
+      const ts = m.ts_iso || (m.ts ? new Date(parseFloat(m.ts)*1000).toISOString() : null);
+      return `<div class="bslack-item">
+        <div class="bslack-hd">
+          <span class="bslack-user">${esc(uname)}</span>
+          <span class="bslack-chan">#${m.channel||'?'}</span>
+          <span class="bslack-time">${fmtTime(ts)}</span>
+        </div>
+        <div class="bslack-txt">${esc(m.text||'')}</div>
+      </div>`;
+    }).join('') +
+    (slackMsgs.length > 6 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('slack');return false;">View all ${slackMsgs.length} alerts →</a></div>` : '');
+  } else {
+    slackSection.style.display = 'none';
+  }
+
+  // ═══ SUMMARY ═══
+  const doneCount = allClients.filter(c => (state[c.id]||{}).complete).length;
+  document.getElementById('bDone').textContent   = doneCount;
+  document.getElementById('bRemain').textContent = allClients.length - doneCount;
+  const totalAlerts = fireItems.length + approvalTickets.length + urgentTasks.length + slackMsgs.length;
+  document.getElementById('briefBadge').textContent = totalAlerts || '✓';
+  document.getElementById('briefBadge').className   = 'tab-badge ' + (totalAlerts > 5 ? 'red' : totalAlerts > 0 ? 'orange' : 'green');
+  document.getElementById('bAllClear').style.display = totalAlerts === 0 ? '' : 'none';
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ SLACK → CLICKUP TASK BRIDGE ══
+// ══════════════════════════════════════════════════════════════
+function openCreateTask(btn, msgText, user, channel) {
+  document.querySelectorAll('.tc-form').forEach(f => f.remove());
+  const form = document.createElement('div');
+  form.className = 'tc-form';
+  const safeName = `[Slack] ${user}: ${msgText.slice(0,80)}`.replace(/`/g,"'");
+  form.innerHTML = `
+    <div style="font-size:11px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Create ClickUp Task from Slack</div>
+    <input type="text" id="tcName" placeholder="Task name" value="${esc(safeName)}">
+    <textarea id="tcDesc" rows="3" placeholder="Description">${esc(msgText)}\n\n— From ${esc(user)} in ${esc(channel)}</textarea>
+    <div class="tc-row">
+      <select id="tcPriority">
+        <option value="1">🔴 Urgent</option>
+        <option value="2">🟠 High</option>
+        <option value="3" selected>🔵 Normal</option>
+        <option value="4">🟢 Low</option>
+      </select>
+      <select id="tcList">
+        <option value="901515083916">Media Tickets</option>
+      </select>
+    </div>
+    <div class="tc-row">
+      <button class="tc-submit" onclick="submitCreateTask(this)">✓ Create Task</button>
+      <button class="tc-cancel" onclick="this.closest('.tc-form').remove()">Cancel</button>
+    </div>
+    <div class="tc-status" style="font-size:11px;color:#555;min-height:16px"></div>
+  `;
+  btn.parentElement.appendChild(form);
+}
+
+async function submitCreateTask(btn) {
+  const form   = btn.closest('.tc-form');
+  const status = form.querySelector('.tc-status');
+  const cfg    = getCfg();
+  if (!cfg.token) { status.innerHTML = '<span style="color:#f87171">⚠ No ClickUp token. Open ⚙ Config first.</span>'; return; }
+  const name     = form.querySelector('#tcName').value.trim();
+  const desc     = form.querySelector('#tcDesc').value.trim();
+  const priority = parseInt(form.querySelector('#tcPriority').value);
+  const listId   = form.querySelector('#tcList').value;
+  if (!name) { status.innerHTML = '<span style="color:#f87171">Task name required</span>'; return; }
+  btn.disabled = true; btn.textContent = '⏳ Creating...';
+  try {
+    const resp = await fetch(`${CU_API}/list/${listId}/task`, {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, description: desc, priority, assignees: [204101467], status: 'to do' }),
+    });
+    if (!resp.ok) throw new Error(`${resp.status} ${resp.statusText}`);
+    const data = await resp.json();
+    const url  = data.url || `https://app.clickup.com/t/${data.id}`;
+    form.innerHTML = `<div style="padding:8px;text-align:center">
+      <div style="color:#34d399;font-weight:700;margin-bottom:6px">✅ Task created!</div>
+      <a href="${url}" target="_blank" style="color:#a78bfa;font-size:12px">Open in ClickUp →</a>
+    </div>`;
+    setTimeout(() => loadAll(), 2000);
+  } catch(e) {
+    status.innerHTML = `<span style="color:#f87171">⚠ ${esc(e.message)}</span>`;
+    btn.disabled = false; btn.textContent = '✓ Create Task';
+  }
+}
 
 // ══════════════════════════════════════════════════════════════
 // DATA FETCHING
@@ -1458,6 +1736,7 @@ async function loadAll() {
     }
 
     renderMaintenance();
+    renderBriefing();
 
     lastSyncTime = Date.now();
     const t = new Date().toLocaleTimeString();
@@ -1492,7 +1771,7 @@ setInterval(() => {
 // INIT
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  switchTab('maintenance');
+  switchTab('briefing');
   renderTasks();   // show loading placeholder immediately
   renderVideo();   // show loading placeholder immediately
   loadAll();
