@@ -1172,8 +1172,9 @@ function renderTasks() {
   // Group by status
   const groups = {};
   list.forEach(t => {
-    const s = t.status || 'no status';
-    if (!groups[s]) groups[s] = { color: t.status_color || '#555', tasks: [] };
+    const s     = (typeof t.status === 'object' && t.status ? t.status.status : t.status) || 'no status';
+    const scol  = (typeof t.status === 'object' && t.status ? t.status.color : t.status_color) || '#555';
+    if (!groups[s]) groups[s] = { color: scol, tasks: [] };
     groups[s].tasks.push(t);
   });
 
@@ -1241,7 +1242,8 @@ function renderVideo() {
 
   const grouped = { todo:[], working:[], waiting:[], approval:[], done:[] };
   filtered.forEach(t => {
-    const s = (t.status || '').trim();
+    const raw = t.status;
+    const s = (typeof raw === 'object' && raw !== null ? (raw.status || '') : (raw || '')).trim();
     let placed = false;
     for (const col of COLS) { if (col.match(s)) { grouped[col.key].push(t); placed = true; break; } }
     if (!placed) grouped.todo.push(t);  // unknown statuses → To Do
