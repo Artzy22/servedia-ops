@@ -577,9 +577,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="fbtn" id="tf-overdue"           onclick="setTaskFilter('overdue')">⏰ Overdue</button>
     <div class="task-filter-divider"></div>
     <input class="filter-input" id="cuSearch" placeholder="Search..." oninput="renderTasks()" style="width:160px;padding:5px 10px">
-    <select class="filter-select" id="cuAssignee" onchange="taskAssignee=this.value;renderTasks()" style="padding:5px 10px">
-      <option value="all">All People</option>
-    </select>
     <select class="filter-select" id="cuSort" onchange="renderTasks()" style="padding:5px 10px">
       <option value="priority">Priority → Due</option>
       <option value="due">Due Date</option>
@@ -601,6 +598,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
   </div>
 
+  <div class="task-filter-row" id="cuPeopleRow" style="margin-bottom:14px;display:none">
+    <span class="task-filter-label">People</span>
+    <div id="cuPeopleBtns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
   <div style="font-size:11px;color:#444;margin-bottom:10px" id="cuUpdated"></div>
   <div id="cuGroups"></div>
 </div>
@@ -726,7 +727,7 @@ let metaData = null, cuData = null, slData = null, vidData = null, maintData = n
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
 let clientMgmtByName = {};    // normalized client name → enriched client record (fallback lookup)
 let clientMgmtAllTasks = [];  // all tasks from Client Management list (for Retention tab)
-let selectedChannel = null, taskFilter = 'all', taskAssignee = 'all', dmFilter = 'all';
+let selectedChannel = null, taskFilter = 'all', taskAssignees = new Set(), dmFilter = 'all';
 let lastSyncTime = null;
 const OFFER_CACHE = {}; // clientId → full offer text
 
@@ -1662,6 +1663,12 @@ function isByronOrAnka(t) {
   });
 }
 
+function toggleAssignee(name) {
+  if (taskAssignees.has(name)) taskAssignees.delete(name);
+  else taskAssignees.add(name);
+  renderTasks();
+}
+
 function setTaskFilter(f) {
   taskFilter = f;
   document.querySelectorAll('[id^="tf-"]').forEach(b => b.classList.remove('active'));
@@ -1766,15 +1773,23 @@ function renderTasks() {
   let mine = tasks.filter(isByronOrAnka);
   if (!mine.length && tasks.length) mine = tasks;
 
-  // Populate assignee dropdown
-  const assigneeSel = document.getElementById('cuAssignee');
+  // Build people toggle buttons
   const allAssignees = [...new Set(mine.flatMap(t =>
     (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]))
   ).filter(Boolean))].sort();
-  const curAssignee = assigneeSel.value;
-  assigneeSel.innerHTML = '<option value="all">All People</option>' +
-    allAssignees.map(n => `<option value="${n}"${n===curAssignee?' selected':''}>${n}</option>`).join('');
-  if (taskAssignee !== 'all' && !allAssignees.includes(taskAssignee)) taskAssignee = 'all';
+  // Remove any selected names that no longer exist in data
+  for (const n of taskAssignees) { if (!allAssignees.includes(n)) taskAssignees.delete(n); }
+  const peopleRow  = document.getElementById('cuPeopleRow');
+  const peopleBtns = document.getElementById('cuPeopleBtns');
+  if (allAssignees.length) {
+    peopleRow.style.display = '';
+    peopleBtns.innerHTML = allAssignees.map(n => {
+      const active = taskAssignees.has(n);
+      return `<button class="fbtn${active?' active':''}" onclick="toggleAssignee('${esc(n)}')">${esc(n)}</button>`;
+    }).join('');
+  } else {
+    peopleRow.style.display = 'none';
+  }
 
   // Status filter helpers
   const statusFilters = ['todo','inprogress','waiting','needsinfo','approval','complete'];
@@ -1786,9 +1801,9 @@ function renderTasks() {
     if (taskFilter === 'high'       && t.priority !== 'high' && t.priority !== 'urgent') return false;
     if (taskFilter === 'overdue'    && (!t.due_date || Number(t.due_date) >= now)) return false;
     if (statusFilters.includes(taskFilter) && classifyStatus(rawStatus) !== taskFilter) return false;
-    if (taskAssignee !== 'all') {
+    if (taskAssignees.size > 0) {
       const names = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]));
-      if (!names.includes(taskAssignee)) return false;
+      if (!names.some(n => taskAssignees.has(n))) return false;
     }
     return true;
   });
