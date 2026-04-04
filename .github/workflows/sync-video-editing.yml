@@ -2,7 +2,7 @@ name: Sync Video Editing Tasks
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/15 * * * *'   # every 15 min — video tickets change frequently
   workflow_dispatch:
 
 permissions:
@@ -19,28 +19,88 @@ jobs:
           CLICKUP_API_KEY: ${{ secrets.CLICKUP_API_KEY }}
         run: |
           LIST_ID="8cnp5x7-4995"
-          RESPONSE=$(curl -s -w "\n%{http_code}" \
-            "https://api.clickup.com/api/v2/list/${LIST_ID}/task?archived=false&include_closed=true&page=0" \
-            -H "Authorization: ${CLICKUP_API_KEY}")
-          HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-          BODY=$(echo "$RESPONSE" | sed '$d')
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "List endpoint failed ($HTTP_CODE), trying view endpoint..."
-            RESPONSE=$(curl -s -w "\n%{http_code}" \
-              "https://api.clickup.com/api/v2/view/${LIST_ID}/task" \
-              -H "Authorization: ${CLICKUP_API_KEY}")
-            HTTP_CODE=$(echo "$RESPONSE" | tail -1)
-            BODY=$(echo "$RESPONSE" | sed '$d')
-          fi
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "ERROR: Both endpoints failed. HTTP $HTTP_CODE"
-            echo "$BODY"
-            exit 1
-          fi
           PULLED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           mkdir -p data
-          echo "$BODY" | python3 -c "import sys,json;d=json.load(sys.stdin);t=d.get('tasks',[]);cf=lambda x,n:next((f.get('value') or f.get('value_richtext') or '' for f in x.get('custom_fields',[]) if f.get('name','').lower()==n.lower()),'');print(json.dumps({'tasks':[{'id':i.get('id'),'name':i.get('name'),'status':i.get('status',{}).get('status'),'status_color':i.get('status',{}).get('color'),'client_name':cf(i,'Client Full Name'),'assignees':[{'id':a.get('id'),'username':a.get('username'),'email':a.get('email')} for a in i.get('assignees',[])],'priority':i.get('priority',{}).get('priority') if i.get('priority') else None,'due_date':i.get('due_date'),'date_updated':i.get('date_updated'),'url':i.get('url')} for i in t],'count':len(t),'pulled_at':'${PULLED_AT}'},indent=2))" > data/video-editing.json
-          echo "Synced $(python3 -c "import json; d=json.load(open('data/video-editing.json')); print(d['count'])") tasks"
+
+          python3 << 'PYEOF'
+import json, urllib.request, os, sys
+
+api_key = os.environ["CLICKUP_API_KEY"]
+list_id = "8cnp5x7-4995"
+all_tasks = []
+page = 0
+
+while True:
+    url = (
+        f"https://api.clickup.com/api/v2/list/{list_id}/task"
+        f"?archived=false&include_closed=true&subtasks=true&page={page}"
+    )
+    req = urllib.request.Request(url, headers={"Authorization": api_key})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        # Fallback: try view endpoint
+        url2 = f"https://api.clickup.com/api/v2/view/{list_id}/task?page={page}"
+        req2 = urllib.request.Request(url2, headers={"Authorization": api_key})
+        try:
+            with urllib.request.urlopen(req2, timeout=30) as resp2:
+                data = json.loads(resp2.read())
+        except Exception as e2:
+            print(f"Both endpoints failed: {e} / {e2}", file=sys.stderr)
+            sys.exit(1)
+
+    tasks = data.get("tasks", [])
+    all_tasks.extend(tasks)
+    print(f"Page {page}: got {len(tasks)} tasks (total so far: {len(all_tasks)})")
+
+    # ClickUp returns fewer than 100 when there are no more pages
+    if len(tasks) < 100:
+        break
+    page += 1
+    if page > 20:  # safety cap
+        break
+
+def get_cf(task, name):
+    for f in task.get("custom_fields", []):
+        if (f.get("name") or "").lower() == name.lower():
+            return f.get("value") or f.get("value_richtext") or ""
+    return ""
+
+output = {
+    "tasks": [
+        {
+            "id":           t.get("id"),
+            "name":         t.get("name"),
+            "status":       (t.get("status") or {}).get("status"),
+            "status_color": (t.get("status") or {}).get("color"),
+            "client_name":  get_cf(t, "Client Full Name"),
+            "assignees": [
+                {"id": a.get("id"), "username": a.get("username"), "email": a.get("email")}
+                for a in t.get("assignees", [])
+            ],
+            "priority":     (t.get("priority") or {}).get("priority"),
+            "due_date":     t.get("due_date"),
+            "date_updated": t.get("date_updated"),
+            "comment_count":t.get("comment_count", 0),
+            "url":          t.get("url"),
+        }
+        for t in all_tasks
+    ],
+    "count":     len(all_tasks),
+    "pulled_at": os.environ.get("PULLED_AT", ""),
+}
+
+with open("data/video-editing.json", "w") as f:
+    json.dump(output, f, indent=2)
+
+# Print status breakdown
+from collections import Counter
+statuses = Counter(t["status"] for t in output["tasks"])
+print(f"\nSynced {len(all_tasks)} tasks:")
+for s, c in statuses.most_common():
+    print(f"  {s}: {c}")
+PYEOF
 
       - name: Commit and push
         run: |
