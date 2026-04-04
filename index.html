@@ -1338,10 +1338,10 @@ async function fetchJ(url, headers) {
 // ══════════════════════════════════════════════════════════════
 async function fetchCUListLive(listId, token, opts = {}) {
   if (!listId || !token) return null;
-  const { customFields = false, includeClosed = true, subtasks = false } = opts;
+  const { includeClosed = true, subtasks = false } = opts;
   let allTasks = [], page = 0;
   while (true) {
-    const url = `${CU_API}/list/${listId}/task?archived=false&include_closed=${includeClosed}&subtasks=${subtasks}&custom_fields=${customFields}&page=${page}`;
+    const url = `${CU_API}/list/${listId}/task?archived=false&include_closed=${includeClosed}&subtasks=${subtasks}&page=${page}`;
     const data = await fetchJ(url, { Authorization: token });
     const tasks = data.tasks || [];
     allTasks = allTasks.concat(tasks);
@@ -1384,7 +1384,7 @@ async function loadAll() {
       const liveFetches = await Promise.allSettled([
         fetchCUListLive('901512331541',    cfg.token, { includeClosed: true, subtasks: true }),   // video editing
         fetchCUListLive('901515083916',    cfg.token, { includeClosed: true }),   // tasks (Media Tickets)
-        fetchCUListLive('901514441223',    cfg.token, { customFields: true }),    // maintenance
+        fetchCUListLive('901514441223',    cfg.token, {}),    // maintenance (custom_fields returned by default)
       ]);
 
       if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) { vidData   = liveFetches[0].value; renderVideo(); }
