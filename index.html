@@ -169,19 +169,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .cfg-warn-icon{font-size:18px;flex-shrink:0}
 
 /* ══════════ TASKS ══════════ */
-.task-filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-.sg{margin-bottom:22px}
+.task-filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.task-filter-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:14px;padding:10px 12px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:10px}
+.task-filter-label{font-size:9px;color:#444;text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-right:2px;white-space:nowrap}
+.task-filter-divider{width:1px;height:20px;background:#1e1e1e;margin:0 4px;flex-shrink:0}
+
+/* Focus Queue */
+.fq-wrap{margin-bottom:18px}
+.fq-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.fq-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:#7c3aed}
+.fq-hint{font-size:11px;color:#444}
+.fq-zone{min-height:64px;border:2px dashed #2a2030;border-radius:10px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;transition:border-color .15s,background .15s}
+.fq-zone.drag-over{border-color:#7c3aed;background:#0e0a18}
+.fq-zone.fq-empty{align-items:center;justify-content:center}
+.fq-empty-msg{font-size:12px;color:#333;pointer-events:none;user-select:none}
+.fq-card{background:#130f22;border:1px solid #2d2b55;border-radius:8px;padding:8px 10px;display:flex;align-items:flex-start;gap:8px;cursor:default;min-width:200px;max-width:280px;flex:1}
+.fq-card-body{flex:1;min-width:0}
+.fq-card-name{font-size:12px;font-weight:600;color:#e0e0e0;line-height:1.35;margin-bottom:4px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.fq-card-meta{display:flex;gap:5px;flex-wrap:wrap}
+.fq-remove{background:none;border:none;color:#444;cursor:pointer;font-size:14px;padding:0 2px;flex-shrink:0;line-height:1;margin-top:1px}
+.fq-remove:hover{color:#f87171}
+
+/* Task cards */
+.sg{margin-bottom:20px}
 .sg-hd{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a;margin-bottom:8px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .sg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .sg-count{color:#555;font-weight:400}
-.ttable{width:100%;border-collapse:collapse}
-.ttable th{text-align:left;padding:8px 12px;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #1e1e1e;font-weight:600}
-.ttable td{padding:9px 12px;border-bottom:1px solid #111;font-size:13px;vertical-align:middle}
-.ttable tr:hover td{background:#0f0f0f}
-.ttable tr.overdue-row td{background:#120505}
-.tname{color:#ddd;font-weight:500;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tlist-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:2px 7px;border-radius:4px;font-size:10px}
-.pbadge{padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600}
+.tc{background:#0d0d0d;border:1px solid #181818;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;cursor:grab;transition:border-color .12s,background .12s}
+.tc:hover{border-color:#2a2a2a;background:#101010}
+.tc.dragging{opacity:.4;cursor:grabbing}
+.tc-drag{color:#2a2a2a;font-size:14px;flex-shrink:0;margin-top:2px;cursor:grab;user-select:none}
+.tc:hover .tc-drag{color:#555}
+.tc-overdue{border-color:#2d1010;background:#0e0808}
+.tc-body{flex:1;min-width:0}
+.tc-name{font-size:13px;font-weight:500;color:#ddd;line-height:1.35;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tc-due{font-size:11px;padding:1px 7px;border-radius:4px;font-weight:600}
+.tc-due.due-ok{background:#0a1a0e;color:#4ade80;border:1px solid #14532d}
+.tc-due.due-soon{background:#1c1400;color:#fbbf24;border:1px solid #713f12}
+.tc-due.due-overdue{background:#1c0505;color:#f87171;border:1px solid #7f1d1d}
+.tc-assignee{font-size:11px;color:#666}
+.tlist-badge{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:1px 6px;border-radius:4px;font-size:10px}
+.pbadge{padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700}
 .p-urgent{background:#450a0a;color:#f87171}
 .p-high{background:#2a1a00;color:#fb923c}
 .p-normal{background:#1a1a2e;color:#818cf8}
@@ -523,29 +552,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <!-- ════════════════ TASKS ════════════════ -->
 <div id="panel-tasks" class="panel content">
   <div class="stat-grid">
-    <div class="stat-card"><div class="stat-label">Byron + Anka Tasks</div><div class="stat-value purple" id="cuTotal">–</div></div>
+    <div class="stat-card"><div class="stat-label">Total Tasks</div><div class="stat-value purple" id="cuTotal">–</div></div>
     <div class="stat-card"><div class="stat-label">Urgent</div><div class="stat-value red" id="cuUrgent">–</div></div>
-    <div class="stat-card"><div class="stat-label">High Priority</div><div class="stat-value orange" id="cuHigh">–</div></div>
     <div class="stat-card"><div class="stat-label">Overdue</div><div class="stat-value red" id="cuOverdue">–</div></div>
-    <div class="stat-card"><div class="stat-label">No Due Date</div><div class="stat-value" id="cuNoDue">–</div></div>
+    <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value orange" id="cuApproval">–</div></div>
+    <div class="stat-card"><div class="stat-label">Waiting On</div><div class="stat-value" id="cuWaiting">–</div></div>
   </div>
-  <div class="task-filters">
-    <input class="filter-input" id="cuSearch" placeholder="Search tasks..." oninput="renderTasks()">
-    <button class="fbtn active" id="tf-all" onclick="setTaskFilter('all')">All</button>
-    <button class="fbtn" id="tf-urgent" onclick="setTaskFilter('urgent')">🔴 Urgent</button>
-    <button class="fbtn" id="tf-high" onclick="setTaskFilter('high')">🟠 High</button>
-    <button class="fbtn" id="tf-overdue" onclick="setTaskFilter('overdue')">⏰ Overdue</button>
-    <button class="fbtn" id="tf-nodue" onclick="setTaskFilter('nodue')">📋 No Due Date</button>
-    <select class="filter-select" id="cuSort" onchange="renderTasks()">
-      <option value="priority">Priority → Due Date</option>
+
+  <!-- Filters -->
+  <div class="task-filter-row">
+    <span class="task-filter-label">Status</span>
+    <button class="fbtn active" id="tf-all"       onclick="setTaskFilter('all')">All</button>
+    <button class="fbtn" id="tf-todo"              onclick="setTaskFilter('todo')">📋 To Do</button>
+    <button class="fbtn" id="tf-inprogress"        onclick="setTaskFilter('inprogress')">⚡ In Progress</button>
+    <button class="fbtn" id="tf-waiting"           onclick="setTaskFilter('waiting')">⏳ Waiting On</button>
+    <button class="fbtn" id="tf-needsinfo"         onclick="setTaskFilter('needsinfo')">❓ Needs Info</button>
+    <button class="fbtn" id="tf-approval"          onclick="setTaskFilter('approval')">👀 Needs Approval</button>
+    <button class="fbtn" id="tf-complete"          onclick="setTaskFilter('complete')">✅ Complete</button>
+    <div class="task-filter-divider"></div>
+    <span class="task-filter-label">Priority</span>
+    <button class="fbtn" id="tf-urgent"            onclick="setTaskFilter('urgent')">🔴 Urgent</button>
+    <button class="fbtn" id="tf-high"              onclick="setTaskFilter('high')">🟠 High</button>
+    <button class="fbtn" id="tf-overdue"           onclick="setTaskFilter('overdue')">⏰ Overdue</button>
+    <div class="task-filter-divider"></div>
+    <input class="filter-input" id="cuSearch" placeholder="Search..." oninput="renderTasks()" style="width:160px;padding:5px 10px">
+    <select class="filter-select" id="cuAssignee" onchange="taskAssignee=this.value;renderTasks()" style="padding:5px 10px">
+      <option value="all">All People</option>
+    </select>
+    <select class="filter-select" id="cuSort" onchange="renderTasks()" style="padding:5px 10px">
+      <option value="priority">Priority → Due</option>
       <option value="due">Due Date</option>
       <option value="updated">Recently Updated</option>
     </select>
-    <select class="filter-select" id="cuAssignee" onchange="taskAssignee=this.value;renderTasks()">
-      <option value="all">All Assignees</option>
-    </select>
   </div>
-  <div style="font-size:11px;color:#555;margin-bottom:12px" id="cuUpdated"></div>
+
+  <!-- Focus Queue -->
+  <div class="fq-wrap">
+    <div class="fq-header">
+      <span class="fq-title">⚡ Focus Queue — Working On Now</span>
+      <span class="fq-hint">Drag tasks here to track what you're doing right now</span>
+    </div>
+    <div class="fq-zone fq-empty" id="fqZone"
+         ondragover="fqDragOver(event)"
+         ondragleave="fqDragLeave(event)"
+         ondrop="fqDrop(event)">
+      <span class="fq-empty-msg">Drop tasks here</span>
+    </div>
+  </div>
+
+  <div style="font-size:11px;color:#444;margin-bottom:10px" id="cuUpdated"></div>
   <div id="cuGroups"></div>
 </div>
 
@@ -1575,17 +1630,99 @@ function setTaskFilter(f) {
   renderTasks();
 }
 
+// ── Focus Queue (localStorage-persisted) ──────────────────────
+let _fqIds = [];
+function fqLoad() {
+  try { _fqIds = JSON.parse(localStorage.getItem('task_focus_queue') || '[]'); } catch { _fqIds = []; }
+}
+function fqSave() {
+  try { localStorage.setItem('task_focus_queue', JSON.stringify(_fqIds)); } catch {}
+}
+function fqAdd(taskId) {
+  if (!_fqIds.includes(taskId)) { _fqIds.push(taskId); fqSave(); }
+  renderFocusQueue();
+}
+function fqRemove(taskId) {
+  _fqIds = _fqIds.filter(id => id !== taskId);
+  fqSave();
+  renderFocusQueue();
+}
+function renderFocusQueue() {
+  const zone = document.getElementById('fqZone');
+  if (!zone) return;
+  const tasks = cuData ? (cuData.tasks || []) : [];
+  const cards = _fqIds.map(id => tasks.find(t => t.id === id)).filter(Boolean);
+  if (!cards.length) {
+    zone.className = 'fq-zone fq-empty';
+    zone.innerHTML = '<span class="fq-empty-msg">Drop tasks here</span>';
+    return;
+  }
+  zone.className = 'fq-zone';
+  zone.innerHTML = cards.map(t => {
+    const pri = t.priority || 'normal';
+    const statusLabel = (typeof t.status === 'object' && t.status ? t.status.status : t.status) || '';
+    const statusColor = (typeof t.status === 'object' && t.status ? t.status.color : t.status_color) || '#555';
+    const dueHtml = t.due_date ? (() => {
+      const dl = Math.ceil((Number(t.due_date) - Date.now()) / 86400000);
+      const ds = new Date(Number(t.due_date)).toLocaleDateString('en-US', {month:'short',day:'numeric'});
+      const dc = dl < 0 ? 'due-overdue' : dl < 3 ? 'due-soon' : 'due-ok';
+      return `<span class="tc-due ${dc}">${ds}</span>`;
+    })() : '';
+    const link = t.url ? `<a href="${esc(t.url)}" target="_blank" class="olink" style="font-size:12px">↗</a>` : '';
+    return `<div class="fq-card">
+      <div class="fq-card-body">
+        <div class="fq-card-name" title="${esc(t.name)}">${esc(t.name)}</div>
+        <div class="fq-card-meta">
+          <span class="pbadge p-${pri}" style="font-size:10px">${pri}</span>
+          <span style="font-size:10px;color:${esc(statusColor)};background:${esc(statusColor)}18;border:1px solid ${esc(statusColor)}40;padding:1px 6px;border-radius:4px">${esc(statusLabel)}</span>
+          ${dueHtml}${link}
+        </div>
+      </div>
+      <button class="fq-remove" onclick="fqRemove('${esc(t.id)}')" title="Remove from queue">×</button>
+    </div>`;
+  }).join('');
+}
+
+let _dragTaskId = null;
+function fqDragOver(e) {
+  e.preventDefault();
+  document.getElementById('fqZone').classList.add('drag-over');
+}
+function fqDragLeave(e) {
+  document.getElementById('fqZone').classList.remove('drag-over');
+}
+function fqDrop(e) {
+  e.preventDefault();
+  document.getElementById('fqZone').classList.remove('drag-over');
+  const id = e.dataTransfer.getData('text/plain') || _dragTaskId;
+  if (id) fqAdd(id);
+}
+
+// Status bucket classifier — matches task status string to a filter key
+function classifyStatus(s) {
+  s = (s || '').toLowerCase().trim();
+  if (/complet|done|finish|closed|delivered/.test(s)) return 'complete';
+  if (/approv|review|revision/.test(s)) return 'approval';
+  if (/needs.?info|info.?need|waiting.?info|need.?clarif|clarif/.test(s)) return 'needsinfo';
+  if (/wait/.test(s)) return 'waiting';
+  if (/in.?prog|work|active|started|doing/.test(s)) return 'inprogress';
+  if (/to.?do|open|new|not.?start|backlog/.test(s)) return 'todo';
+  return 'todo'; // default
+}
+
 function renderTasks() {
   if (!cuData) {
     document.getElementById('cuGroups').innerHTML = '<div class="no-data">⏳ Loading tasks… If this persists, open ⚙ Config and confirm your ClickUp token is saved.</div>';
     return;
   }
+  fqLoad();
+  renderFocusQueue();
+
   const tasks  = cuData.tasks || [];
   const search = (document.getElementById('cuSearch').value || '').toLowerCase();
   const sort   = document.getElementById('cuSort').value;
   const now    = Date.now();
 
-  // Show Byron + Anka tasks; fall back to all if filter returns nothing (list is already scoped)
   let mine = tasks.filter(isByronOrAnka);
   if (!mine.length && tasks.length) mine = tasks;
 
@@ -1595,16 +1732,20 @@ function renderTasks() {
     (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]))
   ).filter(Boolean))].sort();
   const curAssignee = assigneeSel.value;
-  assigneeSel.innerHTML = '<option value="all">All Assignees</option>' +
+  assigneeSel.innerHTML = '<option value="all">All People</option>' +
     allAssignees.map(n => `<option value="${n}"${n===curAssignee?' selected':''}>${n}</option>`).join('');
   if (taskAssignee !== 'all' && !allAssignees.includes(taskAssignee)) taskAssignee = 'all';
 
+  // Status filter helpers
+  const statusFilters = ['todo','inprogress','waiting','needsinfo','approval','complete'];
+
   let list = mine.filter(t => {
     if (search && !(t.name || '').toLowerCase().includes(search)) return false;
-    if (taskFilter === 'urgent'  && t.priority !== 'urgent') return false;
-    if (taskFilter === 'high'    && t.priority !== 'high' && t.priority !== 'urgent') return false;
-    if (taskFilter === 'overdue' && (!t.due_date || Number(t.due_date) >= now)) return false;
-    if (taskFilter === 'nodue'   && t.due_date) return false;
+    const rawStatus = typeof t.status === 'object' && t.status ? (t.status.status||'') : (t.status||'');
+    if (taskFilter === 'urgent'     && t.priority !== 'urgent') return false;
+    if (taskFilter === 'high'       && t.priority !== 'high' && t.priority !== 'urgent') return false;
+    if (taskFilter === 'overdue'    && (!t.due_date || Number(t.due_date) >= now)) return false;
+    if (statusFilters.includes(taskFilter) && classifyStatus(rawStatus) !== taskFilter) return false;
     if (taskAssignee !== 'all') {
       const names = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]));
       if (!names.includes(taskAssignee)) return false;
@@ -1623,66 +1764,81 @@ function renderTasks() {
     return (Number(b.date_updated)||0) - (Number(a.date_updated)||0);
   });
 
-  // Stats over all Byron/Anka tasks
+  // Stats
+  const approvalCount = mine.filter(t => classifyStatus(typeof t.status==='object'?t.status?.status||'':t.status||'') === 'approval').length;
+  const waitingCount  = mine.filter(t => classifyStatus(typeof t.status==='object'?t.status?.status||'':t.status||'') === 'waiting').length;
   document.getElementById('cuTotal').textContent   = mine.length;
   document.getElementById('cuUrgent').textContent  = mine.filter(t => t.priority === 'urgent').length;
-  document.getElementById('cuHigh').textContent    = mine.filter(t => t.priority === 'high' || t.priority === 'urgent').length;
   document.getElementById('cuOverdue').textContent = mine.filter(t => t.due_date && Number(t.due_date) < now).length;
-  document.getElementById('cuNoDue').textContent   = mine.filter(t => !t.due_date).length;
-  document.getElementById('cuUpdated').textContent = cuData.pulled_at ? 'Synced: ' + fmtTime(cuData.pulled_at) + ' · Showing Byron + Anka tasks' : '';
+  document.getElementById('cuApproval').textContent = approvalCount;
+  document.getElementById('cuWaiting').textContent  = waitingCount;
+  document.getElementById('cuUpdated').textContent  = cuData.pulled_at ? 'Synced ' + fmtTime(cuData.pulled_at) + ' · Byron + Anka tasks' : '';
 
   const urgentCount = mine.filter(t => t.priority === 'urgent').length;
   document.getElementById('tasksBadge').textContent = urgentCount || mine.length;
 
   const container = document.getElementById('cuGroups');
   if (!list.length) {
-    container.innerHTML = '<div class="no-data">No tasks match filters.<br><span style="font-size:12px;color:#444">Showing tasks assigned to Byron Vale, Anka Alemparo, or Anka Elamparo.</span></div>';
+    container.innerHTML = '<div class="no-data">No tasks match this filter.</div>';
     return;
   }
 
   // Group by status
+  const STATUS_ORDER = ['inprogress','todo','waiting','needsinfo','approval','complete'];
   const groups = {};
   list.forEach(t => {
-    const s     = (typeof t.status === 'object' && t.status ? t.status.status : t.status) || 'no status';
-    const scol  = (typeof t.status === 'object' && t.status ? t.status.color : t.status_color) || '#555';
-    if (!groups[s]) groups[s] = { color: scol, tasks: [] };
-    groups[s].tasks.push(t);
+    const rawStatus = typeof t.status === 'object' && t.status ? (t.status.status||'') : (t.status||'');
+    const rawColor  = typeof t.status === 'object' && t.status ? (t.status.color||'') : (t.status_color||'');
+    const bucket    = classifyStatus(rawStatus);
+    if (!groups[rawStatus]) groups[rawStatus] = { color: rawColor||'#555', bucket, tasks: [] };
+    groups[rawStatus].tasks.push(t);
   });
 
-  container.innerHTML = Object.entries(groups).map(([status, grp]) => {
-    const rows = grp.tasks.map(t => {
+  // Sort groups by STATUS_ORDER bucket
+  const sortedGroups = Object.entries(groups).sort(([,a],[,b]) => {
+    return (STATUS_ORDER.indexOf(a.bucket)||99) - (STATUS_ORDER.indexOf(b.bucket)||99);
+  });
+
+  container.innerHTML = sortedGroups.map(([status, grp]) => {
+    const cards = grp.tasks.map(t => {
       const pri       = t.priority || 'normal';
       const isOverdue = t.due_date && Number(t.due_date) < now;
-      let dueHtml = '—';
+      let dueHtml = '';
       if (t.due_date) {
-        const d  = new Date(Number(t.due_date));
-        const dl = Math.ceil((d - now) / 86400000);
-        const ds = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+        const dl = Math.ceil((Number(t.due_date) - now) / 86400000);
+        const ds = new Date(Number(t.due_date)).toLocaleDateString('en-US', { month:'short', day:'numeric' });
         const dc = dl < 0 ? 'due-overdue' : dl < 3 ? 'due-soon' : 'due-ok';
-        dueHtml  = `<span class="${dc}">${ds}${dl<0?' ('+Math.abs(dl)+'d ago)':''}</span>`;
+        const suffix = dl < 0 ? ` · ${Math.abs(dl)}d overdue` : dl === 0 ? ' · today' : dl === 1 ? ' · tomorrow' : '';
+        dueHtml = `<span class="tc-due ${dc}">📅 ${ds}${suffix}</span>`;
       }
-      const assignees = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'?').split('@')[0])).join(', ') || '—';
+      const assignees = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'?').split('@')[0])).join(', ');
       const listName  = typeof t.list === 'object' ? (t.list?.name || '') : (t.list || '');
       const listBadge = listName ? `<span class="tlist-badge">${esc(listName)}</span>` : '';
-      const link      = t.url  ? `<a href="${t.url}" target="_blank" class="olink">↗</a>` : '';
-      return `<tr${isOverdue?' class="overdue-row"':''}>
-        <td class="tname" title="${esc(t.name)}">${esc(t.name)}</td>
-        <td>${dueHtml}</td>
-        <td style="color:#888;font-size:12px">${esc(assignees)}</td>
-        <td>${listBadge}</td>
-        <td><span class="pbadge p-${pri}">${pri}</span></td>
-        <td>${link}</td>
-      </tr>`;
+      const link      = t.url ? `<a href="${esc(t.url)}" target="_blank" class="olink">↗</a>` : '';
+      return `<div class="tc${isOverdue?' tc-overdue':''}"
+        draggable="true"
+        ondragstart="event.dataTransfer.setData('text/plain','${esc(t.id)}');_dragTaskId='${esc(t.id)}';this.classList.add('dragging')"
+        ondragend="this.classList.remove('dragging');_dragTaskId=null">
+        <span class="tc-drag" title="Drag to Focus Queue">⠿</span>
+        <div class="tc-body">
+          <div class="tc-name" title="${esc(t.name)}">${esc(t.name)}</div>
+          <div class="tc-meta">
+            <span class="pbadge p-${pri}">${pri}</span>
+            ${listBadge}
+            ${dueHtml}
+            ${assignees ? `<span class="tc-assignee">👤 ${esc(assignees)}</span>` : ''}
+            ${link}
+          </div>
+        </div>
+      </div>`;
     }).join('');
+
     return `<div class="sg">
       <div class="sg-hd">
         <div class="sg-dot" style="background:${grp.color}"></div>
-        ${esc(status)} <span class="sg-count">(${grp.tasks.length})</span>
+        ${esc(status)} <span class="sg-count">${grp.tasks.length}</span>
       </div>
-      <table class="ttable">
-        <thead><tr><th>Task</th><th>Due</th><th>Assignee</th><th>List</th><th>Priority</th><th></th></tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
+      ${cards}
     </div>`;
   }).join('');
 }
