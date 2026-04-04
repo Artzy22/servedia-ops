@@ -1,0 +1,4 @@
+{
+  "_instructions": "Map each Meta Ads account ID to its ClickUp task ID. meta_account_id should match the account_id in data/meta.json (just the numeric part, no 'act_' prefix). clickup_task_id is the task ID from the ClickUp URL or API.",
+  "clients": []
+}

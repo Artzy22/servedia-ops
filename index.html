@@ -285,6 +285,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .msave:hover{background:#6d28d9}
 .mstatus{font-size:12px;color:#34d399;margin-top:8px;text-align:center;min-height:18px}
 
+/* ══════════ CLIENT INFO MODAL ══════════ */
+.cm-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.cm-ov.open{display:flex}
+.cm-modal{background:#111;border:1px solid #2a2a3a;border-radius:16px;width:100%;max-width:660px;max-height:88vh;overflow-y:auto;padding:28px;position:relative;box-shadow:0 32px 64px rgba(0,0,0,.7)}
+.cm-modal::-webkit-scrollbar{width:5px}.cm-modal::-webkit-scrollbar-track{background:transparent}.cm-modal::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+.cm-close{position:absolute;top:18px;right:20px;background:none;border:none;color:#555;cursor:pointer;font-size:20px;line-height:1;padding:4px;border-radius:4px;transition:color .15s}
+.cm-close:hover{color:#fff;background:#1e1e1e}
+.cm-loading{text-align:center;padding:48px;color:#555;font-size:14px}
+.cm-err{padding:28px;text-align:center}.cm-err h3{color:#f87171;margin-bottom:8px;font-size:16px}.cm-err p{color:#888;font-size:13px;margin-bottom:12px}.cm-err code{background:#1a1a1a;padding:2px 7px;border-radius:4px;font-size:11px;color:#a78bfa}
+.cm-retry{background:#1e1b33;border:1px solid #7c3aed;color:#a78bfa;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;transition:all .15s}.cm-retry:hover{background:#2d2b55}
+.cm-head{margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid #1e1e1e}
+.cm-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;line-height:1.2}
+.cm-subtitle{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.cm-status{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700;background:#1e1b33;color:#a78bfa;border:1px solid #2d2b55}
+.cm-assignee{font-size:12px;color:#888}
+.cm-updated{font-size:11px;color:#555}
+.cm-stale{background:#2a1a00;color:#fbbf24;border:1px solid #713f12;padding:2px 8px;border-radius:4px;font-size:11px}
+.cm-section{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;padding:16px;margin-bottom:12px}
+.cm-section-warn{background:#130d00;border-color:#92400e}
+.cm-section-hl{background:#0c0a1a;border-color:#2d2b55}
+.cm-slabel{font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.7px;font-weight:700;margin-bottom:5px}
+.cm-sval{font-size:15px;font-weight:700;color:#e0e0e0}
+.cm-row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.cm-dosdonts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cm-dos-list,.cm-donts-list{list-style:none;padding:0;margin:6px 0 0}
+.cm-dos-list li{color:#4ade80;font-size:12px;padding:3px 0;display:flex;align-items:flex-start;gap:5px;line-height:1.35}
+.cm-donts-list li{color:#f87171;font-size:12px;padding:3px 0;display:flex;align-items:flex-start;gap:5px;line-height:1.35}
+.cm-dos-list li::before{content:"✓";font-weight:800;flex-shrink:0;margin-top:1px}
+.cm-donts-list li::before{content:"✗";font-weight:800;flex-shrink:0;margin-top:1px}
+.cm-rules{font-size:12px;color:#fcd34d;line-height:1.55;white-space:pre-wrap}
+.cm-links{display:flex;gap:8px;flex-wrap:wrap}
+.cm-link{display:inline-flex;align-items:center;gap:5px;background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;padding:7px 13px;border-radius:7px;text-decoration:none;font-size:12px;font-weight:600;transition:all .15s}
+.cm-link:hover{background:#2d2b55;color:#c4b5fd;border-color:#7c3aed}
+.cm-comments{display:flex;flex-direction:column;gap:9px}
+.cm-comment{background:#0a0a0a;border:1px solid #111;border-radius:7px;padding:10px 12px}
+.cm-cmt-hd{display:flex;align-items:center;gap:6px;margin-bottom:5px;font-size:11px}
+.cm-cmt-author{color:#a78bfa;font-weight:700}
+.cm-cmt-date{color:#555}
+.cm-cmt-txt{font-size:12px;color:#ccc;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.cm-raw-toggle{background:none;border:none;color:#7c3aed;cursor:pointer;font-size:12px;padding:4px 0;font-weight:600;transition:color .15s}
+.cm-raw-toggle:hover{color:#a78bfa}
+.cm-raw{font-size:11px;color:#888;background:#080808;border:1px solid #111;border-radius:6px;padding:12px;margin-top:8px;white-space:pre-wrap;max-height:200px;overflow-y:auto;line-height:1.5;word-break:break-word}
+.cm-parse-warn{font-size:11px;color:#888;text-align:center;padding-top:8px;font-style:italic}
+.ci-btn{background:#1a1a2e;border:1px solid #2d2d50;color:#818cf8;cursor:pointer;font-family:inherit}
+.ci-btn:hover{background:#2d2b55;color:#c4b5fd;border-color:#7c3aed}
+
+/* ══════════ UI POLISH ══════════ */
+.header{background:linear-gradient(135deg,#0f0f1a 0%,#111 100%);border-bottom:1px solid #1a1a2e}
+.logo{letter-spacing:-.3px}
+.stat-card{background:linear-gradient(145deg,#111 0%,#0d0d0d 100%);border:1px solid #1e1e1e;transition:border-color .2s}
+.stat-card:hover{border-color:#2d2b55}
+.accard{box-shadow:0 2px 12px rgba(0,0,0,.4);transition:border-color .2s,box-shadow .2s}
+.accard:hover{border-color:#2d2b55;box-shadow:0 4px 20px rgba(124,58,237,.1)}
+.tab{transition:color .15s,border-color .15s}
+.tab.active{text-shadow:0 0 20px rgba(167,139,250,.3)}
+.hbtn{border-radius:8px;transition:all .15s}
+.hbtn:hover{background:#1e1b33;border-color:#7c3aed;color:#a78bfa}
+
 /* ══════════ Responsive ══════════ */
 @media(max-width:768px){
   .content{padding:12px 14px}
@@ -822,8 +880,9 @@ function renderMeta() {
       </div>
       <div id="mg-${id}-7d">${mkGrid(rows7)}</div>
       <div id="mg-${id}-30d" style="display:none">${mkGrid(rows30)}</div>
-      <div style="margin-top:10px">
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="dmc-link-btn" href="${adsUrl}" target="_blank">📈 Ads Manager</a>
+        <button class="dmc-link-btn ci-btn" onclick="openClientModal('${id}','${nameE}')">ℹ Client Info</button>
       </div>
     </div>`;
   }).join('');
@@ -1752,6 +1811,212 @@ async function loadAll() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// ══ CLIENT INFO MODAL ══
+// ══════════════════════════════════════════════════════════════
+const _clientInfoCache = new Map(); // accountId → { data, ts }
+const CM_TTL = 10 * 60 * 1000;     // 10 min
+let _clientMap = null;
+
+async function _loadClientMap() {
+  if (_clientMap) return _clientMap;
+  try {
+    const ts = Date.now();
+    const r = await fetch(`${BASE}/client-map.json?_=${ts}`);
+    if (!r.ok) throw new Error('not found');
+    _clientMap = await r.json();
+  } catch { _clientMap = { clients: [] }; }
+  return _clientMap;
+}
+
+function _parseClientDesc(md) {
+  if (!md) return {};
+  const sections = {};
+  const re = /^#{1,3}\s+(.+)\n([\s\S]*?)(?=^#{1,3}\s|\s*$)/gm;
+  let m;
+  while ((m = re.exec(md)) !== null) {
+    const key = m[1].trim().toLowerCase().replace(/[^a-z0-9\s]/g,'').trim();
+    sections[key] = m[2].trim();
+  }
+  const getUrl = t => { if (!t) return null; const u = t.match(/https?:\/\/[^\s)]+/); return u ? u[0] : null; };
+  const getList = t => { if (!t) return []; return t.split('\n').map(l => l.replace(/^[-*•]\s*/,'')).filter(Boolean); };
+  return {
+    offer:       sections['offer'] || sections['offer name'] || null,
+    dailyBudget: sections['daily budget'] || sections['budget'] || null,
+    funnelLink:  getUrl(sections['funnel link'] || sections['funnel'] || ''),
+    driveFolder: getUrl(sections['drive folder'] || sections['google drive'] || sections['drive'] || ''),
+    adDos:       getList(sections['ad dos'] || sections['dos'] || ''),
+    adDonts:     getList(sections['ad donts'] || sections['donts'] || sections['ad don\u2019ts'] || ''),
+    specialRules:sections['special rules'] || sections['rules'] || sections['client rules'] || null,
+    raw: md
+  };
+}
+
+function _getCFVal(task, ...names) {
+  const cfs = task.custom_fields || [];
+  for (const name of names) {
+    const lc = name.toLowerCase();
+    const f = cfs.find(f => (f.name || '').toLowerCase().includes(lc));
+    if (f && (f.value || f.value_richtext)) return f.value || f.value_richtext;
+  }
+  return null;
+}
+
+async function fetchClientInfo(accountId, forceRefresh) {
+  const cfg = getCfg();
+  if (!cfg.token) return { _error: 'no_token' };
+
+  if (!forceRefresh && _clientInfoCache.has(accountId)) {
+    const c = _clientInfoCache.get(accountId);
+    if (Date.now() - c.ts < CM_TTL) return { ...c.data, _cached: true, _cacheAge: Math.round((Date.now()-c.ts)/1000) };
+  }
+
+  const map = await _loadClientMap();
+  const entry = (map.clients || []).find(c =>
+    String(c.meta_account_id) === String(accountId) ||
+    String(c.meta_account_id) === 'act_' + accountId ||
+    String(c.meta_account_id).replace('act_','') === String(accountId)
+  );
+  if (!entry) return { _error: 'unmapped' };
+
+  const headers = { 'Authorization': cfg.token, 'Content-Type': 'application/json' };
+  let task;
+  try {
+    const r = await fetch(`https://api.clickup.com/api/v2/task/${entry.clickup_task_id}?include_subtasks=true`, { headers });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    task = await r.json();
+  } catch(e) {
+    if (_clientInfoCache.has(accountId)) return { ..._clientInfoCache.get(accountId).data, _stale: true };
+    return { _error: 'clickup_unavailable', msg: e.message };
+  }
+
+  let comments = [];
+  try {
+    const cr = await fetch(`https://api.clickup.com/api/v2/task/${entry.clickup_task_id}/comment`, { headers });
+    if (cr.ok) {
+      const cd = await cr.json();
+      comments = (cd.comments || []).slice(0, 5).map(c => ({
+        text: Array.isArray(c.comment) ? c.comment.map(x => x.text||'').join('') : (c.comment_text || ''),
+        author: c.user?.username || c.user?.email || 'Unknown',
+        date: c.date,
+        dateFmt: c.date ? new Date(parseInt(c.date)).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : ''
+      }));
+    }
+  } catch { /* non-critical */ }
+
+  const parsed = _parseClientDesc(task.markdown_description || task.description || '');
+  const data = {
+    name: task.name || entry.client_name || 'Unknown Client',
+    status: typeof task.status === 'object' ? (task.status?.status || 'Unknown') : (task.status || 'Unknown'),
+    assignees: (task.assignees || []).map(a => a.username || a.email).filter(Boolean),
+    priority: typeof task.priority === 'object' ? (task.priority?.priority || null) : (task.priority || null),
+    clickupUrl: task.url,
+    lastUpdated: task.date_updated,
+    offer:        _getCFVal(task,'offer name','offer') || parsed.offer,
+    dailyBudget:  _getCFVal(task,'daily budget','budget') || parsed.dailyBudget,
+    funnelLink:   _getCFVal(task,'funnel link','funnel') || parsed.funnelLink,
+    driveFolder:  _getCFVal(task,'drive folder','google drive') || parsed.driveFolder,
+    adDos:        parsed.adDos,
+    adDonts:      parsed.adDonts,
+    specialRules: _getCFVal(task,'special rules','client rules','rules') || parsed.specialRules,
+    recentComments: comments,
+    _rawDescription: parsed.raw,
+    _parsedFromDescription: !_getCFVal(task,'offer name','offer'),
+    _fetchedAt: new Date().toISOString()
+  };
+
+  _clientInfoCache.set(accountId, { data, ts: Date.now() });
+  return data;
+}
+
+function openClientModal(accountId, accountName) {
+  const ov = document.getElementById('clientModalOv');
+  const body = document.getElementById('clientModalBody');
+  body.innerHTML = '<div class="cm-loading">Loading client info…</div>';
+  ov.classList.add('open');
+  document.addEventListener('keydown', _cmEsc);
+
+  fetchClientInfo(accountId, false).then(data => {
+    if (data._error === 'no_token') {
+      body.innerHTML = `<div class="cm-err"><h3>Token Required</h3><p>Set your ClickUp API token in ⚙ Config to load client details.</p></div>`;
+    } else if (data._error === 'unmapped') {
+      body.innerHTML = `<div class="cm-err"><h3>Client Not Linked</h3><p>This Meta account isn't mapped to a ClickUp task yet.</p><p>Add it to <code>data/client-map.json</code> and push to GitHub.</p></div>`;
+    } else if (data._error === 'clickup_unavailable') {
+      body.innerHTML = `<div class="cm-err"><h3>ClickUp Unavailable</h3><p>Could not reach ClickUp API. ${esc(data.msg||'')}</p><button class="cm-retry" onclick="openClientModal('${esc(accountId)}','${esc(accountName)}')">↻ Retry</button></div>`;
+    } else {
+      body.innerHTML = renderClientModalContent(accountId, data);
+    }
+  }).catch(e => {
+    body.innerHTML = `<div class="cm-err"><h3>Error</h3><p>${esc(String(e))}</p></div>`;
+  });
+}
+
+function renderClientModalContent(accountId, d) {
+  const staleHtml = d._stale ? `<span class="cm-stale">⚠ Stale</span>` : '';
+  const cachedHtml = d._cached && !d._stale ? `<span class="cm-updated">(cached ${d._cacheAge}s ago)</span>` : '';
+  const updatedHtml = d.lastUpdated ? `<span class="cm-updated">Updated ${fmtTime(parseInt(d.lastUpdated))}</span>` : '';
+
+  const offerHtml = `<div class="cm-section cm-section-hl"><div class="cm-row2">
+    <div><div class="cm-slabel">Offer</div><div class="cm-sval">${esc(d.offer||'—')}</div></div>
+    <div><div class="cm-slabel">Daily Budget</div><div class="cm-sval">${esc(d.dailyBudget||'—')}</div></div>
+  </div></div>`;
+
+  let dosDontsHtml = '';
+  if (d.adDos?.length || d.adDonts?.length) {
+    dosDontsHtml = `<div class="cm-section"><div class="cm-dosdonts">
+      <div><div class="cm-slabel">Ad Do's</div><ul class="cm-dos-list">${(d.adDos||[]).map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>
+      <div><div class="cm-slabel">Ad Don'ts</div><ul class="cm-donts-list">${(d.adDonts||[]).map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>
+    </div></div>`;
+  }
+
+  const rulesHtml = d.specialRules
+    ? `<div class="cm-section cm-section-warn"><div class="cm-slabel">⚠ Special Rules</div><div class="cm-rules">${esc(d.specialRules)}</div></div>`
+    : '';
+
+  const linksArr = [];
+  if (d.funnelLink) linksArr.push(`<a class="cm-link" href="${esc(d.funnelLink)}" target="_blank" rel="noopener">🔗 Funnel Page</a>`);
+  if (d.driveFolder) linksArr.push(`<a class="cm-link" href="${esc(d.driveFolder)}" target="_blank" rel="noopener">📁 Drive Folder</a>`);
+  if (d.clickupUrl) linksArr.push(`<a class="cm-link" href="${esc(d.clickupUrl)}" target="_blank" rel="noopener">📋 ClickUp Task</a>`);
+  const linksHtml = linksArr.length ? `<div class="cm-section"><div class="cm-links">${linksArr.join('')}</div></div>` : '';
+
+  let commentsHtml = '';
+  if (d.recentComments?.length) {
+    const items = d.recentComments.map(c =>
+      `<div class="cm-comment"><div class="cm-cmt-hd"><span class="cm-cmt-author">${esc(c.author)}</span><span class="cm-cmt-date">${esc(c.dateFmt)}</span></div><div class="cm-cmt-txt">${esc(c.text)}</div></div>`
+    ).join('');
+    commentsHtml = `<div class="cm-section"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="cm-slabel" style="margin-bottom:0">Recent Team Notes</div>
+      <button class="cm-retry" style="font-size:11px;padding:4px 10px" onclick="(()=>{_clientInfoCache.delete('${esc(accountId)}');openClientModal('${esc(accountId)}','')})()">↻ Refresh</button>
+    </div><div class="cm-comments">${items}</div></div>`;
+  } else {
+    commentsHtml = `<div class="cm-section"><div class="cm-slabel">Recent Team Notes</div><div class="cm-updated" style="margin-top:6px">No recent comments</div></div>`;
+  }
+
+  const rawHtml = d._rawDescription
+    ? `<div class="cm-section"><button class="cm-raw-toggle" onclick="const r=this.nextElementSibling;r.style.display=r.style.display==='none'?'':'none';this.textContent=(r.style.display===''?'▼':'▶')+' Raw Description'">▶ Raw Description</button><pre class="cm-raw" style="display:none">${esc((d._rawDescription||'').slice(0,5000))}</pre></div>`
+    : '';
+
+  const parseWarnHtml = d._parsedFromDescription
+    ? `<div class="cm-parse-warn">ℹ Data parsed from task description — some fields may be missing</div>`
+    : '';
+
+  return `<div class="cm-head">
+    <div class="cm-title">${esc(d.name)}</div>
+    <div class="cm-subtitle">
+      <span class="cm-status">${esc(d.status)}</span>
+      ${d.assignees?.length ? `<span class="cm-assignee">👤 ${esc(d.assignees.join(', '))}</span>` : ''}
+      ${updatedHtml}${staleHtml}${cachedHtml}
+    </div>
+  </div>
+  ${offerHtml}${dosDontsHtml}${rulesHtml}${linksHtml}${commentsHtml}${rawHtml}${parseWarnHtml}`;
+}
+
+function closeClientModal() {
+  document.getElementById('clientModalOv').classList.remove('open');
+  document.removeEventListener('keydown', _cmEsc);
+}
+function _cmEsc(e) { if (e.key === 'Escape') closeClientModal(); }
+
+// ══════════════════════════════════════════════════════════════
 // AUTO-REFRESH — 30s when live, 60s when cached. Live countdown.
 // ══════════════════════════════════════════════════════════════
 setInterval(() => {
@@ -1777,5 +2042,13 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAll();
 });
 </script>
+
+<!-- ════════ CLIENT INFO MODAL ════════ -->
+<div id="clientModalOv" class="cm-ov" onclick="if(event.target===this)closeClientModal()">
+  <div class="cm-modal">
+    <button class="cm-close" onclick="closeClientModal()">✕</button>
+    <div id="clientModalBody"><div class="cm-loading">Loading client info…</div></div>
+  </div>
+</div>
 </body>
 </html>
