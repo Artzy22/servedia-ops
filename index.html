@@ -369,6 +369,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="due">Due Date</option>
       <option value="updated">Recently Updated</option>
     </select>
+    <select class="filter-select" id="cuAssignee" onchange="taskAssignee=this.value;renderTasks()">
+      <option value="all">All Assignees</option>
+    </select>
   </div>
   <div style="font-size:11px;color:#555;margin-bottom:12px" id="cuUpdated"></div>
   <div id="cuGroups"></div>
@@ -378,9 +381,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 <div id="panel-video" class="panel content">
   <div class="stat-grid">
     <div class="stat-card"><div class="stat-label">Total Tickets</div><div class="stat-value purple" id="vidTotal">–</div></div>
-    <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value orange" id="vidApproval">–</div></div>
+    <div class="stat-card"><div class="stat-label">To Do</div><div class="stat-value" id="vidTodo">–</div></div>
     <div class="stat-card"><div class="stat-label">Working On</div><div class="stat-value blue" id="vidWorking">–</div></div>
     <div class="stat-card"><div class="stat-label">Waiting On</div><div class="stat-value yellow" id="vidWaiting">–</div></div>
+    <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value orange" id="vidApproval">–</div></div>
     <div class="stat-card"><div class="stat-label">Done</div><div class="stat-value green" id="vidDone">–</div></div>
   </div>
   <div class="filters">
@@ -455,7 +459,7 @@ const CU_API = 'https://api.clickup.com/api/v2';
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null;
-let selectedChannel = null, taskFilter = 'all', dmFilter = 'all';
+let selectedChannel = null, taskFilter = 'all', taskAssignee = 'all', dmFilter = 'all';
 let lastSyncTime = null;
 const OFFER_CACHE = {}; // clientId → full offer text
 
@@ -1114,12 +1118,26 @@ function renderTasks() {
   let mine = tasks.filter(isByronOrAnka);
   if (!mine.length && tasks.length) mine = tasks;
 
+  // Populate assignee dropdown
+  const assigneeSel = document.getElementById('cuAssignee');
+  const allAssignees = [...new Set(mine.flatMap(t =>
+    (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]))
+  ).filter(Boolean))].sort();
+  const curAssignee = assigneeSel.value;
+  assigneeSel.innerHTML = '<option value="all">All Assignees</option>' +
+    allAssignees.map(n => `<option value="${n}"${n===curAssignee?' selected':''}>${n}</option>`).join('');
+  if (taskAssignee !== 'all' && !allAssignees.includes(taskAssignee)) taskAssignee = 'all';
+
   let list = mine.filter(t => {
     if (search && !(t.name || '').toLowerCase().includes(search)) return false;
     if (taskFilter === 'urgent'  && t.priority !== 'urgent') return false;
     if (taskFilter === 'high'    && t.priority !== 'high' && t.priority !== 'urgent') return false;
     if (taskFilter === 'overdue' && (!t.due_date || Number(t.due_date) >= now)) return false;
     if (taskFilter === 'nodue'   && t.due_date) return false;
+    if (taskAssignee !== 'all') {
+      const names = (t.assignees || []).map(a => typeof a === 'string' ? a : (a.username || (a.email||'').split('@')[0]));
+      if (!names.includes(taskAssignee)) return false;
+    }
     return true;
   });
 
@@ -1214,18 +1232,19 @@ function renderVideo() {
   );
 
   const COLS = [
-    { key:'approval', label:'👀 Needs Approval', cls:'needs-approval', match: s => /approval/i.test(s) },
-    { key:'working',  label:'⚡ Working On',      cls:'working-on',     match: s => /working|progress/i.test(s) },
-    { key:'waiting',  label:'⏳ Waiting On',       cls:'waiting-on',     match: s => /waiting/i.test(s) },
-    { key:'done',     label:'✅ Done',             cls:'done',           match: s => /done|complet/i.test(s) },
+    { key:'todo',     label:'📋 To Do',           cls:'todo',           match: s => /^to.?do$|^open$|^new$|^not.?start/i.test(s) },
+    { key:'working',  label:'⚡ Working On',       cls:'working-on',     match: s => /work|progress|in.?prog|active|started/i.test(s) },
+    { key:'waiting',  label:'⏳ Waiting On',        cls:'waiting-on',     match: s => /wait/i.test(s) },
+    { key:'approval', label:'👀 Needs Approval',   cls:'needs-approval', match: s => /approv|review|feedback|revision/i.test(s) },
+    { key:'done',     label:'✅ Done',              cls:'done',           match: s => /done|complet|finish|closed|delivered/i.test(s) },
   ];
 
-  const grouped = { approval:[], working:[], waiting:[], done:[] };
+  const grouped = { todo:[], working:[], waiting:[], approval:[], done:[] };
   filtered.forEach(t => {
-    const s = t.status || '';
+    const s = (t.status || '').trim();
     let placed = false;
     for (const col of COLS) { if (col.match(s)) { grouped[col.key].push(t); placed = true; break; } }
-    if (!placed) grouped.waiting.push(t);
+    if (!placed) grouped.todo.push(t);  // unknown statuses → To Do
   });
 
   // Sort Needs Approval by priority
@@ -1233,9 +1252,10 @@ function renderVideo() {
   grouped.approval.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
 
   document.getElementById('vidTotal').textContent    = tasks.length;
-  document.getElementById('vidApproval').textContent = grouped.approval.length;
+  document.getElementById('vidTodo').textContent     = grouped.todo.length;
   document.getElementById('vidWorking').textContent  = grouped.working.length;
   document.getElementById('vidWaiting').textContent  = grouped.waiting.length;
+  document.getElementById('vidApproval').textContent = grouped.approval.length;
   document.getElementById('vidDone').textContent     = grouped.done.length;
   document.getElementById('videoBadge').textContent  = grouped.approval.length || tasks.length;
   if (vidData.pulled_at) document.getElementById('vidUpdated').textContent = 'Synced: ' + fmtTime(vidData.pulled_at);
@@ -1256,13 +1276,14 @@ function renderVideo() {
       const link    = t.url ? `<a href="${t.url}" target="_blank" class="vlink">↗</a>` : '';
       const comment = t.comment_count ? `<span style="color:#555;font-size:10px">💬 ${t.comment_count}</span>` : '';
       const pColor  = priColors[pri] || '#818cf8';
+      const statusBadge = t.status ? `<span style="font-size:9px;color:#555;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:4px;padding:1px 5px">${esc(t.status)}</span>` : '';
       return `<div class="vcard">
         <div class="vcard-client">${esc(t.client_name || '(No client)')}</div>
         <div class="vcard-name">${esc(t.name || 'Untitled')}</div>
         <div class="vcard-meta">
           <span class="vpri" style="background:${pColor}22;color:${pColor};border:1px solid ${pColor}44">${pri}</span>
           <span class="vassignee">${esc(assignees)}</span>
-          ${dueHtml}${comment}${link}
+          ${statusBadge}${dueHtml}${comment}${link}
         </div>
       </div>`;
     }).join('') : `<div style="padding:14px;color:#555;font-size:12px;text-align:center">None</div>`;
