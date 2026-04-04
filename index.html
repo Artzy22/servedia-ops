@@ -454,7 +454,7 @@ const BASE = 'https://raw.githubusercontent.com/Artzy22/servedia-ops/main/data';
 const CU_API = 'https://api.clickup.com/api/v2';
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
-let metaData = null, cuData = null, slData = null, vidData = null, maintData = null;
+let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null;
 let selectedChannel = null, taskFilter = 'all', dmFilter = 'all';
 let lastSyncTime = null;
 const OFFER_CACHE = {}; // clientId → full offer text
@@ -809,7 +809,7 @@ function buildDmClients() {
       marketingOffers:  cu ? cu.marketing_offers    : null,
       dosDonts:         cu ? cu.dos_donts           : null,
       contentStatus:    cu ? cu.content_status      : null,
-      driveLink:        cu ? (cu.drive_link || DRIVE_ROOT) : DRIVE_ROOT,
+      driveLink:        cu && cu.drive_link ? cu.drive_link : getDriveFolder(name),
       statsSheet:       cu ? cu.stats_sheet_url     : null,
       serviceAd:        cu ? cu.service_advertised  : null,
       optNotes:         cu ? cu.optimization_notes  : null,
@@ -825,6 +825,35 @@ function wordsOverlap(a, b) {
   const wa = a.split(/\s+/).filter(w => w.length > 3);
   const wb = new Set(b.split(/\s+/).filter(w => w.length > 3));
   return wa.some(w => wb.has(w));
+}
+
+// Find the best matching Drive folder URL for a given client name
+function getDriveFolder(clientName) {
+  const folders = (driveData && driveData.folders) || [];
+  if (!folders.length) return DRIVE_ROOT;
+
+  const cn = clientName.toLowerCase().trim();
+
+  // 1. Exact match
+  let match = folders.find(f => f.name_norm === cn);
+  if (match) return match.url;
+
+  // 2. One contains the other
+  match = folders.find(f => cn.includes(f.name_norm) || f.name_norm.includes(cn));
+  if (match) return match.url;
+
+  // 3. Word overlap (meaningful words only, length > 3)
+  const clientWords = new Set(cn.split(/\s+/).filter(w => w.length > 3));
+  let bestScore = 0, bestMatch = null;
+  for (const f of folders) {
+    const folderWords = f.name_norm.split(/\s+/).filter(w => w.length > 3);
+    const shared = folderWords.filter(w => clientWords.has(w)).length;
+    if (shared > bestScore) { bestScore = shared; bestMatch = f; }
+  }
+  if (bestScore >= 1) return bestMatch.url;
+
+  // 4. Fallback to root
+  return DRIVE_ROOT;
 }
 
 function setDmFilter(f) {
@@ -963,7 +992,7 @@ function renderMaintenance() {
           <div class="dmc-dosdont">${esc(c.optNotes)}</div>
         </div>` : ''}
         ${!c.driveLink && !c.statsSheet && !offerFull && !c.dosDonts
-          ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive Root</span><a class="dmc-alink" href="${DRIVE_ROOT}" target="_blank">📂 Open Servedia Drive →</a></div>` : ''}
+          ? `<div class="dmc-asset-row"><span class="dmc-asset-lbl">Drive</span><a class="dmc-alink" href="${getDriveFolder(c.name)}" target="_blank">📂 ${driveData ? 'Open Folder →' : 'Open Servedia Drive →'}</a></div>` : ''}
       </div>
     </div>`;
 
@@ -1309,20 +1338,22 @@ async function loadAll() {
   // All data comes from pre-synced JSON files written by GitHub Actions every 30 min.
   // No API tokens needed in the browser.
   const results = await Promise.allSettled([
-    fetchJ(`${BASE}/meta.json?_=${ts}`),          // 0 — Meta Ads
-    fetchJ(`${BASE}/clickup.json?_=${ts}`),        // 1 — Tasks (Client Mgmt list)
-    fetchJ(`${BASE}/slack.json?_=${ts}`),          // 2 — Slack
-    fetchJ(`${BASE}/video-editing.json?_=${ts}`),  // 3 — Video editing tickets
-    fetchJ(`${BASE}/maintenance.json?_=${ts}`),    // 4 — Ads Management + custom fields
+    fetchJ(`${BASE}/meta.json?_=${ts}`),           // 0 — Meta Ads
+    fetchJ(`${BASE}/clickup.json?_=${ts}`),         // 1 — Tasks (Client Mgmt list)
+    fetchJ(`${BASE}/slack.json?_=${ts}`),           // 2 — Slack
+    fetchJ(`${BASE}/video-editing.json?_=${ts}`),   // 3 — Video editing tickets
+    fetchJ(`${BASE}/maintenance.json?_=${ts}`),     // 4 — Ads Management + custom fields
+    fetchJ(`${BASE}/drive-folders.json?_=${ts}`),   // 5 — Google Drive folder map
   ]);
 
-  if (results[0].status === 'fulfilled' && results[0].value) { metaData  = results[0].value; renderMeta(); }
-  if (results[1].status === 'fulfilled' && results[1].value) { cuData    = results[1].value; renderTasks(); }
-  if (results[2].status === 'fulfilled' && results[2].value) { slData    = results[2].value; renderSlack(); }
-  if (results[3].status === 'fulfilled' && results[3].value) { vidData   = results[3].value; renderVideo(); }
-  if (results[4].status === 'fulfilled' && results[4].value) { maintData = results[4].value; }
+  if (results[0].status === 'fulfilled' && results[0].value) { metaData   = results[0].value; renderMeta(); }
+  if (results[1].status === 'fulfilled' && results[1].value) { cuData     = results[1].value; renderTasks(); }
+  if (results[2].status === 'fulfilled' && results[2].value) { slData     = results[2].value; renderSlack(); }
+  if (results[3].status === 'fulfilled' && results[3].value) { vidData    = results[3].value; renderVideo(); }
+  if (results[4].status === 'fulfilled' && results[4].value) { maintData  = results[4].value; }
+  if (results[5].status === 'fulfilled' && results[5].value) { driveData  = results[5].value; }
 
-  // Always render maintenance — it works with just meta.json if maintenance.json isn't ready yet
+  // Always render maintenance — works with just meta.json if other files aren't ready yet
   renderMaintenance();
 
   lastSyncTime = Date.now();

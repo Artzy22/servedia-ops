@@ -1,0 +1,89 @@
+name: Sync Google Drive Folders
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours (folder list changes rarely)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: List client Drive subfolders
+        env:
+          GOOGLE_DRIVE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
+        run: |
+          ROOT_FOLDER_ID="1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr"
+
+          python3 << 'PYEOF'
+import json, urllib.request, urllib.parse, os, sys
+
+api_key    = os.environ["GOOGLE_DRIVE_API_KEY"]
+root_id    = "1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr"
+folders    = []
+page_token = None
+
+while True:
+    params = {
+        "q":        f"'{root_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false",
+        "fields":   "nextPageToken, files(id, name, modifiedTime)",
+        "pageSize": "1000",
+        "key":      api_key,
+    }
+    if page_token:
+        params["pageToken"] = page_token
+
+    url = "https://www.googleapis.com/drive/v3/files?" + urllib.parse.urlencode(params)
+    try:
+        with urllib.request.urlopen(url, timeout=15) as resp:
+            data = json.loads(resp.read())
+    except Exception as e:
+        print(f"ERROR fetching Drive: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    for f in data.get("files", []):
+        folders.append({
+            "id":           f["id"],
+            "name":         f["name"],
+            "url":          f"https://drive.google.com/drive/folders/{f['id']}",
+            "modified":     f.get("modifiedTime"),
+            # Normalized name for matching (lowercase, strip common words)
+            "name_norm":    f["name"].lower().strip(),
+        })
+
+    page_token = data.get("nextPageToken")
+    if not page_token:
+        break
+
+import subprocess
+pulled_at = subprocess.check_output(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
+
+result = {
+    "root_id":   root_id,
+    "root_url":  f"https://drive.google.com/drive/folders/{root_id}",
+    "folders":   sorted(folders, key=lambda x: x["name"]),
+    "count":     len(folders),
+    "pulled_at": pulled_at,
+}
+
+with open("data/drive-folders.json", "w") as f:
+    json.dump(result, f, indent=2)
+
+print(f"Found {len(folders)} Drive folders")
+for fo in sorted(folders, key=lambda x: x["name"]):
+    print(f"  {fo['name']}")
+PYEOF
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main
+          git add data/drive-folders.json
+          git diff --staged --quiet || git commit -m "sync drive folders [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git push
