@@ -285,6 +285,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .msave:hover{background:#6d28d9}
 .mstatus{font-size:12px;color:#34d399;margin-top:8px;text-align:center;min-height:18px}
 
+/* ══════════ ENRICHED MAINTENANCE CARD ══════════ */
+.dmc-contact{font-size:12px;color:#888;margin-bottom:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.dmc-contact a{color:#60a5fa;text-decoration:none;font-size:11px}
+.dmc-contact a:hover{color:#a78bfa}
+.dmc-health{background:#0a0a14;border:1px solid #1e1e2e;border-radius:8px;padding:11px 13px;margin-bottom:11px;display:grid;grid-template-columns:1fr 1fr;gap:7px 16px}
+.dmc-hrow{display:flex;align-items:flex-start;gap:5px;font-size:11px;line-height:1.35}
+.dmc-hicon{flex-shrink:0;font-size:11px;margin-top:1px}
+.dmc-hlabel{color:#555;min-width:0}
+.dmc-hval{color:#ccc;font-weight:600;flex:1;min-width:0}
+.dmc-hval.hv-green{color:#34d399}.dmc-hval.hv-red{color:#f87171}.dmc-hval.hv-yellow{color:#fbbf24}.dmc-hval.hv-orange{color:#fb923c}
+.dmc-renewal-warn{background:#130000;border:1px solid #5c1b1b;border-radius:6px;padding:6px 10px;font-size:11px;color:#f87171;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+
+/* ══════════ RETENTION RISK TAB ══════════ */
+.ret-stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px}
+.ret-section{margin-bottom:20px}
+.ret-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;padding:8px 12px;border-radius:8px 8px 0 0;display:flex;align-items:center;gap:8px}
+.ret-title-red{background:#450a0a;color:#f87171}
+.ret-title-orange{background:#2a1200;color:#fb923c}
+.ret-title-yellow{background:#2a1a00;color:#fbbf24}
+.ret-title-green{background:#052e16;color:#34d399}
+.ret-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;padding:2px 0}
+.ret-card{background:#111;border:1px solid #1e1e1e;border-radius:0 0 10px 10px;padding:14px;margin-bottom:0}
+.ret-card.critical{border-color:#7f1d1d;background:#120505}
+.ret-card.guarantee{border-color:#7c2d12}
+.ret-card.watch{border-color:#1e1e1e}
+.ret-client-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px}
+.ret-signals{font-size:12px;color:#888;line-height:1.5;margin-bottom:8px}
+.ret-risk-bar{height:4px;border-radius:2px;margin-bottom:8px;background:#1a1a1a;overflow:hidden}
+.ret-risk-fill{height:100%;border-radius:2px;transition:width .3s}
+.ret-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.ret-actions{display:flex;gap:7px;flex-wrap:wrap}
+.ret-summary-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;background:#0d0d0d;border:1px solid #1a1a1a;border-radius:10px;padding:14px;margin-bottom:18px}
+.ret-sum-item{text-align:center}
+.ret-sum-val{font-size:22px;font-weight:800;margin-bottom:3px}
+.ret-sum-lbl{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px}
+
 /* ══════════ CLIENT INFO MODAL ══════════ */
 .cm-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
 .cm-ov.open{display:flex}
@@ -379,6 +415,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="tab" id="tab-tasks" onclick="switchTab('tasks')">☑ Tasks <span class="tab-badge orange" id="tasksBadge">–</span></div>
   <div class="tab" id="tab-video" onclick="switchTab('video')">🎬 Video Editing <span class="tab-badge blue" id="videoBadge">–</span></div>
   <div class="tab" id="tab-slack" onclick="switchTab('slack')">💬 Slack <span class="tab-badge orange" id="slackBadge">–</span></div>
+  <div class="tab" id="tab-retention" onclick="switchTab('retention')">⚠️ Retention <span class="tab-badge red" id="retBadge">–</span></div>
 </div>
 
 <!-- ════════════════ META ADS ════════════════ -->
@@ -540,6 +577,37 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
 </div>
 
+<!-- ════════════════ RETENTION RISK ════════════════ -->
+<div id="panel-retention" class="panel content">
+  <div class="ret-summary-row">
+    <div class="ret-sum-item"><div class="ret-sum-val red" id="retAtRiskMRR" style="color:#f87171">—</div><div class="ret-sum-lbl">At-Risk MRR</div></div>
+    <div class="ret-sum-item"><div class="ret-sum-val" id="retCritical" style="color:#f87171">—</div><div class="ret-sum-lbl">Critical</div></div>
+    <div class="ret-sum-item"><div class="ret-sum-val" id="retWatchList" style="color:#fbbf24">—</div><div class="ret-sum-lbl">Watch List</div></div>
+    <div class="ret-sum-item"><div class="ret-sum-val" id="retChurnRate" style="color:#fb923c">—</div><div class="ret-sum-lbl">Lifetime Churn</div></div>
+  </div>
+  <div id="retNeedsCfg" style="display:none" class="cfg-warn">
+    <div class="cfg-warn-icon">⚙</div>
+    <div>Set your <strong>Client Management List ID</strong> in ⚙ Config and ensure your ClickUp token is set to load retention data.</div>
+  </div>
+  <div id="retCriticalSection" class="ret-section" style="display:none">
+    <div class="ret-section-title ret-title-red">🔴 Immediate Risk — Unhappy + Renewal ≤14 days</div>
+    <div class="ret-grid" id="retCriticalGrid"></div>
+  </div>
+  <div id="retGuaranteeSection" class="ret-section" style="display:none">
+    <div class="ret-section-title ret-title-orange">🟠 Guarantee Risk — Money-Back Period + Not Happy</div>
+    <div class="ret-grid" id="retGuaranteeGrid"></div>
+  </div>
+  <div id="retWatchSection" class="ret-section" style="display:none">
+    <div class="ret-section-title ret-title-yellow">🟡 Watch List — Unhappy or Not Happy</div>
+    <div class="ret-grid" id="retWatchGrid"></div>
+  </div>
+  <div id="retWinsSection" class="ret-section" style="display:none">
+    <div class="ret-section-title ret-title-green">✅ Retention Wins — Happy &amp; Renewed</div>
+    <div class="ret-grid" id="retWinsGrid"></div>
+  </div>
+  <div id="retLoadingMsg" style="text-align:center;padding:48px;color:#555;font-size:14px">Set Client Management List ID in Config to load retention data.</div>
+</div>
+
 <!-- ════════════════ SETTINGS MODAL ════════════════ -->
 <div class="modal-ov" id="settingsModal">
   <div class="modal">
@@ -567,6 +635,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <input class="minput" id="cfTasksListId" placeholder="e.g. 901234567892">
       <div class="mhint">If set, tasks will be fetched from this ClickUp list instead of the JSON file.</div>
     </div>
+    <div class="mfield">
+      <label class="mlabel">Client Management List ID <span style="color:#fb923c;font-size:10px">— powers Retention Risk + Auto-Mapping</span></label>
+      <input class="minput" id="cfClientMgmtListId" placeholder="e.g. 901234567893">
+      <div class="mhint">The ClickUp "Client Management" list ID. Enables auto client mapping, enriched Daily Maintenance cards, and the Retention Risk tab. Find it in the list URL.</div>
+    </div>
     <hr class="msep">
     <div class="mfield">
       <label class="mlabel">GitHub PAT (optional — for notes sync)</label>
@@ -587,6 +660,8 @@ const CU_API = 'https://api.clickup.com/api/v2';
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null;
+let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
+let clientMgmtAllTasks = [];  // all tasks from Client Management list (for Retention tab)
 let selectedChannel = null, taskFilter = 'all', taskAssignee = 'all', dmFilter = 'all';
 let lastSyncTime = null;
 const OFFER_CACHE = {}; // clientId → full offer text
@@ -609,22 +684,24 @@ const BUDGETS = { 'rebalance': 150, 'celebrity body sculpting': 60, 'ra sculpt':
 // ══════════════════════════════════════════════════════════════
 function getCfg() {
   return {
-    token:       localStorage.getItem('cu_token') || '',
-    adsListId:   localStorage.getItem('cu_ads_list') || '',
-    videoListId: localStorage.getItem('cu_video_list') || '',
-    tasksListId: localStorage.getItem('cu_tasks_list') || '',
-    ghPat:       localStorage.getItem('gh_pat') || '',
+    token:             localStorage.getItem('cu_token') || '',
+    adsListId:         localStorage.getItem('cu_ads_list') || '',
+    videoListId:       localStorage.getItem('cu_video_list') || '',
+    tasksListId:       localStorage.getItem('cu_tasks_list') || '',
+    clientMgmtListId:  localStorage.getItem('cu_client_mgmt_list') || '',
+    ghPat:             localStorage.getItem('gh_pat') || '',
   };
 }
 
 function openSettings() {
   const c = getCfg();
-  document.getElementById('cfToken').value     = c.token;
-  document.getElementById('cfAdsListId').value = c.adsListId;
-  document.getElementById('cfVideoListId').value = c.videoListId;
-  document.getElementById('cfTasksListId').value = c.tasksListId;
-  document.getElementById('cfGhPat').value     = c.ghPat;
-  document.getElementById('cfgStatus').textContent = '';
+  document.getElementById('cfToken').value           = c.token;
+  document.getElementById('cfAdsListId').value       = c.adsListId;
+  document.getElementById('cfVideoListId').value     = c.videoListId;
+  document.getElementById('cfTasksListId').value     = c.tasksListId;
+  document.getElementById('cfClientMgmtListId').value = c.clientMgmtListId;
+  document.getElementById('cfGhPat').value           = c.ghPat;
+  document.getElementById('cfgStatus').textContent   = '';
   document.getElementById('settingsModal').classList.add('open');
 }
 
@@ -633,11 +710,13 @@ function closeSettings() {
 }
 
 function saveSettings() {
-  localStorage.setItem('cu_token',      document.getElementById('cfToken').value.trim());
-  localStorage.setItem('cu_ads_list',   document.getElementById('cfAdsListId').value.trim());
-  localStorage.setItem('cu_video_list', document.getElementById('cfVideoListId').value.trim());
-  localStorage.setItem('cu_tasks_list', document.getElementById('cfTasksListId').value.trim());
-  localStorage.setItem('gh_pat',        document.getElementById('cfGhPat').value.trim());
+  localStorage.setItem('cu_token',            document.getElementById('cfToken').value.trim());
+  localStorage.setItem('cu_ads_list',         document.getElementById('cfAdsListId').value.trim());
+  localStorage.setItem('cu_video_list',       document.getElementById('cfVideoListId').value.trim());
+  localStorage.setItem('cu_tasks_list',       document.getElementById('cfTasksListId').value.trim());
+  localStorage.setItem('cu_client_mgmt_list', document.getElementById('cfClientMgmtListId').value.trim());
+  localStorage.setItem('gh_pat',              document.getElementById('cfGhPat').value.trim());
+  localStorage.removeItem('cu_client_mgmt_cache'); // invalidate cache on save
   document.getElementById('cfgStatus').textContent = '✓ Saved! Refreshing data...';
   setTimeout(() => { closeSettings(); loadAll(); }, 800);
 }
@@ -738,6 +817,99 @@ function getCF(task, nameFragment) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// CLIENT MANAGEMENT — build enriched record from ClickUp task
+// ══════════════════════════════════════════════════════════════
+function buildCMRecord(task) {
+  // Helper for date fields — returns ms number or null
+  const getDate = (frag) => {
+    const v = getCF(task, frag);
+    if (!v) return null;
+    const n = Number(v);
+    return isNaN(n) ? null : n;
+  };
+  const happiness = getCF(task, 'client happiness');
+  const refundRaw = getCF(task, 'refund needed');
+  const refund = refundRaw === true || refundRaw === 1 || String(refundRaw).toLowerCase() === 'yes' || String(refundRaw).toLowerCase() === 'true';
+  return {
+    taskId:            task.id,
+    taskName:          task.name,
+    taskUrl:           task.url,
+    lifecycleStatus:   task.status,
+    // Contact
+    contactName:       getCF(task, 'client full name') || getCF(task, 'client name'),
+    phone:             getCF(task, 'phone') || getCF(task, 'managers phone'),
+    // Health
+    clientHappiness:   happiness,
+    refundNeeded:      refund,
+    adStatus:          getCF(task, 'ad status'),
+    // Operations
+    lastOptimized:     getDate('last optimized'),
+    checkBackDate:     getDate('check back date'),
+    sop:               getCF(task, 'sop'),
+    team:              getCF(task, 'team'),
+    // Business
+    ltv:               getCF(task, 'net ltv'),
+    monthly:           getCF(task, 'amount due this month'),
+    dailyBudget:       getCF(task, 'daily ad spend budget'),
+    agreement:         getCF(task, 'agreement'),
+    billingType:       getCF(task, 'billing type'),
+    // Dates
+    launchDate:        getDate('launch date'),
+    renewalDate:       getDate('renewal date'),
+    onboardingDuration:getCF(task, 'onboarding duration'),
+    // Performance
+    abrLast7:          getCF(task, 'abr (last 7') || getCF(task, 'abr'),
+    bookingsLast7:     getCF(task, 'bookings (last 7'),
+    // Marketing
+    niche:             getCF(task, 'niche'),
+    offer:             getCF(task, 'marketing offer') || getCF(task, 'offer'),
+    adDosDonts:        getCF(task, "ad do"),
+    // Links
+    adAccountUrl:      getCF(task, 'ad account'),
+  };
+}
+
+async function loadClientMgmtData() {
+  const cfg = getCfg();
+  if (!cfg.token || !cfg.clientMgmtListId) return;
+
+  // Check localStorage cache (1hr TTL)
+  try {
+    const raw = localStorage.getItem('cu_client_mgmt_cache');
+    if (raw) {
+      const c = JSON.parse(raw);
+      if (Date.now() - c.ts < 3600000) {
+        clientMgmtData = c.data || {};
+        clientMgmtAllTasks = c.allTasks || [];
+        return;
+      }
+    }
+  } catch {}
+
+  const result = await fetchCUListLive(cfg.clientMgmtListId, cfg.token, { includeClosed: true, subtasks: false });
+  if (!result || !result.tasks) return;
+
+  clientMgmtAllTasks = result.tasks;
+  clientMgmtData = {};
+
+  for (const task of result.tasks) {
+    const rec = buildCMRecord(task);
+    // Index by ad account ID extracted from the "Ad Account" URL
+    if (rec.adAccountUrl) {
+      const m = String(rec.adAccountUrl).match(/act=?(\d+)/);
+      if (m) clientMgmtData[m[1]] = rec;
+    }
+  }
+
+  // Cache
+  try {
+    localStorage.setItem('cu_client_mgmt_cache', JSON.stringify({
+      ts: Date.now(), data: clientMgmtData, allTasks: clientMgmtAllTasks
+    }));
+  } catch {}
+}
+
+// ══════════════════════════════════════════════════════════════
 // LOCALSTORAGE HELPERS
 // ══════════════════════════════════════════════════════════════
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -757,16 +929,57 @@ function updateSaveHint(id) {
 // ══════════════════════════════════════════════════════════════
 // AI SUGGESTIONS
 // ══════════════════════════════════════════════════════════════
-function buildSuggestions(cpl, cpb, leads7) {
+function buildSuggestions(cpl, cpb, leads7, client) {
   const tips = [];
+  const now2 = Date.now();
+  const c = client || {};
+
+  // CPL
   if (cpl !== null) {
-    if (cpl > 20)          tips.push('CPL $' + cpl.toFixed(2) + ' — consider pausing underperforming ad sets. Test new creative angle.');
-    else if (cpl >= 10)    tips.push('CPL $' + cpl.toFixed(2) + ' — monitor closely. Check frequency — if >3, rotate creatives.');
-    else                   tips.push('CPL $' + cpl.toFixed(2) + ' — performing well. Consider increasing budget by 10–20%.');
+    if (cpl > 20)       tips.push('CPL ' + fmtCur(cpl) + ' — above $20 threshold. Pause underperforming ad sets, test new creative angle.');
+    else if (cpl >= 10) tips.push('CPL ' + fmtCur(cpl) + ' — monitor closely. Check ad frequency (>3 → rotate creatives).');
+    else                tips.push('CPL ' + fmtCur(cpl) + ' — performing well. Consider scaling budget 10–20%.');
   }
-  if (cpb !== null && cpb > 100) tips.push('CPB $' + cpb.toFixed(2) + ' — check booking funnel. Notify CSM.');
-  if (leads7 === 0)  tips.push('Zero leads this week — check pixel. Verify ad is still active and approved.');
-  if (tips.length === 0) tips.push('Metrics look healthy — keep monitoring.');
+
+  // CPB
+  if (cpb !== null && cpb > 100) tips.push('CPB ' + fmtCur(cpb) + ' — booking funnel issue. Notify CSM to check booking link.');
+
+  // Zero leads
+  if (leads7 === 0) tips.push('Zero leads this week — verify pixel, confirm ad is active and approved.');
+
+  // Enriched signals (only when CM data present)
+  if (c.refundNeeded) tips.push('⚠️ REFUND NEEDED flagged — escalate immediately.');
+
+  if (c.clientHappiness) {
+    const h = c.clientHappiness.toLowerCase();
+    if (h === 'unhappy') tips.push('Client is UNHAPPY — prioritize improvement. Check recent MB notes for context.');
+    else if (h === 'not happy') tips.push('Client is Not Happy — review performance trends and MB notes.');
+  }
+
+  if (c.renewalDate) {
+    const renewalDays = Math.ceil((Number(c.renewalDate) - now2) / 86400000);
+    if (renewalDays > 0 && renewalDays <= 14) {
+      tips.push(`Renewal in ${renewalDays} day${renewalDays===1?'':'s'} — ${(c.clientHappiness||'').toLowerCase() !== 'happy' ? 'client not happy, prep retention plan NOW' : 'confirm renewal conversation scheduled'}.`);
+    }
+  }
+
+  if (c.agreement?.includes('Money Back') && c.launchDate) {
+    const daysIn = Math.ceil((now2 - Number(c.launchDate)) / 86400000);
+    if (daysIn > 60 && (c.clientHappiness||'').toLowerCase() !== 'happy') {
+      tips.push(`Day ${daysIn} of money-back guarantee — client not fully satisfied. Prevent refund request.`);
+    }
+  }
+
+  if (c.abrLast7 && parseFloat(c.abrLast7) < 15) {
+    tips.push(`ABR only ${c.abrLast7}% — low booking conversion. Review booking flow and funnel quality.`);
+  }
+
+  if (c.lastOptimized) {
+    const daysSince = Math.floor((now2 - Number(c.lastOptimized)) / 86400000);
+    if (daysSince > 3) tips.push(`Not optimized in ${daysSince} days — account needs attention today.`);
+  }
+
+  if (tips.length === 0) tips.push('Metrics look healthy — keep monitoring and maintain current strategy.');
   return tips;
 }
 
@@ -778,6 +991,7 @@ function switchTab(tab) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.getElementById('tab-' + tab).classList.add('active');
   document.getElementById('panel-' + tab).classList.add('active');
+  if (tab === 'retention') renderRetention();
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -931,29 +1145,48 @@ function buildDmClients() {
 
     const d7  = acc.last_7_days  || {};
     const cpl = d7.cost_per_lead ?? null;
+    // Enrich with ClickUp Client Management data if available (live mode)
+    const cm = clientMgmtData[id] || null;
 
     return {
       id, name,
-      status:           acc.status,
+      status:            acc.status,
       cpl,
-      leads7:           d7.leads  ?? 0,
-      spend7:           d7.spend  || 0,
-      // Pre-parsed fields from maintenance.json (set by GitHub Action)
-      cpb:              cu ? cu.cpb_7d             : null,
-      adAccountUrl:     cu ? cu.ad_account_url     : null,
-      kpiStatus:        cu ? cu.kpi_status         : null,
-      clientHappiness:  cu ? cu.client_happiness   : null,
-      requiresApproval: cu ? cu.requires_approval  : null,
-      lastOptimized:    cu ? cu.last_optimized      : null,
-      checkBackDate:    cu ? cu.check_back_date     : null,
-      marketingOffers:  cu ? cu.marketing_offers    : null,
-      dosDonts:         cu ? cu.dos_donts           : null,
-      contentStatus:    cu ? cu.content_status      : null,
-      driveLink:        cu && cu.drive_link ? cu.drive_link : getDriveFolder(name),
-      statsSheet:       cu ? cu.stats_sheet_url     : null,
-      serviceAd:        cu ? cu.service_advertised  : null,
-      optNotes:         cu ? cu.optimization_notes  : null,
-      cuTaskUrl:        cu ? cu.url                : null,
+      leads7:            d7.leads  ?? 0,
+      spend7:            d7.spend  || 0,
+      // Pre-parsed fields from maintenance.json (GitHub Action fallback)
+      cpb:               cu ? cu.cpb_7d            : null,
+      adAccountUrl:      cm?.adAccountUrl || (cu ? cu.ad_account_url : null),
+      kpiStatus:         cu ? cu.kpi_status        : null,
+      clientHappiness:   cm?.clientHappiness  || (cu ? cu.client_happiness  : null),
+      refundNeeded:      cm?.refundNeeded     ?? false,
+      requiresApproval:  cu ? cu.requires_approval : null,
+      lastOptimized:     cm?.lastOptimized    || (cu ? cu.last_optimized    : null),
+      checkBackDate:     cm?.checkBackDate    || (cu ? cu.check_back_date   : null),
+      marketingOffers:   cm?.offer            || (cu ? cu.marketing_offers  : null),
+      dosDonts:          cm?.adDosDonts       || (cu ? cu.dos_donts         : null),
+      contentStatus:     cu ? cu.content_status    : null,
+      driveLink:         cu && cu.drive_link ? cu.drive_link : getDriveFolder(name),
+      statsSheet:        cu ? cu.stats_sheet_url   : null,
+      serviceAd:         cu ? cu.service_advertised: null,
+      optNotes:          cu ? cu.optimization_notes: null,
+      cuTaskUrl:         cm?.taskUrl          || (cu ? cu.url              : null),
+      // Enriched ClickUp CM fields
+      contactName:       cm?.contactName      || null,
+      phone:             cm?.phone            || null,
+      ltv:               cm?.ltv              || null,
+      monthly:           cm?.monthly          || null,
+      dailyBudget:       cm?.dailyBudget      || null,
+      agreement:         cm?.agreement        || null,
+      team:              cm?.team             || null,
+      niche:             cm?.niche            || null,
+      sop:               cm?.sop              || null,
+      renewalDate:       cm?.renewalDate      || null,
+      launchDate:        cm?.launchDate       || null,
+      onboardingDuration:cm?.onboardingDuration ?? null,
+      lifecycleStatus:   cm?.lifecycleStatus  || null,
+      abrLast7:          cm?.abrLast7         || null,
+      bookingsLast7:     cm?.bookingsLast7    || null,
     };
   });
 
@@ -1095,8 +1328,52 @@ function renderMaintenance() {
       ${checkBack ? `<div class="dmc-date"><strong>Check Back</strong><span class="${cbOverdue?'overdue':''}">${checkBack}${cbOverdue?' ⚠️':''}</span></div>` : ''}
     </div>` : '';
 
-    // AI suggestions
-    const suggs = buildSuggestions(c.cpl, c.cpb, c.leads7);
+    // ── Enriched client health section (from CM) ──
+    const hasCM = !!(c.renewalDate || c.ltv || c.niche || c.agreement || c.launchDate || c.team);
+    let enrichedHtml = '';
+    if (hasCM) {
+      const now2 = Date.now();
+      const happyColor = { happy:'hv-green', great:'hv-green', satisfied:'hv-green', neutral:'', 'not happy':'hv-yellow', unhappy:'hv-red', 'at risk':'hv-red' };
+      const hk2 = (c.clientHappiness||'').toLowerCase();
+      const hColor = happyColor[hk2] || '';
+
+      const renewalDays = c.renewalDate ? Math.ceil((Number(c.renewalDate) - now2) / 86400000) : null;
+      const launchDays  = c.launchDate  ? Math.ceil((now2 - Number(c.launchDate))  / 86400000) : null;
+      const maxDays = c.agreement?.includes('90') ? 90 : c.agreement?.includes('6 month') ? 180 : null;
+      const dayProgress = maxDays && launchDays ? `Day ${launchDays}/${maxDays}` : (launchDays ? `Day ${launchDays}` : null);
+
+      // Critical renewal warning banner
+      const renewalWarn = renewalDays !== null && renewalDays <= 14 && renewalDays >= 0 &&
+        (c.clientHappiness || '').toLowerCase() !== 'happy'
+        ? `<div class="dmc-renewal-warn">⚠️ Renewal in <strong>${renewalDays} day${renewalDays===1?'':'s'}</strong> — client is ${esc(c.clientHappiness || 'unknown status')}</div>` : '';
+
+      const rows = [
+        c.clientHappiness ? ['😊', 'Happiness', c.clientHappiness, hColor] : null,
+        c.refundNeeded    ? ['⚠️', 'Refund', 'REQUESTED', 'hv-red'] : null,
+        c.renewalDate     ? ['📅', 'Renewal', `${fmtDate(c.renewalDate)}${renewalDays!==null ? ` (${renewalDays>0?renewalDays+'d away':Math.abs(renewalDays)+'d past'})` : ''}`, renewalDays!==null&&renewalDays<=14?'hv-orange':''] : null,
+        dayProgress       ? ['📅', 'Launch', `${fmtDate(c.launchDate)} · ${dayProgress}`, launchDays>75?'hv-orange':''] : null,
+        (c.ltv||c.monthly)? ['💰', 'Value', `${c.ltv ? 'LTV '+fmtCur(c.ltv) : ''}${c.ltv&&c.monthly?' · ':''}${c.monthly ? fmtCur(c.monthly)+'/mo' : ''}`, ''] : null,
+        c.niche           ? ['🎯', 'Niche', c.niche, ''] : null,
+        c.team            ? ['👥', 'Team', c.team, ''] : null,
+        c.agreement       ? ['📋', 'Agreement', c.agreement, ''] : null,
+        c.sop             ? ['📝', 'SOP', c.sop, ''] : null,
+        c.dailyBudget     ? ['💵', 'Daily Budget', fmtCur(c.dailyBudget), ''] : null,
+        c.abrLast7        ? ['📈', 'ABR (7d)', c.abrLast7 + '%', parseFloat(c.abrLast7)<10?'hv-red':parseFloat(c.abrLast7)<15?'hv-yellow':'hv-green'] : null,
+        c.bookingsLast7   ? ['📆', 'Bookings (7d)', String(c.bookingsLast7), ''] : null,
+      ].filter(Boolean);
+
+      enrichedHtml = renewalWarn + (rows.length ? `<div class="dmc-health">` +
+        rows.map(([icon, label, val, cls]) =>
+          `<div class="dmc-hrow"><span class="dmc-hicon">${icon}</span><span class="dmc-hlabel">${esc(label)}: </span>&nbsp;<span class="dmc-hval ${cls}">${esc(val)}</span></div>`
+        ).join('') + `</div>` : '');
+    }
+
+    // ── Contact info ──
+    const contactHtml = c.contactName
+      ? `<div class="dmc-contact">${esc(c.contactName)}${c.phone ? ` · <a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : ''}</div>` : '';
+
+    // AI suggestions (enhanced when CM data available)
+    const suggs = buildSuggestions(c.cpl, c.cpb, c.leads7, c);
     const suggsHtml = `<div class="dmc-sugg">
       <div class="dmc-sugg-title">💡 AI Suggestions</div>
       ${suggs.map(s => `<div class="dmc-sugg-item">${esc(s)}</div>`).join('')}
@@ -1154,8 +1431,10 @@ function renderMaintenance() {
           ${isFlagged  ? '<span class="kbadge kb-red">🚩 Flagged</span>' : ''}
         </div>
       </div>
+      ${contactHtml}
       ${rule ? `<div class="dmc-rule"><div class="dmc-rule-icon">⚠️</div><div><strong>Client Rule:</strong> ${esc(rule)}</div></div>` : ''}
       <div class="dmc-badges">${cplB}${cpbB}${kpiB}${happyB}</div>
+      ${enrichedHtml}
       ${datesHtml}
       ${suggsHtml}
       ${assetsHtml}
@@ -1507,6 +1786,14 @@ function renderBriefing() {
     if (cs.flagged) reasons.push('Manually flagged');
     if (c.checkBackDate && Number(c.checkBackDate) < now) reasons.push('Check-back date overdue');
     if ((c.requiresApproval || '').toLowerCase().includes('yes')) reasons.push('Needs ad approval');
+    // Enriched CM signals
+    if (c.refundNeeded) reasons.push('⚠️ REFUND NEEDED');
+    if (c.renewalDate) {
+      const rd = Math.ceil((Number(c.renewalDate) - now) / 86400000);
+      if (rd >= 0 && rd <= 14 && (c.clientHappiness||'').toLowerCase() !== 'happy')
+        reasons.push(`Renewal in ${rd}d — ${c.clientHappiness || 'status unknown'}`);
+    }
+    if ((c.clientHappiness||'').toLowerCase() === 'unhappy') reasons.push(`Client UNHAPPY`);
     if (reasons.length) fireItems.push({ ...c, reasons, severity: reasons.length });
   });
   fireItems.sort((a, b) => b.severity - a.severity);
@@ -1761,10 +2048,12 @@ async function loadAll() {
 
     if (hasToken) {
       // LIVE MODE — fetch directly from ClickUp API
+      // Fetch Client Management in parallel with the other lists
       const liveFetches = await Promise.allSettled([
-        fetchCUListLive('901512331541',    cfg.token, { includeClosed: true, subtasks: true }),   // video editing
-        fetchCUListLive('901515083916',    cfg.token, { includeClosed: true }),   // tasks (Media Tickets)
-        fetchCUListLive('901514441223',    cfg.token, {}),    // maintenance (custom_fields returned by default)
+        fetchCUListLive('901512331541', cfg.token, { includeClosed: true, subtasks: true }),  // video editing
+        fetchCUListLive('901515083916', cfg.token, { includeClosed: true }),                  // tasks (Media Tickets)
+        fetchCUListLive('901514441223', cfg.token, {}),                                       // maintenance
+        loadClientMgmtData(),  // Client Management (enrichment + retention)
       ]);
 
       if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) {
@@ -1778,12 +2067,15 @@ async function loadAll() {
       }
       if (liveFetches[1].status === 'fulfilled' && liveFetches[1].value) { cuData    = liveFetches[1].value; renderTasks(); }
       if (liveFetches[2].status === 'fulfilled' && liveFetches[2].value) { maintData = liveFetches[2].value; }
+      // [3] loadClientMgmtData updates clientMgmtData + clientMgmtAllTasks as side effects
 
       liveFetches.forEach((r, i) => {
         if (r.status === 'rejected') console.warn(`Live fetch [${i}] failed:`, r.reason);
       });
     } else {
       // FALLBACK — use pre-synced JSON files from GitHub Actions
+      // Still try to load client mgmt from cache
+      await loadClientMgmtData();
       const jsonFetches = await Promise.allSettled([
         fetchJ(`${BASE}/video-editing.json?_=${ts}`),
         fetchJ(`${BASE}/clickup.json?_=${ts}`),
@@ -1796,6 +2088,7 @@ async function loadAll() {
 
     renderMaintenance();
     renderBriefing();
+    renderRetention();
 
     lastSyncTime = Date.now();
     const t = new Date().toLocaleTimeString();
@@ -1808,6 +2101,143 @@ async function loadAll() {
   } finally {
     isRefreshing = false;
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ RETENTION RISK ══
+// ══════════════════════════════════════════════════════════════
+function calculateChurnRisk(rec) {
+  let score = 0;
+  const now2 = Date.now();
+  const h = (rec.clientHappiness || '').toLowerCase();
+  if (h === 'unhappy')    score += 40;
+  else if (h === 'not happy') score += 25;
+  else if (h === 'neutral')   score += 10;
+  if (rec.refundNeeded)   score += 30;
+  if (rec.renewalDate) {
+    const d = Math.ceil((Number(rec.renewalDate) - now2) / 86400000);
+    if (d <= 14 && d >= 0) score += 15;
+    if (d <= 7  && d >= 0) score += 10;
+  }
+  if (rec.abrLast7 && parseFloat(rec.abrLast7) < 10) score += 10;
+  if (rec.agreement?.includes('Money Back') && rec.launchDate) {
+    const dIn = Math.ceil((now2 - Number(rec.launchDate)) / 86400000);
+    if (dIn > 60) score += 15;
+  }
+  if (rec.lastOptimized) {
+    const d = Math.floor((now2 - Number(rec.lastOptimized)) / 86400000);
+    if (d > 5) score += 10;
+  }
+  return Math.min(score, 100);
+}
+
+function renderRetention() {
+  const cfg = getCfg();
+  const loadMsg = document.getElementById('retLoadingMsg');
+  const needsCfg = document.getElementById('retNeedsCfg');
+
+  if (!cfg.token || !cfg.clientMgmtListId) {
+    if (loadMsg) loadMsg.style.display = '';
+    if (needsCfg) needsCfg.style.display = 'flex';
+    return;
+  }
+  if (loadMsg) loadMsg.style.display = 'none';
+  if (needsCfg) needsCfg.style.display = 'none';
+
+  if (!clientMgmtAllTasks.length) {
+    if (loadMsg) { loadMsg.style.display = ''; loadMsg.textContent = 'Loading client data…'; }
+    return;
+  }
+
+  const now2 = Date.now();
+  // Only active clients (not churned/paused for retention analysis)
+  const active = clientMgmtAllTasks.filter(t => {
+    const s = (t.status || '').toLowerCase();
+    return !s.includes('churn') && !s.includes('paus');
+  });
+  const churned = clientMgmtAllTasks.filter(t => (t.status || '').toLowerCase().includes('churn'));
+
+  // Build enriched records
+  const records = active.map(t => {
+    const rec = buildCMRecord(t);
+    rec.riskScore = calculateChurnRisk(rec);
+    return rec;
+  });
+
+  // Buckets
+  const critical  = records.filter(r => {
+    const d = r.renewalDate ? Math.ceil((Number(r.renewalDate) - now2) / 86400000) : null;
+    const h = (r.clientHappiness||'').toLowerCase();
+    return r.refundNeeded || (d !== null && d <= 14 && d >= 0 && (h === 'unhappy' || h === 'not happy'));
+  }).sort((a,b) => b.riskScore - a.riskScore);
+
+  const guarantee = records.filter(r => {
+    if (critical.find(c => c.taskId === r.taskId)) return false;
+    const h = (r.clientHappiness||'').toLowerCase();
+    if (h !== 'unhappy' && h !== 'not happy') return false;
+    if (!r.agreement?.includes('Money Back') || !r.launchDate) return false;
+    const dIn = Math.ceil((now2 - Number(r.launchDate)) / 86400000);
+    return dIn > 60;
+  }).sort((a,b) => b.riskScore - a.riskScore);
+
+  const watchUsed = new Set([...critical, ...guarantee].map(r => r.taskId));
+  const watch = records.filter(r => {
+    if (watchUsed.has(r.taskId)) return false;
+    const h = (r.clientHappiness||'').toLowerCase();
+    return h === 'unhappy' || h === 'not happy';
+  }).sort((a,b) => (b.ltv||0) - (a.ltv||0));
+
+  const wins = records.filter(r => {
+    const h = (r.clientHappiness||'').toLowerCase();
+    const s = (r.lifecycleStatus||'').toLowerCase();
+    return (h === 'happy' || h === 'great') && s.includes('renew');
+  });
+
+  // Summary stats
+  const atRiskMRR = [...critical, ...guarantee].reduce((s,r) => s + (r.monthly||0), 0);
+  const churnRate = clientMgmtAllTasks.length > 0
+    ? Math.round(churned.length / clientMgmtAllTasks.length * 100) : 0;
+  document.getElementById('retAtRiskMRR').textContent = atRiskMRR ? fmtCur(atRiskMRR) + '/mo' : '$0';
+  document.getElementById('retCritical').textContent  = critical.length;
+  document.getElementById('retWatchList').textContent = watch.length;
+  document.getElementById('retChurnRate').textContent = churnRate + '%';
+  document.getElementById('retBadge').textContent     = critical.length || '–';
+
+  const riskColor = s => s >= 70 ? '#f87171' : s >= 40 ? '#fb923c' : s >= 20 ? '#fbbf24' : '#34d399';
+
+  function makeRetCard(rec, cls) {
+    const h = rec.clientHappiness || '—';
+    const renewalDays = rec.renewalDate ? Math.ceil((Number(rec.renewalDate) - now2) / 86400000) : null;
+    const launchDays  = rec.launchDate  ? Math.ceil((now2 - Number(rec.launchDate))  / 86400000) : null;
+    const signals = [];
+    if (rec.refundNeeded) signals.push('⚠️ Refund requested');
+    if (renewalDays !== null && renewalDays >= 0 && renewalDays <= 30) signals.push(`Renewal in ${renewalDays}d`);
+    if (rec.agreement?.includes('Money Back') && launchDays) signals.push(`Day ${launchDays} guarantee`);
+    if (rec.abrLast7 && parseFloat(rec.abrLast7) < 10) signals.push(`ABR ${rec.abrLast7}%`);
+    const hBadge = `<span class="kbadge ${rec.refundNeeded?'kb-red':(h.toLowerCase()==='unhappy'?'kb-red':'kb-yellow')}">${esc(h)}</span>`;
+    const monthBadge = rec.monthly ? `<span class="kbadge kb-blue">${fmtCur(rec.monthly)}/mo</span>` : '';
+    return `<div class="ret-card ${cls}">
+      <div class="ret-client-name">${esc(rec.taskName)}</div>
+      <div class="ret-risk-bar"><div class="ret-risk-fill" style="width:${rec.riskScore}%;background:${riskColor(rec.riskScore)}"></div></div>
+      <div class="ret-badges">${hBadge}${monthBadge}${rec.niche?`<span class="kbadge kb-gray">${esc(rec.niche.split('(')[0].trim())}</span>`:''}</div>
+      ${signals.length ? `<div class="ret-signals">${signals.map(s=>'• '+esc(s)).join('<br>')}</div>` : ''}
+      <div class="ret-actions">
+        ${rec.taskUrl ? `<a class="dmc-link-btn cu" href="${esc(rec.taskUrl)}" target="_blank" style="font-size:11px">📋 ClickUp</a>` : ''}
+        ${rec.phone   ? `<a class="dmc-link-btn" href="tel:${esc(rec.phone)}" style="font-size:11px">📞 Call</a>` : ''}
+        <a class="dmc-link-btn" href="#" style="font-size:11px" onclick="switchTab('maintenance');document.getElementById('dmSearch').value='${esc(rec.taskName).replace(/'/g,"\\'")}';renderMaintenance();return false;">→ Maintenance</a>
+      </div>
+    </div>`;
+  }
+
+  function renderSection(sectionId, gridId, items, cls) {
+    document.getElementById(sectionId).style.display = items.length ? '' : 'none';
+    if (items.length) document.getElementById(gridId).innerHTML = items.map(r => makeRetCard(r, cls)).join('');
+  }
+
+  renderSection('retCriticalSection',  'retCriticalGrid',  critical,  'critical');
+  renderSection('retGuaranteeSection', 'retGuaranteeGrid', guarantee, 'guarantee');
+  renderSection('retWatchSection',     'retWatchGrid',     watch,     'watch');
+  renderSection('retWinsSection',      'retWinsGrid',      wins,      '');
 }
 
 // ══════════════════════════════════════════════════════════════
