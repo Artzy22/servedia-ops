@@ -453,6 +453,46 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "golden health is <@U08TW0F2QNS>'s client \u2014 she'd know which offers they're running",
+      "ts": "1775494725.054979",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> michel medspa \u2014 is it their ad account payment or something on our end?",
+      "ts": "1775494724.782969",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> heritage is good to go \u2014 molly confirmed the amex is verified and balance is paid. can you launch?",
+      "ts": "1775494724.675709",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U09GF9KJDP0",
+      "text": "<https://us06web.zoom.us/j/82102881457?pwd=Fiz2Mbr5STvKfOMlnFbvdb7sHaRvIG.1>\nguys the all hands meeting is now live <@U0AKM2J0H4J> <@U09BW62550C> <@U0AQ54RSN91>",
+      "ts": "1775494148.851569",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
       "text": "Needing some clarity for Golden Health & Beauty Are they running botox neck lift and nonsurgical jawlift? <@U08TW0F2QNS> <@U0ALKDM4CRX>",
       "ts": "1775492617.112659",
@@ -563,15 +603,15 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
-      "message_count_24h": 10,
+      "message_count_24h": 14,
       "is_private": false,
       "topic": "",
       "purpose": ""
     }
   ],
-  "total_messages_24h": 55,
+  "total_messages_24h": 59,
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-06T16:42:22Z"
+  "pulled_at": "2026-04-06T17:41:23Z"
 }
