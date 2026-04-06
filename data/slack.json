@@ -453,11 +453,21 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "yes it was connected to another one",
+      "ts": "1775504353.987839",
+      "thread_ts": "1775482090.457199",
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U08TW0F2QNS",
       "text": "<@U0AKM2J0H4J> <@U0AQ54RSN91> <@U09BW62550C> is triage live ?",
       "ts": "1775500317.743809",
       "thread_ts": "1775500317.743809",
-      "reply_count": 2,
+      "reply_count": 8,
       "reactions": 0
     },
     {
@@ -626,8 +636,8 @@
       "user": "U097PL60HTN",
       "text": "<@U0AKM2J0H4J> <@U0AQ54RSN91> <@U09BW62550C>\n\nCan anyone add the Facebook Pixel ID and Access Token on GHL for the following Clients :\n*PRIOTY:* \nUplift Aesthetics\nThe Lamkin Clinic\nTulsa Body Sculpting\nWilmarwell",
       "ts": "1775482090.457199",
-      "thread_ts": null,
-      "reply_count": 0,
+      "thread_ts": "1775482090.457199",
+      "reply_count": 11,
       "reactions": 1
     },
     {
@@ -929,16 +939,6 @@
       "thread_ts": "1775142982.159439",
       "reply_count": 2,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U08TW0F2QNS",
-      "text": "<@U09BW62550C> <@U0AKM2J0H4J> HELP PLZ  - Luxe Med spa and The Derm clinic ",
-      "ts": "1775140147.794319",
-      "thread_ts": "1775140147.794319",
-      "reply_count": 8,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-06T18:53:43Z"
+  "pulled_at": "2026-04-06T19:51:04Z"
 }
