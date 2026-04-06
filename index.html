@@ -427,6 +427,46 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   .slack-layout{grid-template-columns:1fr}
   .ch-list{border-right:none;border-bottom:1px solid #1e1e1e}
 }
+
+/* ══════════ CPL TIER BADGES (dynamic thresholds) ══════════ */
+.kb-great{background:#052e16;color:#22c55e;border:1px solid #166534}
+.kb-good{background:#0a1a08;color:#86efac;border:1px solid #166534}
+.kb-ok{background:#2a1a00;color:#fbbf24;border:1px solid #713f12}
+.kb-watch{background:#2a1200;color:#f97316;border:1px solid #9a3412}
+.kb-bad{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d}
+.kb-cut{background:#991b1b;color:#fff;border:1px solid #7f1d1d;font-weight:900}
+.met-val.kb-great{color:#22c55e;background:transparent;border:none}
+.met-val.kb-good{color:#86efac;background:transparent;border:none}
+.met-val.kb-ok{color:#fbbf24;background:transparent;border:none}
+.met-val.kb-watch{color:#f97316;background:transparent;border:none}
+.met-val.kb-bad{color:#ef4444;background:transparent;border:none}
+.met-val.kb-cut{color:#fff;background:#7f1d1d;border-radius:4px;padding:1px 5px;font-weight:800}
+
+/* ══════════ CPL SETTINGS UI ══════════ */
+.cpl-section-hd{font-size:11px;font-weight:800;color:#a78bfa;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.cpl-tier-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #1a1a1a}
+.cpl-tier-row:last-child{border-bottom:none}
+.cpl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cpl-tier-lbl{font-size:12px;font-weight:700;min-width:52px;color:#ccc}
+.cpl-tier-mid{font-size:11px;color:#555;flex:1}
+.cpl-tier-input{background:#0d0d0d;border:1px solid #333;color:#e0e0e0;padding:5px 8px;border-radius:6px;font-size:13px;width:68px;text-align:right;font-family:inherit}
+.cpl-tier-input:focus{outline:none;border-color:#7c3aed}
+.cpl-tier-err{font-size:10px;color:#f87171;display:none;margin-top:2px}
+.cpl-save{background:#7c3aed;border:none;color:#fff;padding:8px 16px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:700;margin-top:10px;width:100%;transition:background .15s}
+.cpl-save:hover{background:#6d28d9}
+.cpl-saved-msg{font-size:11px;color:#34d399;text-align:center;min-height:16px;margin-top:6px;transition:opacity .3s}
+
+/* ══════════ CPL REFERENCE STRIP ══════════ */
+.cpl-strip-wrap{border:1px solid #1e1e1e;border-radius:8px;overflow:hidden;margin-bottom:14px}
+.cpl-strip-hd{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#0c0c0c;cursor:pointer;user-select:none;transition:background .15s}
+.cpl-strip-hd:hover{background:#111}
+.cpl-strip-hd-left{font-size:10px;color:#555;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.cpl-strip-body{display:none;padding:10px 12px 12px;background:#090909}
+.cpl-strip-body.open{display:block}
+.cpl-strip{display:flex;border-radius:6px;overflow:hidden;height:26px}
+.cpl-strip-seg{display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;overflow:hidden;white-space:nowrap;min-width:0;transition:flex .3s}
+.cpl-strip-labels{display:flex;margin-top:4px}
+.cpl-strip-label{font-size:9px;color:#555;text-align:center;overflow:hidden;white-space:nowrap;transition:flex .3s}
 </style>
 </head>
 <body>
@@ -482,6 +522,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="section-title" id="metaSubtitle">Loading...</div>
   <div class="meta-grid" id="metaGrid"></div>
+  <div class="cpl-strip-wrap" id="metaCplStrip" style="margin-top:16px">
+    <div class="cpl-strip-hd" onclick="toggleCPLStrip('metaCplStrip')">
+      <span class="cpl-strip-hd-left">📊 CPL Thresholds Reference</span>
+      <span style="font-size:10px;color:#444" id="metaCplStripArr">▼ Expand</span>
+    </div>
+    <div class="cpl-strip-body" id="metaCplStripBody">
+      <div class="cpl-strip" id="metaStripBar"></div>
+      <div class="cpl-strip-labels" id="metaStripLabels"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ════════════════ DAILY MAINTENANCE ════════════════ -->
@@ -534,8 +584,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="stat-card"><div class="stat-label">Completed Today</div><div class="stat-value green" id="dmDone">–</div></div>
     <div class="stat-card"><div class="stat-label">Flagged</div><div class="stat-value red" id="dmFlagged">–</div></div>
     <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value yellow" id="dmApproval">–</div></div>
-    <div class="stat-card"><div class="stat-label">Red CPL (&gt;$20)</div><div class="stat-value red" id="dmRedCPL">–</div></div>
-    <div class="stat-card"><div class="stat-label">Green CPL (&lt;$10)</div><div class="stat-value green" id="dmGreenCPL">–</div></div>
+    <div class="stat-card"><div class="stat-label" id="dmRedCPLLabel">Red CPL (&gt;$20)</div><div class="stat-value red" id="dmRedCPL">–</div></div>
+    <div class="stat-card"><div class="stat-label" id="dmGreenCPLLabel">Green CPL (&lt;$10)</div><div class="stat-value green" id="dmGreenCPL">–</div></div>
   </div>
   <div class="filters">
     <input class="filter-input" id="dmSearch" placeholder="Search clients..." oninput="renderMaintenance()">
@@ -546,6 +596,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="fbtn" id="dmf-flagged" onclick="setDmFilter('flagged')">🚩 Flagged</button>
     <button class="fbtn" id="dmf-pending" onclick="setDmFilter('pending')">⏳ Pending</button>
     <button class="fbtn" id="dmf-approval" onclick="setDmFilter('approval')">⚠️ Needs Approval</button>
+  </div>
+  <div class="cpl-strip-wrap" id="maintCplStrip" style="margin-bottom:14px">
+    <div class="cpl-strip-hd" onclick="toggleCPLStrip('maintCplStrip')">
+      <span class="cpl-strip-hd-left">📊 CPL Thresholds Reference</span>
+      <span style="font-size:10px;color:#444" id="maintCplStripArr">▼ Expand</span>
+    </div>
+    <div class="cpl-strip-body" id="maintCplStripBody">
+      <div class="cpl-strip" id="maintStripBar"></div>
+      <div class="cpl-strip-labels" id="maintStripLabels"></div>
+    </div>
   </div>
   <div class="dm-grid" id="dmGrid"></div>
 </div>
@@ -679,6 +739,61 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       ⚙ Dashboard Configuration
       <button class="modal-close" onclick="closeSettings()">✕</button>
     </div>
+    <!-- ── CPL Thresholds ── -->
+    <div class="cpl-section-hd">📊 CPL Thresholds</div>
+    <div style="font-size:11px;color:#666;margin-bottom:10px;line-height:1.5">Set the upper $ ceiling for each tier. Anything above Watch is automatically Cut. Changes apply instantly everywhere CPL is shown.</div>
+    <div id="cplTierRows">
+      <div class="cpl-tier-row">
+        <div class="cpl-dot" style="background:#22c55e"></div>
+        <span class="cpl-tier-lbl" style="color:#22c55e">Great</span>
+        <span class="cpl-tier-mid">up to $</span>
+        <div style="display:flex;flex-direction:column">
+          <input class="cpl-tier-input" id="cpl-great" type="number" min="1" max="999" value="10" oninput="validateCPLTiers()">
+          <div class="cpl-tier-err" id="cpl-great-err">Must be positive</div>
+        </div>
+      </div>
+      <div class="cpl-tier-row">
+        <div class="cpl-dot" style="background:#86efac"></div>
+        <span class="cpl-tier-lbl" style="color:#86efac">Good</span>
+        <span class="cpl-tier-mid">up to $</span>
+        <div style="display:flex;flex-direction:column">
+          <input class="cpl-tier-input" id="cpl-good" type="number" min="1" max="999" value="12" oninput="validateCPLTiers()">
+          <div class="cpl-tier-err" id="cpl-good-err">Must be higher than Great</div>
+        </div>
+      </div>
+      <div class="cpl-tier-row">
+        <div class="cpl-dot" style="background:#fbbf24"></div>
+        <span class="cpl-tier-lbl" style="color:#fbbf24">OK</span>
+        <span class="cpl-tier-mid">up to $</span>
+        <div style="display:flex;flex-direction:column">
+          <input class="cpl-tier-input" id="cpl-ok" type="number" min="1" max="999" value="15" oninput="validateCPLTiers()">
+          <div class="cpl-tier-err" id="cpl-ok-err">Must be higher than Good</div>
+        </div>
+      </div>
+      <div class="cpl-tier-row">
+        <div class="cpl-dot" style="background:#f97316"></div>
+        <span class="cpl-tier-lbl" style="color:#f97316">Watch</span>
+        <span class="cpl-tier-mid">up to $</span>
+        <div style="display:flex;flex-direction:column">
+          <input class="cpl-tier-input" id="cpl-watch" type="number" min="1" max="999" value="20" oninput="validateCPLTiers()">
+          <div class="cpl-tier-err" id="cpl-watch-err">Must be higher than OK</div>
+        </div>
+      </div>
+      <div class="cpl-tier-row">
+        <div class="cpl-dot" style="background:#991b1b"></div>
+        <span class="cpl-tier-lbl" style="color:#ef4444">Cut</span>
+        <span class="cpl-tier-mid" id="cpl-cut-auto" style="color:#555;font-style:italic">auto — above Watch threshold</span>
+      </div>
+    </div>
+    <!-- Live preview strip -->
+    <div style="margin-top:12px;margin-bottom:4px">
+      <div class="cpl-strip" id="cfgStripBar" style="height:22px;border-radius:6px"></div>
+      <div class="cpl-strip-labels" id="cfgStripLabels"></div>
+    </div>
+    <button class="cpl-save" onclick="saveCPLThresholds()">💾 Save Thresholds</button>
+    <div class="cpl-saved-msg" id="cplSavedMsg"></div>
+    <hr class="msep">
+
     <div class="mfield">
       <label class="mlabel">ClickUp API Token <span style="color:#34d399;font-size:10px">— enables LIVE mode (30s refresh)</span></label>
       <input class="minput" id="cfToken" type="password" placeholder="pk_xxxxxxxxxxxxxxxxxxxxxxxx">
@@ -767,6 +882,7 @@ function openSettings() {
   document.getElementById('cfClientMgmtListId').value = c.clientMgmtListId;
   document.getElementById('cfGhPat').value           = c.ghPat;
   document.getElementById('cfgStatus').textContent   = '';
+  loadCPLSettings();
   document.getElementById('settingsModal').classList.add('open');
 }
 
@@ -819,14 +935,145 @@ function fmtDate(ts) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// KPI color logic
-function cplKls(v) {
-  if (v === null || v === undefined) return 'kb-gray';
-  if (v < 10) return 'kb-green';
-  if (v <= 12) return 'kb-yellow';
-  if (v <= 20) return 'kb-orange';
-  return 'kb-red';
+// ══════════════════════════════════════════════════════════════
+// CPL TIER SYSTEM (editable thresholds)
+// ══════════════════════════════════════════════════════════════
+
+const CPL_TIERS = [
+  { key:'great', label:'Great',  className:'kb-great', color:'#22c55e', textColor:'#166534', action:'Leave it running — scale if consistent for 3+ days' },
+  { key:'good',  label:'Good',   className:'kb-good',  color:'#86efac', textColor:'#166534', action:'Good — monitor, no changes needed' },
+  { key:'ok',    label:'OK',     className:'kb-ok',    color:'#fbbf24', textColor:'#854d0e', action:'Watch — check CPB before acting' },
+  { key:'watch', label:'Watch',  className:'kb-watch', color:'#f97316', textColor:'#7c2d12', action:'Below target — diagnose and test new creative' },
+  { key:'cut',   label:'Cut',    className:'kb-cut',   color:'#991b1b', textColor:'#ffffff', action:'Cut — pause underperforming ad sets now' },
+];
+
+function getDefaultThresholds() {
+  return { great:10, good:12, ok:15, watch:20 };
 }
+
+function getCPLThresholds() {
+  try {
+    const stored = localStorage.getItem('servedia_cpl_thresholds');
+    if (stored) {
+      const t = JSON.parse(stored);
+      if (t.great && t.good && t.ok && t.watch) return t;
+    }
+  } catch(e) {}
+  return getDefaultThresholds();
+}
+
+function getCPLTier(cpl) {
+  if (cpl === null || cpl === undefined || isNaN(cpl)) {
+    return { label:'N/A', className:'kb-gray', color:'#333', textColor:'#888', action:'' };
+  }
+  const t = getCPLThresholds();
+  if (cpl <= t.great) return CPL_TIERS[0];
+  if (cpl <= t.good)  return CPL_TIERS[1];
+  if (cpl <= t.ok)    return CPL_TIERS[2];
+  if (cpl <= t.watch) return CPL_TIERS[3];
+  return CPL_TIERS[4];
+}
+
+function validateCPLTiers() {
+  const vals = ['great','good','ok','watch'].map(k => parseInt(document.getElementById('cpl-'+k)?.value)||0);
+  const names = ['Great','Good','OK','Watch'];
+  let ok = true;
+  for (let i = 0; i < vals.length; i++) {
+    const err = document.getElementById('cpl-'+['great','good','ok','watch'][i]+'-err');
+    if (!err) continue;
+    const bad = vals[i] <= 0 || (i > 0 && vals[i] <= vals[i-1]);
+    err.style.display = bad ? 'block' : 'none';
+    if (bad) { err.textContent = i === 0 ? 'Must be a positive number' : `Must be higher than ${names[i-1]} ($${vals[i-1]})`; ok = false; }
+  }
+  const cutEl = document.getElementById('cpl-cut-auto');
+  if (cutEl) cutEl.textContent = `auto — above $${vals[3] > 0 ? vals[3] : 20}`;
+  updateCPLStripPreview('cfgStripBar', 'cfgStripLabels');
+  return ok;
+}
+
+function updateCPLStripPreview(barId, labelsId) {
+  const barEl = document.getElementById(barId);
+  const labEl = document.getElementById(labelsId);
+  if (!barEl || !labEl) return;
+  const t = barId === 'cfgStripBar'
+    ? { great: parseInt(document.getElementById('cpl-great')?.value)||10,
+        good:  parseInt(document.getElementById('cpl-good')?.value)||12,
+        ok:    parseInt(document.getElementById('cpl-ok')?.value)||15,
+        watch: parseInt(document.getElementById('cpl-watch')?.value)||20 }
+    : getCPLThresholds();
+  const ranges = [t.great, t.good - t.great, t.ok - t.good, t.watch - t.ok, Math.max(t.watch * 0.5, 10)];
+  const total = ranges.reduce((a,b) => a + Math.max(b,1), 0);
+  const labels = [`<$${t.great}`, `$${t.great}–$${t.good}`, `$${t.good}–$${t.ok}`, `$${t.ok}–$${t.watch}`, `>$${t.watch}`];
+  const colors = ['#22c55e','#86efac','#fbbf24','#f97316','#991b1b'];
+  const tNames = ['GREAT','GOOD','OK','WATCH','CUT'];
+  barEl.innerHTML = ranges.map((r,i) =>
+    `<div class="cpl-strip-seg" style="flex:${Math.max(r,1)};background:${colors[i]};color:${i<2?'rgba(0,0,0,.55)':'rgba(255,255,255,.7)'}">${tNames[i]}</div>`
+  ).join('');
+  labEl.innerHTML = ranges.map((r,i) =>
+    `<div class="cpl-strip-label" style="flex:${Math.max(r,1)}">${labels[i]}</div>`
+  ).join('');
+}
+
+function loadCPLSettings() {
+  const t = getCPLThresholds();
+  ['great','good','ok','watch'].forEach(k => {
+    const el = document.getElementById('cpl-'+k);
+    if (el) el.value = t[k];
+  });
+  const cutEl = document.getElementById('cpl-cut-auto');
+  if (cutEl) cutEl.textContent = `auto — above $${t.watch}`;
+  ['cpl-great-err','cpl-good-err','cpl-ok-err','cpl-watch-err'].forEach(id => {
+    const e = document.getElementById(id); if (e) e.style.display = 'none';
+  });
+  updateCPLStripPreview('cfgStripBar', 'cfgStripLabels');
+}
+
+function saveCPLThresholds() {
+  if (!validateCPLTiers()) return;
+  const t = {
+    great: parseInt(document.getElementById('cpl-great').value),
+    good:  parseInt(document.getElementById('cpl-good').value),
+    ok:    parseInt(document.getElementById('cpl-ok').value),
+    watch: parseInt(document.getElementById('cpl-watch').value),
+  };
+  localStorage.setItem('servedia_cpl_thresholds', JSON.stringify(t));
+  const msg = document.getElementById('cplSavedMsg');
+  if (msg) { msg.textContent = '✓ CPL thresholds updated'; msg.style.opacity = '1'; setTimeout(() => msg.style.opacity = '0', 2000); }
+  // Re-render everything live
+  renderMeta();
+  renderMaintenance();
+  renderBriefing();
+  renderRetention();
+  updateAllCPLStrips();
+}
+
+function updateAllCPLStrips() {
+  updateCPLStripPreview('metaStripBar',  'metaStripLabels');
+  updateCPLStripPreview('maintStripBar', 'maintStripLabels');
+}
+
+function toggleCPLStrip(wrapperId) {
+  const body = document.getElementById(wrapperId + 'Body');
+  const arr  = document.getElementById(wrapperId + 'Arr');
+  if (!body) return;
+  const isOpen = body.classList.toggle('open');
+  if (arr) arr.textContent = isOpen ? '▲ Collapse' : '▼ Expand';
+  if (isOpen) {
+    const barId    = wrapperId === 'metaCplStrip'  ? 'metaStripBar'  : 'maintStripBar';
+    const labelsId = wrapperId === 'metaCplStrip'  ? 'metaStripLabels' : 'maintStripLabels';
+    updateCPLStripPreview(barId, labelsId);
+  }
+}
+
+// KPI color logic — delegates to getCPLTier
+function cplKls(v) {
+  return getCPLTier(v).className;
+}
+
+// Helper: is this a "bad" CPL tier (watch, bad, cut)?
+function cplIsRed(v)   { return ['kb-watch','kb-cut'].includes(cplKls(v)); }
+function cplIsYellow(v){ return cplKls(v) === 'kb-ok'; }
+function cplIsGreen(v) { return ['kb-great','kb-good'].includes(cplKls(v)); }
 
 function cpbKls(v) {
   if (v === null || v === undefined) return 'kb-gray';
@@ -835,13 +1082,11 @@ function cpbKls(v) {
   return 'kb-red';
 }
 
-// Sort score: lower = worse (shown first)
+// Sort score: lower = worse (shown first in "worst CPL" view)
 function cplScore(v) {
-  if (v === null || v === undefined) return 2;
-  if (v > 20) return 0;
-  if (v > 12) return 1;
-  if (v >= 10) return 2;
-  return 3;
+  const cls = cplKls(v);
+  const order = { 'kb-cut':0, 'kb-bad':0, 'kb-watch':1, 'kb-ok':2, 'kb-good':3, 'kb-great':4, 'kb-gray':1 };
+  return order[cls] ?? 2;
 }
 
 // Extract client name from task name pattern "New project for CLIENT_NAME (Offer)"
@@ -1144,7 +1389,9 @@ function renderMeta() {
   const avgCPL = (ld7 > 0) ? sp7 / ld7 : null;
   const cplEl = document.getElementById('mCPL');
   cplEl.textContent = avgCPL ? fmtCur(avgCPL) : 'N/A';
-  cplEl.className = 'stat-value ' + (avgCPL ? (avgCPL < 10 ? 'green' : avgCPL <= 12 ? 'yellow' : 'red') : '');
+  const avgTier = getCPLTier(avgCPL);
+  cplEl.className = 'stat-value';
+  cplEl.style.color = avgCPL ? avgTier.color : '';
   document.getElementById('mImpr').textContent = im7 > 1e6 ? (im7/1e6).toFixed(1)+'M' : Math.round(im7/1000)+'K';
   document.getElementById('metaBadge').textContent = act;
   document.getElementById('metaSubtitle').textContent = list.length + ' accounts · synced ' + fmtTime(metaData.pulled_at);
@@ -1393,9 +1640,9 @@ function renderMaintenance() {
   let list = all.filter(c => {
     if (search && !c.name.toLowerCase().includes(search)) return false;
     const cs = state[c.id] || {};
-    if (dmFilter === 'red'      && cplKls(c.cpl) !== 'kb-red')                              return false;
-    if (dmFilter === 'yellow'   && cplKls(c.cpl) !== 'kb-yellow' && cplKls(c.cpl) !== 'kb-orange') return false;
-    if (dmFilter === 'green'    && cplKls(c.cpl) !== 'kb-green')                            return false;
+    if (dmFilter === 'red'    && !cplIsRed(c.cpl))    return false;
+    if (dmFilter === 'yellow' && !cplIsYellow(c.cpl)) return false;
+    if (dmFilter === 'green'  && !cplIsGreen(c.cpl))  return false;
     if (dmFilter === 'flagged'  && !cs.flagged)                                             return false;
     if (dmFilter === 'pending'  && cs.complete)                                             return false;
     if (dmFilter === 'approval' && !(c.requiresApproval || '').toLowerCase().includes('yes')) return false;
@@ -1413,8 +1660,8 @@ function renderMaintenance() {
   });
 
   // Summary stats (over all clients)
-  const redCount    = all.filter(c => cplKls(c.cpl) === 'kb-red').length;
-  const greenCount  = all.filter(c => cplKls(c.cpl) === 'kb-green').length;
+  const redCount    = all.filter(c => cplIsRed(c.cpl)).length;
+  const greenCount  = all.filter(c => cplIsGreen(c.cpl)).length;
   const doneCount   = all.filter(c => (state[c.id]||{}).complete).length;
   const flagCount   = all.filter(c => (state[c.id]||{}).flagged).length;
   const approvalCount = all.filter(c => (c.requiresApproval||'').toLowerCase().includes('yes')).length;
@@ -1425,6 +1672,12 @@ function renderMaintenance() {
   document.getElementById('dmApproval').textContent = approvalCount;
   document.getElementById('dmRedCPL').textContent   = redCount;
   document.getElementById('dmGreenCPL').textContent = greenCount;
+  // Update stat labels to reflect current thresholds
+  const thr = getCPLThresholds();
+  const rl = document.getElementById('dmRedCPLLabel');
+  const gl = document.getElementById('dmGreenCPLLabel');
+  if (rl) rl.textContent = `Watch/Cut CPL (>$${thr.ok})`;
+  if (gl) gl.textContent = `Great/Good CPL (<$${thr.good})`;
 
   const pending = all.filter(c => !(state[c.id]||{}).complete).length;
   document.getElementById('maintBadge').textContent = pending;
@@ -1449,8 +1702,9 @@ function renderMaintenance() {
     // Store offer text for expand
     if (c.marketingOffers) OFFER_CACHE[c.id] = c.marketingOffers;
 
-    // CPL badge
-    const cplB = `<span class="kbadge ${cplKls(c.cpl)}">CPL ${c.cpl !== null ? fmtCur(c.cpl) : 'N/A'}</span>`;
+    // CPL badge — show tier label
+    const cplTier = getCPLTier(c.cpl);
+    const cplB = `<span class="kbadge ${cplTier.className}" title="${cplTier.action}">CPL ${c.cpl !== null ? fmtCur(c.cpl) : 'N/A'} <span style="opacity:.7;font-weight:500;font-size:10px">${cplTier.label}</span></span>`;
     // CPB badge
     const cpbB = `<span class="kbadge ${cpbKls(c.cpb)}">CPB ${c.cpb !== null ? fmtCur(c.cpb) : 'N/A'}</span>`;
     // KPI status
@@ -2047,7 +2301,7 @@ function renderBriefing() {
     const cs = state[c.id] || {};
     if (cs.complete) return;
     const reasons = [];
-    if (c.cpl !== null && c.cpl > 20)  reasons.push(`CPL ${fmtCur(c.cpl)} — over $20 threshold`);
+    if (c.cpl !== null && cplIsRed(c.cpl)) reasons.push(`CPL ${fmtCur(c.cpl)} — ${getCPLTier(c.cpl).label} (${getCPLTier(c.cpl).action})`);
     if (c.cpb !== null && c.cpb > 100) reasons.push(`CPB ${fmtCur(c.cpb)} — booking funnel issue`);
     if (c.leads7 === 0 && c.status === 'active') reasons.push('Zero leads this week');
     if (cs.flagged) reasons.push('Manually flagged');
@@ -2070,7 +2324,8 @@ function renderBriefing() {
   if (fireItems.length) {
     fireSection.style.display = '';
     fireGrid.innerHTML = fireItems.map(c => {
-      const cplB = c.cpl !== null ? `<span class="kbadge ${cplKls(c.cpl)}">CPL ${fmtCur(c.cpl)}</span>` : '';
+      const cplBT = getCPLTier(c.cpl);
+      const cplB = c.cpl !== null ? `<span class="kbadge ${cplBT.className}" title="${cplBT.action}">CPL ${fmtCur(c.cpl)} <span style="opacity:.7;font-size:10px">${cplBT.label}</span></span>` : '';
       const cpbB = c.cpb !== null ? `<span class="kbadge ${cpbKls(c.cpb)}">CPB ${fmtCur(c.cpb)}</span>` : '';
       const adsUrl = c.adAccountUrl || `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id}`;
       const safeName = esc(c.name).replace(/'/g,"\\'");
