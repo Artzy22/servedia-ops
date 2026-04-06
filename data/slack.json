@@ -453,6 +453,16 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AKM2J0H4J> <@U097PL60HTN>  <@U0AQ54RSN91>  what are we waiting on to be able to launch client don't see media assets or copy <https://app.clickup.com/t/9015334823/SERV-4534> Mckenzie",
+      "ts": "1775507403.042999",
+      "thread_ts": "1775507403.042999",
+      "reply_count": 1,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
       "text": "yes it was connected to another one",
       "ts": "1775504353.987839",
@@ -929,16 +939,6 @@
       "thread_ts": "1775151189.563779",
       "reply_count": 31,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09GF9KJDP0",
-      "text": "<@U0AKM2J0H4J> added a couple more on the list, highest CPL clients",
-      "ts": "1775142982.159439",
-      "thread_ts": "1775142982.159439",
-      "reply_count": 2,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-06T19:51:04Z"
+  "pulled_at": "2026-04-06T20:34:45Z"
 }
