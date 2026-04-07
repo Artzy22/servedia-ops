@@ -3,6 +3,46 @@
     {
       "channel": "video-editing",
       "channel_id": "C07V9L6B3A9",
+      "user": "U080B9NAZ25",
+      "text": "<@U0AKM2J0H4J>?",
+      "ts": "1775584357.889999",
+      "thread_ts": "1775584357.889999",
+      "reply_count": 4,
+      "reactions": 0
+    },
+    {
+      "channel": "video-editing",
+      "channel_id": "C07V9L6B3A9",
+      "user": "U0AKM2J0H4J",
+      "text": "They need to go live today, and they're an urgent client. Can we push their ticket to be a priority?",
+      "ts": "1775584081.544749",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "video-editing",
+      "channel_id": "C07V9L6B3A9",
+      "user": "U0AKM2J0H4J",
+      "text": "Zubair",
+      "ts": "1775584073.293009",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "video-editing",
+      "channel_id": "C07V9L6B3A9",
+      "user": "U0AKM2J0H4J",
+      "text": "hey @saquid",
+      "ts": "1775584070.959259",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "video-editing",
+      "channel_id": "C07V9L6B3A9",
       "user": "U0AKM2J0H4J",
       "text": "",
       "ts": "1775233835.532609",
@@ -411,44 +451,64 @@
       "reactions": 0
     },
     {
-      "channel": "video-editing",
-      "channel_id": "C07V9L6B3A9",
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AKM2J0H4J",
-      "text": "<https://app.clickup.com/t/86c8zg2p8>",
-      "ts": "1774303577.756779",
-      "thread_ts": "1774303577.756779",
-      "reply_count": 1,
-      "reactions": 0
-    },
-    {
-      "channel": "video-editing",
-      "channel_id": "C07V9L6B3A9",
-      "user": "U09BW62550C",
-      "text": "also for this <https://app.clickup.com/t/86c8vp6p7>",
-      "ts": "1774299963.223309",
+      "text": "",
+      "ts": "1775584391.513299",
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
     },
     {
-      "channel": "video-editing",
-      "channel_id": "C07V9L6B3A9",
-      "user": "U09BW62550C",
-      "text": "<@U080B9NAZ25> summoning you for this ticket <https://app.clickup.com/t/86c8wh6p5>",
-      "ts": "1774298342.128379",
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "Never mind found it",
+      "ts": "1775584274.505199",
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
     },
     {
-      "channel": "video-editing",
-      "channel_id": "C07V9L6B3A9",
-      "user": "U080B9NAZ25",
-      "text": "Ok I'll fix ",
-      "ts": "1774272494.124069",
-      "thread_ts": "1774272494.124069",
-      "reply_count": 9,
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U097PL60HTN",
+      "text": "<@U08TW0F2QNS> Ill update the uplift to marketing assets approve. can you confirm one more time",
+      "ts": "1775583173.698609",
+      "thread_ts": null,
+      "reply_count": 0,
       "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U08TW0F2QNS",
+      "text": "<@U0AKM2J0H4J> <@U09BW62550C> Payment isnt working for celebrity and we pay the ad spend... <@U06RQUFSV4G> Can you please help with this what shall we do?",
+      "ts": "1775583081.936459",
+      "thread_ts": "1775583081.936459",
+      "reply_count": 4,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "<@U097PL60HTN> Is there a funnel for Botox/Fillers for Precision Wellness Center? I checked ghl I didnt see any",
+      "ts": "1775582829.511999",
+      "thread_ts": "1775582829.511999",
+      "reply_count": 4,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U09U080MHL2",
+      "text": "<@U09BW62550C> <@U0AKM2J0H4J> <@U08TW0F2QNS>\nAdvanced Health New Offer: bye Bye Saggy Eyes:\n<https://advancedhealthandaesthetics.clinicexclusives.com/bye-bye-saggy-eyes-ah>",
+      "ts": "1775581127.153549",
+      "thread_ts": "1775581127.153549",
+      "reply_count": 3,
+      "reactions": 1
     },
     {
       "channel": "media-ads",
@@ -457,7 +517,7 @@
       "text": "<@U0AQ54RSN91> <@U0AKM2J0H4J> rainier laser \u2014 offer price needs to be $599 not $499 everywhere. funnel, ads, scripts, CV. client had a patient booked at the wrong price <https://app.clickup.com/t/86c97ndg1>",
       "ts": "1775580635.588059",
       "thread_ts": "1775580635.588059",
-      "reply_count": 1,
+      "reply_count": 7,
       "reactions": 0
     },
     {
@@ -466,8 +526,8 @@
       "user": "U0ALKDM4CRX",
       "text": "<@U0AQ54RSN91> delray laser \u2014 budget got defaulted to $188/day instead of $50 when david switched his payment method. been running like that since apr 3 can you fix asap <https://app.clickup.com/t/86c97ndew>",
       "ts": "1775580635.424719",
-      "thread_ts": null,
-      "reply_count": 0,
+      "thread_ts": "1775580635.424719",
+      "reply_count": 8,
       "reactions": 1
     },
     {
@@ -879,66 +939,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0APLPRSMQR",
-      "text": ":alarm_clock: *6:00 PM Reminder \u2014 Jimmy Flores*\nYou have *3* client check-ins still pending:\n\u2022 SkinTight MedSpas\n\u2022 Triage Wellness Institute\n\u2022 Varicose Veins Laser Clinics\n",
-      "ts": "1775253607.506339",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "<@U08TW0F2QNS> <@U09BW62550C> Generations OFFER: Bye Bye Hollow Face : <https://generationswellnesscenter.clinicexclusives.com/bye-bye-hollow-face-gene>",
-      "ts": "1775252195.576669",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0APLPRSMQR",
-      "text": ":rotating_light: *PROBLEM FLAGGED* <!channel>\n\n*Client:* Medical Laser And Aesthetics\n*Flagged by:* Anca Elamparo\n*Issue:* no ads running\n*Ad Account:* <https://adsmanager.facebook.com/adsmanager/manage/campaigns?global_scope_id=770478474190624&amp;business_id=770478474190624&amp;act=947326761106052&amp;redirect_session_id=e975e45d-6ed2-4438-bd54-4d9591a1c5cb#|View Ad Account>\n",
-      "ts": "1775249120.578929",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "<@U08TW0F2QNS> <@U09BW62550C>\n\nEnsoul Byebye Dark SPots: <https://ensoulaestheticsandwellness.clinicexclusives.com/bye-bye-dark-spots-ens>",
-      "ts": "1775247935.683929",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "is tech done for *Wilmarwell LLC. Not seeing pixel data set? <@U09U080MHL2>* *<@U097PL60HTN>* ",
-      "ts": "1775243712.756579",
-      "thread_ts": "1775243712.756579",
-      "reply_count": 2,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "<@U0ALKDM4CRX> *Heritage Wellness and Medspa is now going live!*",
-      "ts": "1775243253.867989",
-      "thread_ts": "1775243253.867989",
-      "reply_count": 1,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-07T16:53:55Z"
+  "pulled_at": "2026-04-07T17:56:15Z"
 }
