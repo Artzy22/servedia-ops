@@ -453,6 +453,56 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "Got it I'm finishing up the vaginal images for zubair cosmetic ",
+      "ts": "1775577091.490469",
+      "thread_ts": "1775577091.490469",
+      "reply_count": 3,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AKM2J0H4J",
+      "text": "Thorpe Wellness - NEED MEDIA KIT",
+      "ts": "1775577048.930989",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "saquib did not get anything sent. ill shoot that over now",
+      "ts": "1775574540.828539",
+      "thread_ts": "1775574540.828539",
+      "reply_count": 17,
+      "reactions": 1
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "Checking",
+      "ts": "1775574419.760139",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U08TW0F2QNS",
+      "text": "<@U0AKM2J0H4J> <@U09BW62550C> <@U0AQ54RSN91> yooo i am missing media assets for Zubair and have launch call in 45 mins  - halp plz\n\nDid this ever get sent to saquib for vids?",
+      "ts": "1775574391.756589",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AKM2J0H4J",
       "text": "UPDATE - WE GOTTA DO THIS",
       "ts": "1775527780.217969",
@@ -889,56 +939,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "Gencore good to go",
-      "ts": "1775240433.446739",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U08TW0F2QNS",
-      "text": "<@U09BW62550C> <@U0AKM2J0H4J> we need HEC and gencore \u2026 been literally over two weeks yall for their new campaigns ..\n\n<@U09U080MHL2> <@U097PL60HTN> is tech done for this yet???",
-      "ts": "1775240384.105129",
-      "thread_ts": "1775240384.105129",
-      "reply_count": 11,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0ALKDM4CRX",
-      "text": "<@U0AKM2J0H4J> launch <https://app.clickup.com/t/9015334823/SERV-4592>",
-      "ts": "1775235200.629209",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U08TW0F2QNS",
-      "text": "<@U09BW62550C> may need your help here sis :revolving_hearts::sweat_smile:",
-      "ts": "1775235041.395449",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0ALKDM4CRX",
-      "text": "<@U0AKM2J0H4J> launch <https://app.clickup.com/t/9015334823/SERV-4527>",
-      "ts": "1775234952.175549",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-07T14:07:14Z"
+  "pulled_at": "2026-04-07T15:53:50Z"
 }
