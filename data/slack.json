@@ -453,11 +453,41 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> <@U0AKM2J0H4J> rainier laser \u2014 offer price needs to be $599 not $499 everywhere. funnel, ads, scripts, CV. client had a patient booked at the wrong price <https://app.clickup.com/t/86c97ndg1>",
+      "ts": "1775580635.588059",
+      "thread_ts": "1775580635.588059",
+      "reply_count": 1,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> delray laser \u2014 budget got defaulted to $188/day instead of $50 when david switched his payment method. been running like that since apr 3 can you fix asap <https://app.clickup.com/t/86c97ndew>",
+      "ts": "1775580635.424719",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 1
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "Understood",
+      "ts": "1775580537.096729",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
       "text": "Got it I'm finishing up the vaginal images for zubair cosmetic ",
       "ts": "1775577091.490469",
       "thread_ts": "1775577091.490469",
-      "reply_count": 3,
+      "reply_count": 7,
       "reactions": 0
     },
     {
@@ -909,36 +939,6 @@
       "thread_ts": "1775243253.867989",
       "reply_count": 1,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "good to go",
-      "ts": "1775240500.729859",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "Mon Petit as well",
-      "ts": "1775240495.376849",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09U080MHL2",
-      "text": "doing HEC now",
-      "ts": "1775240441.214259",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-07T15:53:50Z"
+  "pulled_at": "2026-04-07T16:53:55Z"
 }
