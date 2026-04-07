@@ -7,7 +7,7 @@
       "text": "<@U0AKM2J0H4J>?",
       "ts": "1775584357.889999",
       "thread_ts": "1775584357.889999",
-      "reply_count": 4,
+      "reply_count": 6,
       "reactions": 0
     },
     {
@@ -453,6 +453,16 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AKM2J0H4J>  skinholic asthetics  launch call is today i havent seen their media kit posted any updates on this",
+      "ts": "1775586331.739859",
+      "thread_ts": "1775586331.739859",
+      "reply_count": 3,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AKM2J0H4J",
       "text": "",
       "ts": "1775584391.513299",
@@ -497,7 +507,7 @@
       "text": "<@U097PL60HTN> Is there a funnel for Botox/Fillers for Precision Wellness Center? I checked ghl I didnt see any",
       "ts": "1775582829.511999",
       "thread_ts": "1775582829.511999",
-      "reply_count": 4,
+      "reply_count": 19,
       "reactions": 0
     },
     {
@@ -929,16 +939,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0APLPRSMQR",
-      "text": ":alarm_clock: *6:00 PM Reminder \u2014 Julianne Navarro*\nYou have *38* client check-ins still pending:\n\u2022 Skinny Me Detox Spa\n\u2022 Revitalize Trim Spa And Wellness\n\u2022 Image Wellness Boutique\n\u2022 Breeze Laser MedSpa\n\u2022 Glamoureaux\n\u2022 Luxe Med Spa\n\u2022 Amachi MedSpa\n\u2022 Advanced Health and Aesthetics\n\u2022 My Body Works Well\n\u2022 Next Level Med Solutions LLC\n\u2022 Trim Tactics Weight Loss And Rejuvenation\n\u2022 Generations Wellness Center\n\u2022 Bella Medspa\n\u2022 Natural Beauty And Rejuvenation\n\u2022 Sculpt and Slim Wellness\n\u2022 Central Lakes Medical Corporation\n\u2022 Rainier Laser And Aesthetics\n\u2022 The Derm Clinic\n\u2022 bluSONIL\n\u2022 Rebalance\n\u2022 Skinsation Aesthetics\n\u2022 HEC Wellness Center\n\u2022 Aura Spa\n\u2022 VitalLife\n\u2022 Maryland trim clinic\n\u2022 TP Beauty Aesthetics\n\u2022 Sf Aesthetics MedSpa\n\u2022 OptimalJoy Wellness And Aesthetics\n\u2022 HoneyBee Medspa\n\u2022 The Modern Woman Med Spa\n\u2022 Beverly Hills Lux Body and Aesthetics\n\u2022 Mon Petit Salon et Spa\n\u2022 Sculpt Squad\n\u2022 Beautiful Minds Medical Aesthetics\n\u2022 McQuiston Dental and Aesthetics\n\u2022 Celebrity Body Sculpting &amp; Aesthetics\n\u2022 Collagen Bar\n\u2022 Citrus Aesthetics\n",
-      "ts": "1775253610.012739",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-07T17:56:15Z"
+  "pulled_at": "2026-04-07T19:02:57Z"
 }
