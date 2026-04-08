@@ -454,10 +454,30 @@
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
-      "text": "working on launching tulsa now <@U0AKM2J0H4J>",
-      "ts": "1775667334.570239",
+      "text": "<@U0AKM2J0H4J> Tulsa is now live!",
+      "ts": "1775670729.999279",
       "thread_ts": null,
       "reply_count": 0,
+      "reactions": 1
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U08TW0F2QNS",
+      "text": "<@U0AKM2J0H4J> Can you tell me why ads are off here? Is it bc new campaigns will replace? I see clips are missing for for the task to saquib on the booty offer.. <@U09BW62550C> when you see this plz help\n\nthe two new campaigns should replace the arms - they are ok with staying paused until we launch the two new ones but we cannot be waiting a whole ass other week",
+      "ts": "1775668816.358689",
+      "thread_ts": "1775668816.358689",
+      "reply_count": 1,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "working on launching tulsa now <@U0AKM2J0H4J>",
+      "ts": "1775667334.570239",
+      "thread_ts": "1775667334.570239",
+      "reply_count": 2,
       "reactions": 1
     },
     {
@@ -657,7 +677,7 @@
       "text": "<@U0AKM2J0H4J> <@U09BW62550C> Payment isnt working for celebrity and we pay the ad spend... <@U06RQUFSV4G> Can you please help with this what shall we do?",
       "ts": "1775583081.936459",
       "thread_ts": "1775583081.936459",
-      "reply_count": 5,
+      "reply_count": 6,
       "reactions": 0
     },
     {
@@ -929,26 +949,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0ALKDM4CRX",
-      "text": "golden health is <@U08TW0F2QNS>'s client \u2014 she'd know which offers they're running",
-      "ts": "1775494725.054979",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0ALKDM4CRX",
-      "text": "<@U0AQ54RSN91> michel medspa \u2014 is it their ad account payment or something on our end?",
-      "ts": "1775494724.782969",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -973,5 +973,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-08T16:57:54Z"
+  "pulled_at": "2026-04-08T18:09:07Z"
 }
