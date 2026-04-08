@@ -5,26 +5,26 @@
       "account_name": "Nunova Health & Image",
       "status": "active",
       "last_7_days": {
-        "spend": 552.36,
-        "impressions": 22296,
-        "clicks": 602,
-        "cpc": 0.917542,
-        "cpm": 24.77395,
-        "ctr": 2.700036,
-        "reach": 9766,
+        "spend": 553.37,
+        "impressions": 22378,
+        "clicks": 607,
+        "cpc": 0.911647,
+        "cpm": 24.728305,
+        "ctr": 2.712485,
+        "reach": 9776,
         "leads": 19,
-        "cost_per_lead": 29.071579
+        "cost_per_lead": 29.124737
       },
       "last_30_days": {
-        "spend": 3195.73,
-        "impressions": 107847,
-        "clicks": 3281,
-        "cpc": 0.974011,
-        "cpm": 29.632071,
-        "ctr": 3.042273,
-        "reach": 24519,
+        "spend": 3196.74,
+        "impressions": 107929,
+        "clicks": 3286,
+        "cpc": 0.972836,
+        "cpm": 29.618916,
+        "ctr": 3.044594,
+        "reach": 24521,
         "leads": 94,
-        "cost_per_lead": 33.997128
+        "cost_per_lead": 34.007872
       }
     },
     {
@@ -32,26 +32,26 @@
       "account_name": "AC - AVU Collective",
       "status": "active",
       "last_7_days": {
-        "spend": 1108.98,
-        "impressions": 39869,
-        "clicks": 1950,
-        "cpc": 0.568708,
-        "cpm": 27.815596,
-        "ctr": 4.891018,
-        "reach": 27153,
+        "spend": 1113.18,
+        "impressions": 40063,
+        "clicks": 1957,
+        "cpc": 0.56882,
+        "cpm": 27.785737,
+        "ctr": 4.884806,
+        "reach": 27301,
         "leads": 51,
-        "cost_per_lead": 21.744706
+        "cost_per_lead": 21.827059
       },
       "last_30_days": {
-        "spend": 3622.71,
-        "impressions": 132318,
-        "clicks": 6234,
-        "cpc": 0.581121,
-        "cpm": 27.378815,
-        "ctr": 4.711377,
-        "reach": 57541,
+        "spend": 3626.91,
+        "impressions": 132512,
+        "clicks": 6241,
+        "cpc": 0.581142,
+        "cpm": 27.370427,
+        "ctr": 4.709762,
+        "reach": 57626,
         "leads": 188,
-        "cost_per_lead": 19.269734
+        "cost_per_lead": 19.292074
       }
     },
     {
@@ -59,26 +59,26 @@
       "account_name": "Beyond Vitaliti",
       "status": "active",
       "last_7_days": {
-        "spend": 358.65,
-        "impressions": 18845,
-        "clicks": 594,
-        "cpc": 0.603788,
-        "cpm": 19.031573,
-        "ctr": 3.15203,
-        "reach": 8426,
-        "leads": 10,
-        "cost_per_lead": 35.865
+        "spend": 359.36,
+        "impressions": 18887,
+        "clicks": 598,
+        "cpc": 0.600936,
+        "cpm": 19.026844,
+        "ctr": 3.166199,
+        "reach": 8436,
+        "leads": 11,
+        "cost_per_lead": 32.669091
       },
       "last_30_days": {
-        "spend": 1478.21,
-        "impressions": 95081,
-        "clicks": 3248,
-        "cpc": 0.455114,
-        "cpm": 15.54685,
-        "ctr": 3.416035,
+        "spend": 1478.92,
+        "impressions": 95123,
+        "clicks": 3252,
+        "cpc": 0.454772,
+        "cpm": 15.547449,
+        "ctr": 3.418732,
         "reach": 27857,
-        "leads": 77,
-        "cost_per_lead": 19.197532
+        "leads": 78,
+        "cost_per_lead": 18.960513
       }
     },
     {
@@ -86,26 +86,26 @@
       "account_name": "Body Slim WLC",
       "status": "active",
       "last_7_days": {
-        "spend": 4190.21,
-        "impressions": 95189,
-        "clicks": 2058,
-        "cpc": 2.036059,
-        "cpm": 44.019897,
-        "ctr": 2.162015,
-        "reach": 49743,
+        "spend": 4213.81,
+        "impressions": 95812,
+        "clicks": 2068,
+        "cpc": 2.037626,
+        "cpm": 43.979982,
+        "ctr": 2.158394,
+        "reach": 49884,
         "leads": 46,
-        "cost_per_lead": 91.091522
+        "cost_per_lead": 91.604565
       },
       "last_30_days": {
-        "spend": 15067.38,
-        "impressions": 364325,
-        "clicks": 8191,
-        "cpc": 1.839504,
-        "cpm": 41.356975,
-        "ctr": 2.248267,
+        "spend": 15090.98,
+        "impressions": 364948,
+        "clicks": 8201,
+        "cpc": 1.840139,
+        "cpm": 41.351042,
+        "ctr": 2.247169,
         "reach": 122649,
         "leads": 173,
-        "cost_per_lead": 87.094682
+        "cost_per_lead": 87.231098
       }
     },
     {
@@ -113,26 +113,26 @@
       "account_name": "Body by Lily",
       "status": "active",
       "last_7_days": {
-        "spend": 382.94,
-        "impressions": 26355,
-        "clicks": 779,
-        "cpc": 0.491579,
-        "cpm": 14.53007,
-        "ctr": 2.955796,
-        "reach": 16358,
+        "spend": 384.82,
+        "impressions": 26476,
+        "clicks": 782,
+        "cpc": 0.492097,
+        "cpm": 14.534673,
+        "ctr": 2.953618,
+        "reach": 16401,
         "leads": 33,
-        "cost_per_lead": 11.604242
+        "cost_per_lead": 11.661212
       },
       "last_30_days": {
-        "spend": 1533.23,
-        "impressions": 102600,
-        "clicks": 3074,
-        "cpc": 0.498774,
-        "cpm": 14.943762,
-        "ctr": 2.996101,
-        "reach": 39747,
+        "spend": 1535.11,
+        "impressions": 102721,
+        "clicks": 3077,
+        "cpc": 0.498898,
+        "cpm": 14.944461,
+        "ctr": 2.995493,
+        "reach": 39803,
         "leads": 116,
-        "cost_per_lead": 13.2175
+        "cost_per_lead": 13.233707
       }
     },
     {
@@ -167,26 +167,26 @@
       "account_name": "Cloud Chiropractic Servedia",
       "status": "active",
       "last_7_days": {
-        "spend": 377.08,
-        "impressions": 12508,
-        "clicks": 515,
-        "cpc": 0.732194,
-        "cpm": 30.147106,
-        "ctr": 4.117365,
-        "reach": 8018,
+        "spend": 379.14,
+        "impressions": 12574,
+        "clicks": 519,
+        "cpc": 0.73052,
+        "cpm": 30.152696,
+        "ctr": 4.127565,
+        "reach": 8060,
         "leads": 4,
-        "cost_per_lead": 94.27
+        "cost_per_lead": 94.785
       },
       "last_30_days": {
-        "spend": 1248.72,
-        "impressions": 47329,
-        "clicks": 1864,
-        "cpc": 0.669914,
-        "cpm": 26.383824,
-        "ctr": 3.938389,
-        "reach": 20801,
+        "spend": 1250.78,
+        "impressions": 47395,
+        "clicks": 1868,
+        "cpc": 0.669582,
+        "cpm": 26.390548,
+        "ctr": 3.941344,
+        "reach": 20845,
         "leads": 51,
-        "cost_per_lead": 24.484706
+        "cost_per_lead": 24.525098
       }
     },
     {
@@ -221,26 +221,26 @@
       "account_name": "Cosmetico - SA",
       "status": "active",
       "last_7_days": {
-        "spend": 381.2,
-        "impressions": 13633,
-        "clicks": 541,
-        "cpc": 0.704621,
-        "cpm": 27.961564,
-        "ctr": 3.968312,
-        "reach": 7755,
+        "spend": 383.49,
+        "impressions": 13724,
+        "clicks": 545,
+        "cpc": 0.703651,
+        "cpm": 27.94302,
+        "ctr": 3.971145,
+        "reach": 7764,
         "leads": 20,
-        "cost_per_lead": 19.06
+        "cost_per_lead": 19.1745
       },
       "last_30_days": {
-        "spend": 1537.17,
-        "impressions": 60847,
-        "clicks": 2506,
-        "cpc": 0.613396,
-        "cpm": 25.262872,
-        "ctr": 4.118527,
-        "reach": 21636,
+        "spend": 1539.46,
+        "impressions": 60938,
+        "clicks": 2510,
+        "cpc": 0.613331,
+        "cpm": 25.262726,
+        "ctr": 4.118941,
+        "reach": 21640,
         "leads": 117,
-        "cost_per_lead": 13.138205
+        "cost_per_lead": 13.157778
       }
     },
     {
@@ -302,26 +302,26 @@
       "account_name": "Golden Health & Beauty",
       "status": "active",
       "last_7_days": {
-        "spend": 233.22,
-        "impressions": 5521,
-        "clicks": 185,
-        "cpc": 1.260649,
-        "cpm": 42.242347,
-        "ctr": 3.350842,
-        "reach": 4283,
+        "spend": 235.91,
+        "impressions": 5608,
+        "clicks": 187,
+        "cpc": 1.261551,
+        "cpm": 42.06669,
+        "ctr": 3.334522,
+        "reach": 4315,
         "leads": 6,
-        "cost_per_lead": 38.87
+        "cost_per_lead": 39.318333
       },
       "last_30_days": {
-        "spend": 2071.29,
-        "impressions": 51589,
-        "clicks": 2006,
-        "cpc": 1.032547,
-        "cpm": 40.149838,
-        "ctr": 3.888426,
+        "spend": 2073.98,
+        "impressions": 51676,
+        "clicks": 2008,
+        "cpc": 1.032859,
+        "cpm": 40.134298,
+        "ctr": 3.88575,
         "reach": 20350,
         "leads": 75,
-        "cost_per_lead": 27.6172
+        "cost_per_lead": 27.653067
       }
     },
     {
@@ -356,26 +356,26 @@
       "account_name": "Heritage Wellness and Medspa",
       "status": "active",
       "last_7_days": {
-        "spend": 339.46,
-        "impressions": 9899,
-        "clicks": 360,
-        "cpc": 0.942944,
-        "cpm": 34.292353,
-        "ctr": 3.636731,
-        "reach": 5481,
+        "spend": 341.29,
+        "impressions": 9972,
+        "clicks": 365,
+        "cpc": 0.935041,
+        "cpm": 34.22483,
+        "ctr": 3.660249,
+        "reach": 5517,
         "leads": 48,
-        "cost_per_lead": 7.072083
+        "cost_per_lead": 7.110208
       },
       "last_30_days": {
-        "spend": 339.46,
-        "impressions": 9899,
-        "clicks": 360,
-        "cpc": 0.942944,
-        "cpm": 34.292353,
-        "ctr": 3.636731,
-        "reach": 5481,
+        "spend": 341.29,
+        "impressions": 9972,
+        "clicks": 365,
+        "cpc": 0.935041,
+        "cpm": 34.22483,
+        "ctr": 3.660249,
+        "reach": 5517,
         "leads": 48,
-        "cost_per_lead": 7.072083
+        "cost_per_lead": 7.110208
       }
     },
     {
@@ -410,26 +410,26 @@
       "account_name": "Ideal Weightloss",
       "status": "active",
       "last_7_days": {
-        "spend": 155.76,
-        "impressions": 8678,
+        "spend": 156.97,
+        "impressions": 8739,
         "clicks": 168,
-        "cpc": 0.927143,
-        "cpm": 17.948836,
-        "ctr": 1.93593,
-        "reach": 3655,
+        "cpc": 0.934345,
+        "cpm": 17.962009,
+        "ctr": 1.922417,
+        "reach": 3684,
         "leads": 0,
         "cost_per_lead": 0
       },
       "last_30_days": {
-        "spend": 1159.74,
-        "impressions": 59075,
+        "spend": 1160.95,
+        "impressions": 59136,
         "clicks": 1339,
-        "cpc": 0.866124,
-        "cpm": 19.631655,
-        "ctr": 2.26661,
-        "reach": 15999,
+        "cpc": 0.867028,
+        "cpm": 19.631866,
+        "ctr": 2.264272,
+        "reach": 16020,
         "leads": 1,
-        "cost_per_lead": 1159.74
+        "cost_per_lead": 1160.95
       }
     },
     {
@@ -437,26 +437,26 @@
       "account_name": "Jule's Fibroblast & Body Contour",
       "status": "active",
       "last_7_days": {
-        "spend": 298.11,
-        "impressions": 7524,
-        "clicks": 310,
-        "cpc": 0.961645,
-        "cpm": 39.621212,
-        "ctr": 4.120149,
-        "reach": 4902,
+        "spend": 299.36,
+        "impressions": 7583,
+        "clicks": 311,
+        "cpc": 0.962572,
+        "cpm": 39.477779,
+        "ctr": 4.101279,
+        "reach": 4931,
         "leads": 15,
-        "cost_per_lead": 19.874
+        "cost_per_lead": 19.957333
       },
       "last_30_days": {
-        "spend": 820.41,
-        "impressions": 21195,
-        "clicks": 888,
-        "cpc": 0.923885,
-        "cpm": 38.707714,
-        "ctr": 4.189667,
-        "reach": 10709,
+        "spend": 821.66,
+        "impressions": 21254,
+        "clicks": 889,
+        "cpc": 0.924252,
+        "cpm": 38.659076,
+        "ctr": 4.182742,
+        "reach": 10741,
         "leads": 40,
-        "cost_per_lead": 20.51025
+        "cost_per_lead": 20.5415
       }
     },
     {
@@ -518,26 +518,26 @@
       "account_name": "McQuiston Dental & Aesthetics",
       "status": "active",
       "last_7_days": {
-        "spend": 385.61,
-        "impressions": 9785,
-        "clicks": 604,
-        "cpc": 0.638427,
-        "cpm": 39.408278,
-        "ctr": 6.172713,
-        "reach": 6739,
+        "spend": 387.76,
+        "impressions": 9816,
+        "clicks": 606,
+        "cpc": 0.639868,
+        "cpm": 39.502852,
+        "ctr": 6.173594,
+        "reach": 6749,
         "leads": 23,
-        "cost_per_lead": 16.765652
+        "cost_per_lead": 16.85913
       },
       "last_30_days": {
-        "spend": 1549.44,
-        "impressions": 37766,
-        "clicks": 2278,
-        "cpc": 0.680176,
-        "cpm": 41.027379,
-        "ctr": 6.031881,
-        "reach": 17578,
+        "spend": 1551.59,
+        "impressions": 37797,
+        "clicks": 2280,
+        "cpc": 0.680522,
+        "cpm": 41.050612,
+        "ctr": 6.032225,
+        "reach": 17602,
         "leads": 133,
-        "cost_per_lead": 11.649925
+        "cost_per_lead": 11.66609
       }
     },
     {
@@ -572,26 +572,26 @@
       "account_name": "Precision Weight Loss",
       "status": "active",
       "last_7_days": {
-        "spend": 539.95,
-        "impressions": 13173,
-        "clicks": 553,
-        "cpc": 0.976401,
-        "cpm": 40.989144,
-        "ctr": 4.197981,
+        "spend": 541.93,
+        "impressions": 13224,
+        "clicks": 555,
+        "cpc": 0.97645,
+        "cpm": 40.980793,
+        "ctr": 4.196915,
         "reach": 8463,
         "leads": 20,
-        "cost_per_lead": 26.9975
+        "cost_per_lead": 27.0965
       },
       "last_30_days": {
-        "spend": 2260.46,
-        "impressions": 54191,
-        "clicks": 2527,
-        "cpc": 0.894523,
-        "cpm": 41.712831,
-        "ctr": 4.663136,
+        "spend": 2262.44,
+        "impressions": 54242,
+        "clicks": 2529,
+        "cpc": 0.894599,
+        "cpm": 41.710114,
+        "ctr": 4.662439,
         "reach": 25850,
         "leads": 80,
-        "cost_per_lead": 28.25575
+        "cost_per_lead": 28.2805
       }
     },
     {
@@ -599,26 +599,26 @@
       "account_name": "Prestige Laser & Skin Clinic",
       "status": "active",
       "last_7_days": {
-        "spend": 372.69,
-        "impressions": 22936,
-        "clicks": 791,
-        "cpc": 0.471163,
-        "cpm": 16.249128,
-        "ctr": 3.448727,
-        "reach": 13378,
+        "spend": 374.29,
+        "impressions": 23069,
+        "clicks": 796,
+        "cpc": 0.470214,
+        "cpm": 16.224804,
+        "ctr": 3.450518,
+        "reach": 13394,
         "leads": 27,
-        "cost_per_lead": 13.803333
+        "cost_per_lead": 13.862593
       },
       "last_30_days": {
-        "spend": 1525.3,
-        "impressions": 94077,
-        "clicks": 3014,
-        "cpc": 0.506072,
-        "cpm": 16.213315,
-        "ctr": 3.203759,
-        "reach": 35468,
+        "spend": 1526.9,
+        "impressions": 94210,
+        "clicks": 3019,
+        "cpc": 0.505764,
+        "cpm": 16.207409,
+        "ctr": 3.204543,
+        "reach": 35474,
         "leads": 109,
-        "cost_per_lead": 13.993578
+        "cost_per_lead": 14.008257
       }
     },
     {
@@ -627,22 +627,22 @@
       "status": "active",
       "last_7_days": {
         "spend": 5430.82,
-        "impressions": 294005,
+        "impressions": 294008,
         "clicks": 1401,
         "cpc": 3.876388,
-        "cpm": 18.471863,
-        "ctr": 0.476523,
+        "cpm": 18.471674,
+        "ctr": 0.476518,
         "reach": 254838,
         "leads": 51,
         "cost_per_lead": 106.486667
       },
       "last_30_days": {
         "spend": 22295.48,
-        "impressions": 1130025,
+        "impressions": 1130028,
         "clicks": 6410,
         "cpc": 3.478234,
-        "cpm": 19.730077,
-        "ctr": 0.567244,
+        "cpm": 19.730024,
+        "ctr": 0.567243,
         "reach": 753500,
         "leads": 263,
         "cost_per_lead": 84.773688
@@ -707,26 +707,26 @@
       "account_name": "Skinsation Aesthetics - SA",
       "status": "active",
       "last_7_days": {
-        "spend": 444.72,
-        "impressions": 6252,
-        "clicks": 181,
-        "cpc": 2.457017,
-        "cpm": 71.132438,
-        "ctr": 2.895074,
-        "reach": 3358,
+        "spend": 449.19,
+        "impressions": 6350,
+        "clicks": 188,
+        "cpc": 2.389309,
+        "cpm": 70.738583,
+        "ctr": 2.96063,
+        "reach": 3376,
         "leads": 7,
-        "cost_per_lead": 63.531429
+        "cost_per_lead": 64.17
       },
       "last_30_days": {
-        "spend": 1701.29,
-        "impressions": 39577,
-        "clicks": 1459,
-        "cpc": 1.166066,
-        "cpm": 42.986836,
-        "ctr": 3.686485,
-        "reach": 15805,
+        "spend": 1705.76,
+        "impressions": 39675,
+        "clicks": 1466,
+        "cpc": 1.163547,
+        "cpm": 42.993321,
+        "ctr": 3.695022,
+        "reach": 15814,
         "leads": 51,
-        "cost_per_lead": 33.358627
+        "cost_per_lead": 33.446275
       }
     },
     {
@@ -734,26 +734,26 @@
       "account_name": "The MAC OKC",
       "status": "active",
       "last_7_days": {
-        "spend": 1117.62,
-        "impressions": 19371,
-        "clicks": 562,
-        "cpc": 1.988648,
-        "cpm": 57.695524,
-        "ctr": 2.901244,
-        "reach": 9541,
+        "spend": 1119.46,
+        "impressions": 19411,
+        "clicks": 563,
+        "cpc": 1.988384,
+        "cpm": 57.671423,
+        "ctr": 2.900417,
+        "reach": 9545,
         "leads": 0,
         "cost_per_lead": 0
       },
       "last_30_days": {
-        "spend": 3960.07,
-        "impressions": 60603,
-        "clicks": 2667,
-        "cpc": 1.484841,
-        "cpm": 65.344455,
-        "ctr": 4.400772,
+        "spend": 3961.91,
+        "impressions": 60643,
+        "clicks": 2668,
+        "cpc": 1.484974,
+        "cpm": 65.331695,
+        "ctr": 4.399518,
         "reach": 35481,
         "leads": 97,
-        "cost_per_lead": 40.825464
+        "cost_per_lead": 40.844433
       }
     },
     {
@@ -767,26 +767,26 @@
       "account_name": "Transformations Esthetics & Wellness",
       "status": "active",
       "last_7_days": {
-        "spend": 383.49,
-        "impressions": 9357,
-        "clicks": 336,
-        "cpc": 1.141339,
-        "cpm": 40.98429,
-        "ctr": 3.590895,
-        "reach": 4263,
+        "spend": 384.44,
+        "impressions": 9400,
+        "clicks": 337,
+        "cpc": 1.140772,
+        "cpm": 40.897872,
+        "ctr": 3.585106,
+        "reach": 4270,
         "leads": 15,
-        "cost_per_lead": 25.566
+        "cost_per_lead": 25.629333
       },
       "last_30_days": {
-        "spend": 1569.81,
-        "impressions": 63493,
-        "clicks": 1962,
-        "cpc": 0.800107,
-        "cpm": 24.724143,
-        "ctr": 3.090104,
+        "spend": 1570.76,
+        "impressions": 63536,
+        "clicks": 1963,
+        "cpc": 0.800183,
+        "cpm": 24.722362,
+        "ctr": 3.089587,
         "reach": 25576,
         "leads": 45,
-        "cost_per_lead": 34.884667
+        "cost_per_lead": 34.905778
       }
     },
     {
@@ -794,26 +794,26 @@
       "account_name": "Transformative Wellness",
       "status": "active",
       "last_7_days": {
-        "spend": 453.34,
-        "impressions": 8782,
-        "clicks": 239,
-        "cpc": 1.89682,
-        "cpm": 51.621499,
-        "ctr": 2.721476,
-        "reach": 4553,
+        "spend": 454.96,
+        "impressions": 8810,
+        "clicks": 241,
+        "cpc": 1.887801,
+        "cpm": 51.641317,
+        "ctr": 2.735528,
+        "reach": 4563,
         "leads": 11,
-        "cost_per_lead": 41.212727
+        "cost_per_lead": 41.36
       },
       "last_30_days": {
-        "spend": 1048.59,
-        "impressions": 19732,
-        "clicks": 525,
-        "cpc": 1.997314,
-        "cpm": 53.141597,
-        "ctr": 2.660653,
-        "reach": 7754,
+        "spend": 1050.21,
+        "impressions": 19760,
+        "clicks": 527,
+        "cpc": 1.992808,
+        "cpm": 53.148279,
+        "ctr": 2.667004,
+        "reach": 7760,
         "leads": 28,
-        "cost_per_lead": 37.449643
+        "cost_per_lead": 37.5075
       }
     },
     {
@@ -821,26 +821,26 @@
       "account_name": "Vital Life",
       "status": "active",
       "last_7_days": {
-        "spend": 425.75,
-        "impressions": 10979,
-        "clicks": 355,
-        "cpc": 1.199296,
-        "cpm": 38.778577,
-        "ctr": 3.233446,
+        "spend": 425.83,
+        "impressions": 10980,
+        "clicks": 356,
+        "cpc": 1.196152,
+        "cpm": 38.782332,
+        "ctr": 3.242259,
         "reach": 5139,
         "leads": 12,
-        "cost_per_lead": 35.479167
+        "cost_per_lead": 35.485833
       },
       "last_30_days": {
-        "spend": 1475.91,
-        "impressions": 53794,
-        "clicks": 2240,
-        "cpc": 0.658888,
-        "cpm": 27.436331,
-        "ctr": 4.164033,
+        "spend": 1475.99,
+        "impressions": 53795,
+        "clicks": 2241,
+        "cpc": 0.65863,
+        "cpm": 27.437308,
+        "ctr": 4.165815,
         "reach": 24697,
         "leads": 65,
-        "cost_per_lead": 22.706308
+        "cost_per_lead": 22.707538
       }
     },
     {
@@ -848,26 +848,26 @@
       "account_name": "Wellness Herbal - SA",
       "status": "active",
       "last_7_days": {
-        "spend": 372.58,
-        "impressions": 10811,
-        "clicks": 292,
-        "cpc": 1.275959,
-        "cpm": 34.463047,
-        "ctr": 2.700953,
-        "reach": 7325,
+        "spend": 375.18,
+        "impressions": 10879,
+        "clicks": 294,
+        "cpc": 1.276122,
+        "cpm": 34.486626,
+        "ctr": 2.702454,
+        "reach": 7361,
         "leads": 11,
-        "cost_per_lead": 33.870909
+        "cost_per_lead": 34.107273
       },
       "last_30_days": {
-        "spend": 1484.29,
-        "impressions": 42877,
-        "clicks": 1181,
-        "cpc": 1.256808,
-        "cpm": 34.617394,
-        "ctr": 2.75439,
-        "reach": 19124,
+        "spend": 1486.89,
+        "impressions": 42945,
+        "clicks": 1183,
+        "cpc": 1.256881,
+        "cpm": 34.623123,
+        "ctr": 2.754686,
+        "reach": 19139,
         "leads": 64,
-        "cost_per_lead": 23.192031
+        "cost_per_lead": 23.232656
       }
     },
     {
@@ -902,26 +902,26 @@
       "account_name": "beautyandwellnesscenter",
       "status": "active",
       "last_7_days": {
-        "spend": 379.31,
-        "impressions": 16676,
-        "clicks": 713,
-        "cpc": 0.531992,
-        "cpm": 22.745862,
-        "ctr": 4.275606,
-        "reach": 9595,
+        "spend": 381.63,
+        "impressions": 16778,
+        "clicks": 728,
+        "cpc": 0.524217,
+        "cpm": 22.745858,
+        "ctr": 4.339015,
+        "reach": 9607,
         "leads": 33,
-        "cost_per_lead": 11.494242
+        "cost_per_lead": 11.564545
       },
       "last_30_days": {
-        "spend": 1534.71,
-        "impressions": 73971,
-        "clicks": 2912,
-        "cpc": 0.52703,
-        "cpm": 20.747455,
-        "ctr": 3.936678,
-        "reach": 25641,
+        "spend": 1537.03,
+        "impressions": 74073,
+        "clicks": 2927,
+        "cpc": 0.525121,
+        "cpm": 20.750206,
+        "ctr": 3.951507,
+        "reach": 25648,
         "leads": 130,
-        "cost_per_lead": 11.805462
+        "cost_per_lead": 11.823308
       }
     },
     {
@@ -929,26 +929,26 @@
       "account_name": "dailey aesthetics",
       "status": "active",
       "last_7_days": {
-        "spend": 380.08,
-        "impressions": 8333,
-        "clicks": 331,
-        "cpc": 1.148278,
-        "cpm": 45.611424,
-        "ctr": 3.972159,
-        "reach": 4925,
+        "spend": 382.4,
+        "impressions": 8387,
+        "clicks": 335,
+        "cpc": 1.141493,
+        "cpm": 45.594372,
+        "ctr": 3.994277,
+        "reach": 4940,
         "leads": 10,
-        "cost_per_lead": 38.008
+        "cost_per_lead": 38.24
       },
       "last_30_days": {
-        "spend": 387.54,
-        "impressions": 8429,
-        "clicks": 335,
-        "cpc": 1.156836,
-        "cpm": 45.976984,
-        "ctr": 3.974374,
-        "reach": 4988,
+        "spend": 389.86,
+        "impressions": 8483,
+        "clicks": 339,
+        "cpc": 1.15003,
+        "cpm": 45.957798,
+        "ctr": 3.996228,
+        "reach": 5003,
         "leads": 10,
-        "cost_per_lead": 38.754
+        "cost_per_lead": 38.986
       }
     },
     {
@@ -956,26 +956,26 @@
       "account_name": "servedia - gencore aesthetic",
       "status": "active",
       "last_7_days": {
-        "spend": 483.85,
-        "impressions": 10211,
-        "clicks": 418,
-        "cpc": 1.157536,
-        "cpm": 47.385173,
-        "ctr": 4.093625,
-        "reach": 4876,
+        "spend": 492.8,
+        "impressions": 10412,
+        "clicks": 422,
+        "cpc": 1.167773,
+        "cpm": 47.330004,
+        "ctr": 4.053016,
+        "reach": 4929,
         "leads": 12,
-        "cost_per_lead": 40.320833
+        "cost_per_lead": 41.066667
       },
       "last_30_days": {
-        "spend": 1986.07,
-        "impressions": 47124,
-        "clicks": 2170,
-        "cpc": 0.91524,
-        "cpm": 42.145616,
-        "ctr": 4.604872,
-        "reach": 13645,
+        "spend": 1995.02,
+        "impressions": 47325,
+        "clicks": 2174,
+        "cpc": 0.917672,
+        "cpm": 42.155732,
+        "ctr": 4.593767,
+        "reach": 13718,
         "leads": 84,
-        "cost_per_lead": 23.64369
+        "cost_per_lead": 23.750238
       }
     }
   ],
@@ -988,5 +988,5 @@
       "account_name": "Thorpe Wellness 2.0"
     }
   ],
-  "pulled_at": "2026-04-08T23:05:36Z"
+  "pulled_at": "2026-04-08T23:57:20Z"
 }
