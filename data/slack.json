@@ -454,8 +454,18 @@
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
-      "text": "<@U08TW0F2QNS> Golden Health is Live",
-      "ts": "1775663411.301599",
+      "text": "working on launching tulsa now <@U0AKM2J0H4J>",
+      "ts": "1775667334.570239",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 1
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AKM2J0H4J",
+      "text": "",
+      "ts": "1775667221.812659",
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
@@ -463,11 +473,31 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "<@U08TW0F2QNS> <https://app.clickup.com/t/86c8jh436> check out sculpt ticket lmk what you think",
+      "ts": "1775666958.211889",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "<@U08TW0F2QNS> Golden Health is Live",
+      "ts": "1775663411.301599",
+      "thread_ts": "1775663411.301599",
+      "reply_count": 10,
+      "reactions": 1
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U08TW0F2QNS",
       "text": "<@U0AKM2J0H4J> I need an update on this client- *Breeze* - looks like campaign is flopping hard and theres some issue on an ad set?",
       "ts": "1775660638.346649",
-      "thread_ts": null,
-      "reply_count": 0,
+      "thread_ts": "1775660638.346649",
+      "reply_count": 5,
       "reactions": 0
     },
     {
@@ -486,8 +516,8 @@
       "user": "U08TW0F2QNS",
       "text": "<@U0AKM2J0H4J> <@U09BW62550C> <@U0AQ54RSN91> Can someone plz lower budget for Double Chin Rescue for Mon Petit please? I can't change the ad budget section as its not specifying the amount :confused:",
       "ts": "1775654943.570319",
-      "thread_ts": null,
-      "reply_count": 0,
+      "thread_ts": "1775654943.570319",
+      "reply_count": 2,
       "reactions": 0
     },
     {
@@ -919,36 +949,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0ALKDM4CRX",
-      "text": "<@U0AQ54RSN91> heritage is good to go \u2014 molly confirmed the amex is verified and balance is paid. can you launch?",
-      "ts": "1775494724.675709",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U09GF9KJDP0",
-      "text": "<https://us06web.zoom.us/j/82102881457?pwd=Fiz2Mbr5STvKfOMlnFbvdb7sHaRvIG.1>\nguys the all hands meeting is now live <@U0AKM2J0H4J> <@U09BW62550C> <@U0AQ54RSN91>",
-      "ts": "1775494148.851569",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "Needing some clarity for Golden Health & Beauty Are they running botox neck lift and nonsurgical jawlift? <@U08TW0F2QNS> <@U0ALKDM4CRX>",
-      "ts": "1775492617.112659",
-      "thread_ts": "1775492617.112659",
-      "reply_count": 9,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -973,5 +973,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-08T15:54:34Z"
+  "pulled_at": "2026-04-08T16:57:54Z"
 }
