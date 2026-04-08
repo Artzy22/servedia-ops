@@ -454,10 +454,30 @@
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
-      "text": "how much does the change needed to be?",
-      "ts": "1775654979.936639",
+      "text": "<@U08TW0F2QNS> Golden Health is Live",
+      "ts": "1775663411.301599",
       "thread_ts": null,
       "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U08TW0F2QNS",
+      "text": "<@U0AKM2J0H4J> I need an update on this client- *Breeze* - looks like campaign is flopping hard and theres some issue on an ad set?",
+      "ts": "1775660638.346649",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "how much does the change needed to be?",
+      "ts": "1775654979.936639",
+      "thread_ts": "1775654979.936639",
+      "reply_count": 2,
       "reactions": 0
     },
     {
@@ -487,7 +507,7 @@
       "text": "<@U08TW0F2QNS> golden campaign is finished. Not yet live, but are we good to go? Did the client still approve even though the crazy spend?",
       "ts": "1775616635.980309",
       "thread_ts": "1775616635.980309",
-      "reply_count": 1,
+      "reply_count": 3,
       "reactions": 0
     },
     {
@@ -929,26 +949,6 @@
       "thread_ts": "1775492617.112659",
       "reply_count": 9,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "<@U08TW0F2QNS> <@U0ALKDM4CRX> *Golden Health &amp; Beauty is live with the new Offer (*non surgical jawlift)",
-      "ts": "1775492063.917099",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "<@U0ALKDM4CRX> Michel Medspa offer is already changed. Payment issue is now the problem",
-      "ts": "1775488306.778559",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 1
     }
   ],
   "channels": [
@@ -973,5 +973,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-08T14:08:07Z"
+  "pulled_at": "2026-04-08T15:54:34Z"
 }
