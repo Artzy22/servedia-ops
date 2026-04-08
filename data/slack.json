@@ -453,6 +453,46 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0AQ54RSN91",
+      "text": "<@U08TW0F2QNS> golden campaign is finished. Not yet live, but are we good to go? Did the client still approve even though the crazy spend?",
+      "ts": "1775616635.980309",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AKM2J0H4J> <@U0AQ54RSN91> transformations esthetics (christie shumate) \u2014 whats the status on the new campaign ticket? shes paused and waiting to relaunch <https://app.clickup.com/t/86c6vf5a9>",
+      "ts": "1775610014.725739",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> <@U09BW62550C> connected health needs a new meta ad account created \u2014 previous agency blocking access to the old one. client in canada so billing will be CAD. ticket submitted <https://app.clickup.com/t/86c97tgge>",
+      "ts": "1775610014.571569",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
+      "user": "U0ALKDM4CRX",
+      "text": "<@U0AQ54RSN91> <@U09BW62550C> urgent \u2014 heritage wellness ads showing google reviews from a dental office instead of the medspa. zero leads since launch apr 3. also meta page flagged for recommendation violations. tickets submitted <https://app.clickup.com/t/86c97tggb> + <https://app.clickup.com/t/86c97tggc>",
+      "ts": "1775610014.381959",
+      "thread_ts": "1775610014.381959",
+      "reply_count": 1,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U08TW0F2QNS",
       "text": "<@U0AKM2J0H4J> Need updates for below tickets:\n\n<https://app.clickup.com/t/86c93k6h5> - golden - I think <@U0AQ54RSN91> you did this one right ?\n<https://app.clickup.com/t/86c91hdmq>  -gencore <@U09BW62550C>\n<https://app.clickup.com/t/86c969dtd>  - skinsation\n<https://app.clickup.com/t/86c94fz5k>  - image wellness\n<https://app.clickup.com/t/86c969dxe>   - beautiful minds\n<https://app.clickup.com/t/86c969gx1> - SF aesthetics\n<https://app.clickup.com/t/86c957z5z> - sculpt and slim\n<https://app.clickup.com/t/86c91h78w> - ensoul - tech is done so did saquib edit yet?\n<https://app.clickup.com/t/86c8n5g7e> - advanced health",
       "ts": "1775598007.299679",
@@ -909,46 +949,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "Is Wilmarwell all connected to launch now?",
-      "ts": "1775485889.817609",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "<@U097PL60HTN> all Added!",
-      "ts": "1775485876.741789",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0AQ54RSN91",
-      "text": "Understood!",
-      "ts": "1775483456.427789",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U097PL60HTN",
-      "text": "<@U0AKM2J0H4J> <@U0AQ54RSN91> <@U09BW62550C>\n\nCan anyone add the Facebook Pixel ID and Access Token on GHL for the following Clients :\n*PRIOTY:* \nUplift Aesthetics\nThe Lamkin Clinic\nTulsa Body Sculpting\nWilmarwell",
-      "ts": "1775482090.457199",
-      "thread_ts": "1775482090.457199",
-      "reply_count": 12,
-      "reactions": 1
     }
   ],
   "channels": [
@@ -973,5 +973,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-08T00:01:19Z"
+  "pulled_at": "2026-04-08T03:38:14Z"
 }
