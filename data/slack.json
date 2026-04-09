@@ -443,11 +443,21 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0AKM2J0H4J",
+      "text": "<@U08TW0F2QNS> LAMKIM",
+      "ts": "1775757968.497339",
+      "thread_ts": "1775757968.497339",
+      "reply_count": 2,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U09U080MHL2",
       "text": "Just wanted to tag you here <@U0AKM2J0H4J> <@U09BW62550C> or <@U0AQ54RSN91>\n<https://app.clickup.com/t/86c97rk6q>",
       "ts": "1775752757.681719",
       "thread_ts": "1775752757.681719",
-      "reply_count": 6,
+      "reply_count": 10,
       "reactions": 1
     },
     {
@@ -929,16 +939,6 @@
       "thread_ts": null,
       "reply_count": 0,
       "reactions": 0
-    },
-    {
-      "channel": "media-ads",
-      "channel_id": "C08R3C466MN",
-      "user": "U0APLPRSMQR",
-      "text": ":alarm_clock: *6:00 PM Reminder \u2014 Anca Elamparo*\nYou have *21* client check-ins still pending:\n\u2022 Golden Health And Beauty Center\n\u2022 NuNova Health\n\u2022 McQuiston Dental And Aesthetics\n\u2022 Beauty and Wellness Med Spa\n\u2022 Botanica Beauty Studio\n\u2022 Gencore Aesthetic\n\u2022 Body By Lily\n\u2022 AVU Collective\n\u2022 Dailey Aesthetics\n\u2022 Wellness Herbal Spa\n\u2022 Transformations Esthetics And Wellness\n\u2022 Beaute By Dipsy\n\u2022 Medical Laser And Aesthetics\n\u2022 Ensoul Aesthetics And Wellness\n\u2022 Cloud Chiropractic\n\u2022 Precision wellness center\n\u2022 Jules Fibroblast and  Body Contour\n\u2022 Transformative Wellness\n\u2022 Michel Medspa\n\u2022 Cosmetico Medspa\n\u2022 Beyond Vitaliti\n",
-      "ts": "1775512803.266349",
-      "thread_ts": null,
-      "reply_count": 0,
-      "reactions": 0
     }
   ],
   "channels": [
@@ -963,5 +963,5 @@
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-09T17:56:24Z"
+  "pulled_at": "2026-04-09T19:06:57Z"
 }
