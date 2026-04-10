@@ -33,6 +33,16 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
+      "user": "U0APLPRSMQR",
+      "text": ":rotating_light: *PROBLEM FLAGGED* <!channel>\n\n*Client:* The Derm Clinic\n*Flagged by:* Julianne Navarro\n*Issue:* - failed payment attempt\n*Ad Account:* <https://adsmanager.facebook.com/adsmanager/manage/campaigns?global_scope_id=770478474190624&amp;business_id=770478474190624&amp;act=1058399385925729&amp;redirect_session_id=967b1bdc-ad5f-447d-a704-12629ab900fb#|View Ad Account>\n",
+      "ts": "1775847170.796149",
+      "thread_ts": null,
+      "reply_count": 0,
+      "reactions": 0
+    },
+    {
+      "channel": "media-ads",
+      "channel_id": "C08R3C466MN",
       "user": "U0AQ54RSN91",
       "text": "<@U08TW0F2QNS> *Ensoul Aesthetics And Wellness - SA. We weren't able to place a temporary hold*\nThere weren't enough funds on your card to place a hold so your ads are not delivering. You can update your payment method or try again. If you try again, make sure your card has sufficient funds.  There were put on hold ads are active just not spending",
       "ts": "1775842752.449739",
@@ -133,15 +143,15 @@
     {
       "channel": "media-ads",
       "channel_id": "C08R3C466MN",
-      "message_count_24h": 9,
+      "message_count_24h": 10,
       "is_private": false,
       "topic": "",
       "purpose": ""
     }
   ],
-  "total_messages_24h": 12,
+  "total_messages_24h": 13,
   "total_channels": 2,
   "member_channels": 2,
   "errors": [],
-  "pulled_at": "2026-04-10T18:45:55Z"
+  "pulled_at": "2026-04-10T19:41:05Z"
 }
