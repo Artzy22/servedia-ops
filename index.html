@@ -1516,7 +1516,7 @@ function renderMeta() {
   cplEl.className = 'stat-value';
   cplEl.style.color = avgCPL ? avgTier.color : '';
   document.getElementById('mImpr').textContent = im7 > 1e6 ? (im7/1e6).toFixed(1)+'M' : Math.round(im7/1000)+'K';
-  document.getElementById('metaBadge').textContent = act;
+  { const _e = document.getElementById('metaBadge'); if (_e) _e.textContent = act; }
   document.getElementById('metaSubtitle').textContent = list.length + ' accounts · synced ' + fmtTime(metaData.pulled_at);
 
   const grid = document.getElementById('metaGrid');
@@ -1803,8 +1803,7 @@ function renderMaintenance() {
   if (gl) gl.textContent = `Great/Good CPL (<$${thr.good})`;
 
   const pending = all.filter(c => !(state[c.id]||{}).complete).length;
-  document.getElementById('maintBadge').textContent = pending;
-  document.getElementById('maintBadge').className   = 'tab-badge ' + (flagCount > 0 ? 'red' : pending > 10 ? 'orange' : 'green');
+  { const _e = document.getElementById('maintBadge'); if (_e) { _e.textContent = pending; _e.className = 'tab-badge ' + (flagCount > 0 ? 'red' : pending > 10 ? 'orange' : 'green'); } }
 
   // Problems panel
   const flagged = all.filter(c => (state[c.id]||{}).flagged);
@@ -2207,7 +2206,7 @@ function renderTasks() {
   document.getElementById('cuUpdated').textContent  = cuData.pulled_at ? 'Synced ' + fmtTime(cuData.pulled_at) + ' · Byron + Me tasks' : '';
 
   const urgentCount = mine.filter(t => t.priority === 'urgent').length;
-  document.getElementById('tasksBadge').textContent = urgentCount || mine.length;
+  { const _e = document.getElementById('tasksBadge'); if (_e) _e.textContent = urgentCount || mine.length; }
 
   const container = document.getElementById('cuGroups');
   if (!list.length) {
@@ -2319,7 +2318,7 @@ function renderVideo() {
   document.getElementById('vidWaiting').textContent  = grouped.waiting.length;
   document.getElementById('vidApproval').textContent = grouped.approval.length;
   document.getElementById('vidDone').textContent     = grouped.done.length;
-  document.getElementById('videoBadge').textContent  = grouped.approval.length || tasks.length;
+  { const _e = document.getElementById('videoBadge'); if (_e) _e.textContent = grouped.approval.length || tasks.length; }
   if (vidData.pulled_at) document.getElementById('vidUpdated').textContent = 'Synced: ' + fmtTime(vidData.pulled_at);
 
   const priColors = { urgent:'#f87171', high:'#fb923c', normal:'#818cf8', low:'#4ade80' };
@@ -2365,7 +2364,7 @@ function renderSlack() {
   const msgs   = slData.messages || [];
   const search = (document.getElementById('slSearch').value || '').toLowerCase();
   if (slData.pulled_at) document.getElementById('slUpdated').textContent = 'Synced: ' + fmtTime(slData.pulled_at);
-  document.getElementById('slackBadge').textContent = msgs.length;
+  { const _e = document.getElementById('slackBadge'); if (_e) _e.textContent = msgs.length; }
 
   // Channels
   const chanMap = {};
@@ -2930,7 +2929,7 @@ function renderRetention() {
   document.getElementById('retCritical').textContent  = critical.length;
   document.getElementById('retWatchList').textContent = watch.length;
   document.getElementById('retChurnRate').textContent = churnRate + '%';
-  document.getElementById('retBadge').textContent     = critical.length || '–';
+  { const _e = document.getElementById('retBadge'); if (_e) _e.textContent = critical.length || '–'; }
 
   const riskColor = s => s >= 70 ? '#f87171' : s >= 40 ? '#fb923c' : s >= 20 ? '#fbbf24' : '#34d399';
 
