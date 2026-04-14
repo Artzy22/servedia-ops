@@ -3789,6 +3789,142 @@ function updateNavBadges() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// T4 ACTION QUEUE — render + execute
+// ══════════════════════════════════════════════════════════════
+function renderT4Actions() {
+  const section = document.getElementById('ccT4Section');
+  const list    = document.getElementById('ccT4List');
+  if (!section || !list) return;
+
+  const cfg      = getCfg();
+  const hasToken = !!cfg.token;
+
+  const pending = T4_ACTIONS.filter(a => {
+    const s = t4Executed.get(a.id);
+    return !s || s.state !== 'done';
+  });
+
+  if (pending.length === 0) {
+    section.style.display = 'none';
+    return;
+  }
+
+  section.style.display = '';
+
+  const sevLabel = { critical: '🔴 CRITICAL', high: '🟠 HIGH', medium: '🟡 MEDIUM' };
+  const sevCls   = { critical: 't4-sev-critical', high: 't4-sev-high', medium: 't4-sev-medium' };
+
+  list.innerHTML = T4_ACTIONS.map(action => {
+    const exec   = t4Executed.get(action.id) || { state: 'idle' };
+    const isDone = exec.state === 'done';
+
+    let execHtml = '';
+    if (!hasToken) {
+      execHtml = `<span style="font-size:11px;color:#444">Set token in ⚙ Config to enable</span>`;
+    } else if (exec.state === 'idle') {
+      execHtml = `<button class="t4-btn" onclick="t4StartConfirm('${action.id}')">Execute</button>`;
+    } else if (exec.state === 'confirming') {
+      execHtml = `
+        <span style="font-size:11px;color:#ccc;margin-right:6px;flex:1">${esc(action.confirmText)}</span>
+        <button class="t4-btn t4-btn-confirm" onclick="t4Execute('${action.id}')">✓ Confirm</button>
+        <button class="t4-btn t4-btn-cancel" onclick="t4Cancel('${action.id}')">✗ Cancel</button>`;
+    } else if (exec.state === 'executing') {
+      execHtml = `<span class="t4-status executing">⏳ Running…</span>`;
+    } else if (exec.state === 'done') {
+      execHtml = `<span class="t4-status done">${esc(exec.msg || '✅ Done')}</span>`;
+    } else if (exec.state === 'error') {
+      execHtml = `<span class="t4-status error">❌ Failed: ${esc(exec.msg || 'unknown error')}</span>`;
+    }
+
+    return `<div class="t4-card ${sevCls[action.severity] || ''} ${isDone ? 't4-done' : ''}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:800;color:#555">${sevLabel[action.severity] || ''}</span>
+      </div>
+      <div class="t4-label">${esc(action.label)}</div>
+      <div class="t4-execute-wrap">${execHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function t4StartConfirm(id) {
+  t4Executed.set(id, { state: 'confirming' });
+  renderT4Actions();
+}
+
+function t4Cancel(id) {
+  t4Executed.set(id, { state: 'idle' });
+  renderT4Actions();
+}
+
+async function t4Execute(id) {
+  const action = T4_ACTIONS.find(a => a.id === id);
+  if (!action) return;
+  const cfg = getCfg();
+  if (!cfg.token) return;
+
+  t4Executed.set(id, { state: 'executing' });
+  renderT4Actions();
+
+  const headers = { 'Authorization': cfg.token, 'Content-Type': 'application/json' };
+
+  try {
+    if (action.type === 'comment') {
+      const resp = await fetch(`${CU_API}/task/${action.taskId}/comment`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ comment_text: action.commentText, notify_all: false })
+      });
+      if (!resp.ok) {
+        const e = await resp.json().catch(() => ({}));
+        throw new Error(e.err || `HTTP ${resp.status}`);
+      }
+      t4Executed.set(id, { state: 'done', msg: '✅ Done' });
+
+    } else if (action.type === 'bulk_comment') {
+      const results = await Promise.allSettled(
+        action.taskIds.map(tid =>
+          fetch(`${CU_API}/task/${tid}/comment`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ comment_text: action.commentText, notify_all: false })
+          }).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r; })
+        )
+      );
+      const succeeded = results.filter(r => r.status === 'fulfilled').length;
+      const total     = action.taskIds.length;
+      if (succeeded === total) {
+        t4Executed.set(id, { state: 'done', msg: `✅ ${total}/${total}` });
+      } else {
+        const failed = total - succeeded;
+        t4Executed.set(id, { state: 'done', msg: `⚠️ ${succeeded}/${total} — ${failed} failed` });
+      }
+
+    } else if (action.type === 'create_task') {
+      const resp = await fetch(`${CU_API}/list/${action.listId}/task`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(action.payload)
+      });
+      if (!resp.ok) {
+        const e = await resp.json().catch(() => ({}));
+        throw new Error(e.err || `HTTP ${resp.status}`);
+      }
+      t4Executed.set(id, { state: 'done', msg: '✅ Task created' });
+    }
+  } catch(e) {
+    t4Executed.set(id, { state: 'error', msg: e.message });
+    setTimeout(() => {
+      if ((t4Executed.get(id) || {}).state === 'error') {
+        t4Executed.set(id, { state: 'idle' });
+        renderT4Actions();
+      }
+    }, 4000);
+  }
+
+  renderT4Actions();
+}
+
 function renderCommandCenter() {
   // Date greeting
   const dateEl = document.getElementById('ccDate');
