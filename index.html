@@ -2731,7 +2731,7 @@ function renderCommandCenter() {
     const el1 = document.getElementById('ccActiveAccounts');
     const el2 = document.getElementById('ccSpend7');
     if (el1) el1.textContent = active.length;
-    if (el2) el2.textContent = fmtMoney(spend7);
+    if (el2) el2.textContent = fmtCur(spend7);
   }
 
   if (cuData && cuData.tasks) {
@@ -2793,7 +2793,7 @@ function renderCommandCenter() {
             <div style="display:flex;gap:4px;flex-wrap:wrap">${why.join('')}</div>
           </div>
           <div style="font-size:11px;color:#555">
-            7d Spend: <b style="color:#e0e0e0">${fmtMoney(d7.spend||0)}</b> &nbsp;|&nbsp;
+            7d Spend: <b style="color:#e0e0e0">${fmtCur(d7.spend||0)}</b> &nbsp;|&nbsp;
             Leads: <b style="color:#e0e0e0">${d7.leads||0}</b>
             ${d7.cost_per_lead ? `&nbsp;|&nbsp; CPL: <b style="color:#f87171">$${Math.round(d7.cost_per_lead)}</b>` : ''}
           </div>
