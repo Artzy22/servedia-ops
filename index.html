@@ -676,6 +676,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="section-title" style="color:#a78bfa;margin-bottom:10px">💬 SLACK — NEEDS YOUR RESPONSE</div>
     <div id="ccSlackList"></div>
   </div>
+  <div id="ccWinsSection" style="margin-bottom:20px;display:none">
+    <div class="section-title" style="color:#22c55e;margin-bottom:10px">🏆 CREATIVE WINS TO CLONE</div>
+    <div id="ccWinsList"></div>
+  </div>
   <div id="ccAllClear" style="display:none;text-align:center;padding:40px">
     <div style="font-size:40px;margin-bottom:12px">🎉</div>
     <div style="font-size:18px;font-weight:700;color:#34d399">All clear! Nothing urgent right now.</div>
@@ -1159,7 +1163,8 @@ let metaData = null, cuData = null, slData = null, vidData = null, maintData = n
 let paymentData = null, violationsData = null;
 let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
 let fatigueData   = null; // creative-fatigue.json (F7)
-let slFlaggedData = null; // slack-flagged.json (F9/F10)
+let slFlaggedData    = null; // slack-flagged.json (F9/F10)
+let creativeIntelData = null; // creative-intel.json (F8)
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -3469,6 +3474,31 @@ function renderCommandCenter() {
     }
   }
 
+  // F8: Creative Wins to Clone
+  const winsSection = document.getElementById('ccWinsSection');
+  const winsList    = document.getElementById('ccWinsList');
+  if (winsSection && winsList) {
+    const clones = (creativeIntelData && creativeIntelData.clone_opportunities) || [];
+    if (clones.length) {
+      winsSection.style.display = '';
+      const avgCpl = creativeIntelData.portfolio_avg_cpl ? ` (portfolio avg $${creativeIntelData.portfolio_avg_cpl})` : '';
+      winsList.innerHTML = clones.map(c => {
+        const targets = (c.suggest_cloning_for || []).slice(0, 4).map(n => `<span class="kbadge kb-gray">${esc(n)}</span>`).join(' ');
+        return `<div style="background:#0a1a0a;border:1px solid #166534;border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-weight:700;color:#22c55e">${esc(c.account_name)}</span>
+            <span class="kbadge kb-great">CPL $${c.cpl} · ${c.cpl_vs_avg}% below avg</span>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:6px">${c.leads} leads · $${c.spend} spend this week${avgCpl}</div>
+          ${targets ? `<div style="font-size:11px;color:#888;margin-bottom:4px">Test this offer for:</div><div style="display:flex;flex-wrap:wrap;gap:4px">${targets}</div>` : ''}
+          <div style="font-size:11px;color:#555;margin-top:6px;font-style:italic">No action needed — Slack alert sent to #media-ads</div>
+        </div>`;
+      }).join('');
+    } else {
+      winsSection.style.display = 'none';
+    }
+  }
+
   // All clear?
   const allClear = document.getElementById('ccAllClear');
   if (allClear) {
@@ -3508,7 +3538,8 @@ async function loadAll() {
       fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
       fetchJ(`${BASE}/client-map.json?_=${ts}`),         // 5 — Client map (F5 suggestions)
       fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`),  // 6 — Creative fatigue (F7)
-      fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),    // 7 — Slack flagged (F9/F10)
+      fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),     // 7 — Slack flagged (F9/F10)
+      fetchJ(`${BASE}/creative-intel.json?_=${ts}`),  // 8 — Cross-portfolio intel (F8)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -3524,7 +3555,8 @@ async function loadAll() {
       });
     }
     if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData    = staticFetches[6].value; }
-    if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData  = staticFetches[7].value; }
+    if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData      = staticFetches[7].value; }
+    if (staticFetches[8].status === 'fulfilled' && staticFetches[8].value) { creativeIntelData  = staticFetches[8].value; }
     if (metaData) renderMeta();
     if (slFlaggedData) updateSlackBadge();
 
