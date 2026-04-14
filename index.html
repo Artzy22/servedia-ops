@@ -295,6 +295,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bfire-badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
 .bfire-action{color:#a78bfa;cursor:pointer;text-decoration:none;font-weight:600;font-size:11px}
 .bfire-action:hover{color:#c4b5fd}
+
+/* ══════════ T4 ACTION QUEUE ══════════ */
+.t4-card{background:#0d0d1a;border:1px solid #1e1e33;border-radius:10px;padding:14px;transition:opacity .3s}
+.t4-card.t4-done{opacity:.4;pointer-events:none}
+.t4-sev-critical{border-left:3px solid #ef4444}
+.t4-sev-high{border-left:3px solid #fb923c}
+.t4-sev-medium{border-left:3px solid #fbbf24}
+.t4-label{font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:10px}
+.t4-execute-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.t4-btn{background:#1a1730;border:1px solid #7c3aed;color:#a78bfa;padding:5px 14px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.t4-btn:hover{background:#2a1f4a;color:#c4b5fd}
+.t4-btn-confirm{background:#064e3b;border-color:#059669;color:#34d399}
+.t4-btn-confirm:hover{background:#065f46}
+.t4-btn-cancel{background:#1a1a1a;border-color:#333;color:#777}
+.t4-btn-cancel:hover{border-color:#555;color:#aaa}
+.t4-status{font-size:12px;font-weight:600}
+.t4-status.executing{color:#a78bfa}
+.t4-status.done{color:#34d399}
+.t4-status.error{color:#f87171}
 .bvid-item{display:flex;align-items:center;gap:12px;padding:10px 14px;background:#111;border:1px solid #1e1e1e;border-radius:8px;margin-bottom:6px}
 .bvid-item:hover{border-color:#7c3aed}
 .bvid-client{font-size:12px;font-weight:700;color:#fb923c;min-width:140px}
