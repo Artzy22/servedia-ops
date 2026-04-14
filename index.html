@@ -92,7 +92,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .accard{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:16px;transition:border-color .2s}
 .accard.flagged{border-color:#ef4444!important;border-width:2px!important}
 .accard.reviewed{border-color:#059669!important}
-.ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:6px;flex-wrap:wrap}
+.badge-billing{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;animation:ccPulse 1.8s ease-in-out infinite;white-space:nowrap;cursor:default}
+.badge-violation{background:#2a1a00;color:#f97316;border:1px solid #9a3412;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.badge-violation:hover{background:#3a2200}
 .ac-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .ac-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .st-active{background:#064e3b;color:#34d399}
@@ -958,6 +961,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div><!-- /.body-row -->
 </div><!-- /.app-shell -->
 
+<!-- ════════════════ POLICY VIOLATIONS MODAL ════════════════ -->
+<div class="modal-ov" id="violationsModal" onclick="if(event.target===this)closeViolationsModal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">
+      ⚠ Policy Issues
+      <button class="modal-close" onclick="closeViolationsModal()">✕</button>
+    </div>
+    <div id="violationsModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+  </div>
+</div>
+
 <!-- ════════════════ SETTINGS MODAL ════════════════ -->
 <div class="modal-ov" id="settingsModal">
   <div class="modal">
@@ -1089,6 +1103,7 @@ const CU_API = 'https://api.clickup.com/api/v2';
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
+let paymentData = null, violationsData = null;
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -1504,6 +1519,42 @@ function cpbKls(v) {
   return 'kb-red';
 }
 
+function openViolationsModal(accountId) {
+  const accounts = (violationsData && violationsData.accounts) || [];
+  const entry = accounts.find(a => a.account_id === accountId);
+  const modal = document.getElementById('violationsModal');
+  const body  = document.getElementById('violationsModalBody');
+  if (!modal || !body || !entry) return;
+  const rows = (entry.violations || []).map(v =>
+    `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a">
+      <div style="font-weight:600;color:#f97316">${esc(v.effective_status)}</div>
+      <div style="color:#aaa;margin-top:3px">${esc(v.ad_name)}</div>
+      ${v.delivery_info ? `<div style="font-size:11px;color:#666;margin-top:2px">${esc(v.delivery_info)}</div>` : ''}
+    </div>`
+  ).join('');
+  body.innerHTML = `<p style="color:#aaa;margin-bottom:10px">${esc(entry.account_name)} — <b style="color:#f97316">${entry.violations.length} issue${entry.violations.length !== 1 ? 's' : ''}</b></p>${rows || '<p style="color:#555">No details available.</p>'}`;
+  modal.classList.add('open');
+}
+
+function closeViolationsModal() {
+  const modal = document.getElementById('violationsModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function buildPaymentMap() {
+  const m = {};
+  if (!paymentData) return m;
+  (paymentData.accounts || []).forEach(a => { if (a.payment_issue) m[a.account_id] = a; });
+  return m;
+}
+
+function buildViolationsMap() {
+  const m = {};
+  if (!violationsData) return m;
+  (violationsData.accounts || []).forEach(a => { if (a.violations && a.violations.length) m[a.account_id] = a; });
+  return m;
+}
+
 // Sort score: lower = worse (shown first in "worst CPL" view)
 function cplScore(v) {
   const cls = cplKls(v);
@@ -1831,6 +1882,9 @@ function renderMeta() {
   const grid = document.getElementById('metaGrid');
   if (!list.length) { grid.innerHTML = '<div class="no-data">No accounts match filters</div>'; return; }
 
+  const payMap = buildPaymentMap();
+  const vioMap = buildViolationsMap();
+
   grid.innerHTML = list.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
     const active = c.status === 'active';
@@ -1866,9 +1920,13 @@ function renderMeta() {
     const adsUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${id}`;
     const nameE = esc(c.account_name);
 
+    const billingBadge = payMap[id] ? `<span class="badge-billing" title="${esc(payMap[id].payment_status||'Billing issue detected')}">⛔ BILLING PAUSED</span>` : '';
+    const violBadge    = vioMap[id] ? `<span class="badge-violation" onclick="openViolationsModal('${id}')" title="Click to view policy issues">${vioMap[id].violations.length} POLICY ISSUE${vioMap[id].violations.length !== 1 ? 'S' : ''}</span>` : '';
+
     return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         <div class="ac-name" title="${nameE}">${nameE}</div>
+        ${billingBadge}${violBadge}
         <span class="ac-status ${active?'st-active':'st-nodata'}">${active?'Active':'No Data'}</span>
       </div>
       <div class="mtabs" id="mt-${id}">
@@ -3073,14 +3131,19 @@ async function loadAll() {
   try {
     // Always fetch static sources from JSON
     const staticFetches = await Promise.allSettled([
-      fetchJ(`${BASE}/meta.json?_=${ts}`),          // 0 — Meta Ads (GitHub Actions)
-      fetchJ(`${BASE}/slack.json?_=${ts}`),          // 1 — Slack
-      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),  // 2 — Drive folders
+      fetchJ(`${BASE}/meta.json?_=${ts}`),            // 0 — Meta Ads (GitHub Actions)
+      fetchJ(`${BASE}/slack.json?_=${ts}`),            // 1 — Slack
+      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),   // 2 — Drive folders
+      fetchJ(`${BASE}/payment-status.json?_=${ts}`),  // 3 — Payment failures (F2)
+      fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
     ]);
 
-    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData  = staticFetches[0].value; normalizeMetaData(); renderMeta(); }
-    if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData    = staticFetches[1].value; renderSlack(); }
-    if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData = staticFetches[2].value; }
+    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
+    if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData         = staticFetches[1].value; renderSlack(); }
+    if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData      = staticFetches[2].value; }
+    if (staticFetches[3].status === 'fulfilled' && staticFetches[3].value) { paymentData    = staticFetches[3].value; }
+    if (staticFetches[4].status === 'fulfilled' && staticFetches[4].value) { violationsData = staticFetches[4].value; }
+    if (metaData) renderMeta();
 
     if (hasToken) {
       // LIVE MODE — fetch directly from ClickUp API

@@ -1,0 +1,118 @@
+name: Check Payment Failures
+
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Daily 8am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Check Meta account payment status
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, urllib.parse, os, time
+          from datetime import datetime, timezone
+
+          token = os.environ['META_ACCESS_TOKEN']
+          slack_token = os.environ.get('SLACK_BOT_TOKEN', '')
+
+          # Load account list from meta.json
+          with open('data/meta.json') as f:
+              meta = json.load(f)
+          accounts = [(c['account_id'], c['account_name']) for c in meta.get('clients', [])]
+
+          # account_status codes: 1=Active, 2=Disabled, 3=Unsettled, 9=InGracePeriod
+          # 3 (Unsettled) and 9 (InGracePeriod) are payment-related issues
+          PAYMENT_STATUSES = {1: 'Active', 2: 'Disabled', 3: 'Unsettled', 7: 'Pending Review',
+                              9: 'In Grace Period', 100: 'Pending Closure', 101: 'Closed'}
+          PAYMENT_ISSUE_CODES = {2, 3, 9}
+
+          results = []
+          flagged = []
+          now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+          for account_id, account_name in accounts:
+              params = urllib.parse.urlencode({
+                  'access_token': token,
+                  'fields': 'account_status,disable_reason,funding_source_details',
+              })
+              url = f'https://graph.facebook.com/v19.0/act_{account_id}?{params}'
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url), timeout=20) as resp:
+                      data = json.loads(resp.read())
+              except Exception as e:
+                  print(f'  Error fetching {account_name}: {e}')
+                  time.sleep(0.3)
+                  continue
+
+              status_code = data.get('account_status', 1)
+              payment_issue = status_code in PAYMENT_ISSUE_CODES
+              status_label = PAYMENT_STATUSES.get(status_code, f'Unknown ({status_code})')
+
+              entry = {
+                  'account_id': account_id,
+                  'account_name': account_name,
+                  'account_status': status_code,
+                  'payment_status': status_label,
+                  'payment_issue': payment_issue,
+                  'disable_reason': data.get('disable_reason', 0),
+                  'last_checked': now_iso,
+                  'detected_at': now_iso if payment_issue else None,
+              }
+              results.append(entry)
+
+              if payment_issue:
+                  flagged.append(account_name)
+                  print(f'  FLAGGED: {account_name} — {status_label}')
+              else:
+                  print(f'  OK: {account_name}')
+
+              time.sleep(0.3)
+
+          output = {
+              'pulled_at': now_iso,
+              'total_checked': len(results),
+              'issues_found': len(flagged),
+              'accounts': results,
+          }
+          with open('data/payment-status.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'\nDone: {len(flagged)} payment issue(s) found out of {len(results)} accounts')
+
+          # Slack alert if any flagged
+          if flagged and slack_token:
+              import urllib.request as ur
+              names = '\n'.join(f'  • {n}' for n in flagged)
+              text = f':rotating_light: *Payment Alert* — {len(flagged)} account(s) need immediate attention:\n{names}'
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = ur.Request('https://slack.com/api/chat.postMessage', data=payload,
+                               headers={'Authorization': 'Bearer ' + slack_token, 'Content-Type': 'application/json'})
+              try:
+                  with ur.urlopen(req, timeout=15) as resp:
+                      r = json.loads(resp.read())
+                      if not r.get('ok'):
+                          print(f'Slack error: {r.get("error")}')
+              except Exception as e:
+                  print(f'Slack failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/payment-status.json
+          git diff --staged --quiet || git commit -m "check payment failures [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push

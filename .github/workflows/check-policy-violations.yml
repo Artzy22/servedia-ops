@@ -1,0 +1,121 @@
+name: Check Policy Violations
+
+on:
+  schedule:
+    - cron: '0 7 * * *'  # Daily 7am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Check Meta ads for policy violations
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, urllib.parse, os, time
+          from datetime import datetime, timezone
+
+          token = os.environ['META_ACCESS_TOKEN']
+          slack_token = os.environ.get('SLACK_BOT_TOKEN', '')
+
+          with open('data/meta.json') as f:
+              meta = json.load(f)
+          accounts = [(c['account_id'], c['account_name']) for c in meta.get('clients', []) if c.get('status') == 'active']
+
+          now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          results = []
+          flagged_accounts = []
+
+          for account_id, account_name in accounts:
+              # Fetch disapproved/with-issues ads
+              params = urllib.parse.urlencode({
+                  'access_token': token,
+                  'fields': 'id,name,effective_status,delivery_info',
+                  'filtering': json.dumps([
+                      {'field': 'effective_status', 'operator': 'IN',
+                       'value': ['DISAPPROVED', 'WITH_ISSUES']}
+                  ]),
+                  'limit': 50,
+              })
+              url = f'https://graph.facebook.com/v19.0/act_{account_id}/ads?{params}'
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url), timeout=20) as resp:
+                      data = json.loads(resp.read())
+              except Exception as e:
+                  print(f'  Error fetching {account_name}: {e}')
+                  time.sleep(0.3)
+                  continue
+
+              ads = data.get('data', [])
+              violations = [
+                  {
+                      'ad_id': ad.get('id'),
+                      'ad_name': ad.get('name', 'Unknown ad'),
+                      'effective_status': ad.get('effective_status', ''),
+                      'delivery_info': (ad.get('delivery_info') or {}).get('status', ''),
+                  }
+                  for ad in ads
+              ]
+
+              entry = {
+                  'account_id': account_id,
+                  'account_name': account_name,
+                  'violations': violations,
+                  'last_checked': now_iso,
+              }
+              results.append(entry)
+
+              if violations:
+                  flagged_accounts.append({'name': account_name, 'count': len(violations)})
+                  print(f'  FLAGGED: {account_name} — {len(violations)} issue(s)')
+              else:
+                  print(f'  OK: {account_name}')
+
+              time.sleep(0.3)
+
+          output = {
+              'pulled_at': now_iso,
+              'total_checked': len(results),
+              'accounts_with_issues': len(flagged_accounts),
+              'accounts': results,
+          }
+          with open('data/policy-violations.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'\nDone: {len(flagged_accounts)} account(s) with policy issues')
+
+          # Slack alert if violations found
+          if flagged_accounts and slack_token:
+              import urllib.request as ur
+              lines = '\n'.join(f'  • {a["name"]} ({a["count"]} ad{"s" if a["count"]!=1 else ""})'
+                                for a in flagged_accounts)
+              text = f':warning: *Policy Violations Detected* — {len(flagged_accounts)} account(s):\n{lines}'
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = ur.Request('https://slack.com/api/chat.postMessage', data=payload,
+                               headers={'Authorization': 'Bearer ' + slack_token, 'Content-Type': 'application/json'})
+              try:
+                  with ur.urlopen(req, timeout=15) as resp:
+                      r = json.loads(resp.read())
+                      if not r.get('ok'):
+                          print(f'Slack error: {r.get("error")}')
+              except Exception as e:
+                  print(f'Slack failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/policy-violations.json
+          git diff --staged --quiet || git commit -m "check policy violations [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push
