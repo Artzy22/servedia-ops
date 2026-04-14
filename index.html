@@ -11,30 +11,50 @@
 <style>
 /* ── Reset ── */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0d0d0d;color:#e0e0e0;min-height:100vh}
 
-/* ── Header ── */
-.header{background:#111;border-bottom:1px solid #222;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.logo{font-size:18px;font-weight:700;color:#fff}.logo span{color:#7c3aed}
-.header-meta{display:flex;align-items:center;gap:10px}
-.sync-info{font-size:11px;color:#555;text-align:right;line-height:1.5}
-.sync-counter{font-size:10px;color:#3d3d3d;text-align:right;margin-top:1px}
-.hbtn{background:#1a1a1a;border:1px solid #333;color:#ccc;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
-.hbtn:hover{border-color:#7c3aed;color:#fff}
+/* ── App Shell ── */
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0f;color:#e0e0e0;min-height:100vh;overflow:hidden}
+.app-shell{display:flex;flex-direction:column;height:100vh}
+.topbar{background:#111;border-bottom:1px solid #1a1a1a;padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:100}
+.topbar-brand{display:flex;align-items:center;gap:10px}
+.topbar-logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
+.topbar-name{font-size:15px;font-weight:800;color:#fff}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-sync{font-size:11px;color:#777}
+.topbar-btn{background:#1a1a1a;border:1px solid #2a2a2a;color:#777;padding:5px 12px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s}
+.topbar-btn:hover{border-color:#7c3aed;color:#fff}
 
-/* ── Tabs ── */
-.tabs{display:flex;border-bottom:1px solid #1e1e1e;padding:0 24px;background:#111;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tab{padding:12px 16px;cursor:pointer;color:#666;font-size:13px;font-weight:600;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:7px;white-space:nowrap;flex-shrink:0}
-.tab:hover{color:#ccc}
-.tab.active{color:#fff;border-bottom-color:#7c3aed}
-.tab-badge{border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;background:#7c3aed;color:#fff}
-.tab-badge.green{background:#059669}.tab-badge.orange{background:#d97706}
-.tab-badge.blue{background:#2563eb}.tab-badge.red{background:#dc2626}
+/* ── Body Row ── */
+.body-row{display:flex;flex:1;overflow:hidden}
 
-/* ── Panels ── */
-.content{padding:20px 24px}
+/* ── Sidebar ── */
+.sidebar{width:195px;flex-shrink:0;background:#09090f;border-right:1px solid #13131f;display:flex;flex-direction:column;overflow-y:auto;padding:12px 8px 16px}
+.sidebar::-webkit-scrollbar{width:4px}
+.sidebar::-webkit-scrollbar-thumb{background:#1e1e2e;border-radius:4px}
+.nav-group{margin-bottom:18px}
+.nav-group-label{font-size:8px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#33334a;padding:0 8px;margin-bottom:5px;display:block}
+.nav-item{display:flex;align-items:center;justify-content:space-between;padding:7px 8px;border-radius:7px;cursor:pointer;margin-bottom:2px;border-left:2px solid transparent;transition:all .15s}
+.nav-item:hover{background:#13131f}
+.nav-item.active{background:#1a1730;border-left-color:#7c3aed}
+.nav-item-left{display:flex;align-items:center;gap:8px}
+.nav-icon{font-size:13px;line-height:1}
+.nav-label{font-size:11px;font-weight:600;color:#555;transition:color .15s}
+.nav-item:hover .nav-label{color:#aaa}
+.nav-item.active .nav-label{color:#c4b5fd}
+.nav-badge{font-size:9px;font-weight:800;padding:2px 6px;border-radius:6px}
+.nb-red{background:#450a0a;color:#f87171}
+.nb-orange{background:#2a1200;color:#fb923c}
+.nb-purple{background:#1e1b33;color:#a78bfa}
+.nb-yellow{background:#2a1a00;color:#fbbf24}
+.nb-green{background:#052e16;color:#34d399}
+.nb-gray{background:#1a1a1a;color:#555}
+/* ── Main Content ── */
+.main-content{flex:1;overflow-y:auto;background:#0b0b12}
 .panel{display:none}.panel.active{display:block}
+.content{padding:20px 24px}
+
+/* ── Command Center pulse ── */
+@keyframes ccPulse{0%,100%{opacity:1}50%{opacity:.35}}
 
 /* ── Stat Grid ── */
 .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:18px}
@@ -405,23 +425,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dmc-note-footer{display:flex;align-items:center;justify-content:space-between;margin-top:4px}
 
 /* ══════════ UI POLISH ══════════ */
-.header{background:linear-gradient(135deg,#0f0f1a 0%,#111 100%);border-bottom:1px solid #1a1a2e}
-.logo{letter-spacing:-.3px}
 .stat-card{background:linear-gradient(145deg,#111 0%,#0d0d0d 100%);border:1px solid #1e1e1e;transition:border-color .2s}
 .stat-card:hover{border-color:#2d2b55}
 .accard{box-shadow:0 2px 12px rgba(0,0,0,.4);transition:border-color .2s,box-shadow .2s}
 .accard:hover{border-color:#2d2b55;box-shadow:0 4px 20px rgba(124,58,237,.1)}
-.tab{transition:color .15s,border-color .15s}
-.tab.active{text-shadow:0 0 20px rgba(167,139,250,.3)}
-.hbtn{border-radius:8px;transition:all .15s}
-.hbtn:hover{background:#1e1b33;border-color:#7c3aed;color:#a78bfa}
 
 /* ══════════ Responsive ══════════ */
 @media(max-width:768px){
   .content{padding:12px 14px}
-  .tabs{padding:0 10px}
-  .tab{padding:10px 12px;font-size:12px}
-  .header{padding:10px 14px}
   .meta-grid{grid-template-columns:1fr}
   .dmc-notes-row{grid-template-columns:1fr}
   .slack-layout{grid-template-columns:1fr}
@@ -471,29 +482,94 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
-<!-- ════════════════ HEADER ════════════════ -->
-<div class="header">
-  <div class="logo">Servedia<span>Ops</span></div>
-  <div class="header-meta">
-    <div>
-      <div class="sync-info" id="syncInfo"><b>Last sync</b><br>Loading...</div>
-      <div class="sync-counter" id="syncCounter">–</div>
-    </div>
-    <button class="hbtn" onclick="openSettings()">⚙ Config</button>
-    <button class="hbtn" onclick="loadAll()">↺ Refresh</button>
+<div class="app-shell">
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">S</div>
+    <span class="topbar-name">Servedia Ops</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-sync" id="syncInfo">Loading...</span>
+    <button class="topbar-btn" onclick="openSettings()">⚙ Settings</button>
   </div>
 </div>
 
-<!-- ════════════════ TABS ════════════════ -->
-<div class="tabs">
-  <div class="tab active" id="tab-briefing" onclick="switchTab('briefing')">☀️ Morning Briefing <span class="tab-badge red" id="briefBadge">–</span></div>
-  <div class="tab" id="tab-meta" onclick="switchTab('meta')">📊 Meta Ads <span class="tab-badge green" id="metaBadge">–</span></div>
-  <div class="tab" id="tab-maintenance" onclick="switchTab('maintenance')">✅ Daily Maintenance <span class="tab-badge red" id="maintBadge">–</span></div>
-  <div class="tab" id="tab-tasks" onclick="switchTab('tasks')">☑ Tasks <span class="tab-badge orange" id="tasksBadge">–</span></div>
-  <div class="tab" id="tab-video" onclick="switchTab('video')">🎬 Video Editing <span class="tab-badge blue" id="videoBadge">–</span></div>
-  <div class="tab" id="tab-slack" onclick="switchTab('slack')">💬 Slack <span class="tab-badge orange" id="slackBadge">–</span></div>
-  <div class="tab" id="tab-retention" onclick="switchTab('retention')">⚠️ Retention <span class="tab-badge red" id="retBadge">–</span></div>
-</div>
+<!-- ── Body Row ── -->
+<div class="body-row">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+
+  <!-- Command Center -->
+  <div class="nav-group">
+    <div class="nav-item active" id="nav-command" onclick="switchSection('command')">
+      <div class="nav-item-left">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Command Center</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media Buying -->
+  <div class="nav-group">
+    <span class="nav-group-label">Media Buying</span>
+    <div class="nav-item" id="nav-meta" onclick="switchSection('meta')">
+      <div class="nav-item-left"><span class="nav-icon">📊</span><span class="nav-label">Meta Ads</span></div>
+      <span class="nav-badge nb-orange" id="navBadge-meta">–</span>
+    </div>
+    <div class="nav-item" id="nav-maintenance" onclick="switchSection('maintenance')">
+      <div class="nav-item-left"><span class="nav-icon">🗂️</span><span class="nav-label">Daily Maintenance</span></div>
+      <span class="nav-badge nb-red" id="navBadge-maintenance">–</span>
+    </div>
+    <div class="nav-item" id="nav-retention" onclick="switchSection('retention')">
+      <div class="nav-item-left"><span class="nav-icon">🏆</span><span class="nav-label">Creative Intel</span></div>
+      <span class="nav-badge nb-gray" id="navBadge-retention">–</span>
+    </div>
+  </div>
+
+  <!-- Clients -->
+  <div class="nav-group">
+    <span class="nav-group-label">Clients</span>
+    <div class="nav-item" id="nav-crm" onclick="switchSection('crm')">
+      <div class="nav-item-left"><span class="nav-icon">🤝</span><span class="nav-label">CRM</span></div>
+      <span class="nav-badge nb-yellow" id="navBadge-crm">–</span>
+    </div>
+    <div class="nav-item" id="nav-onboarding" onclick="switchSection('onboarding')">
+      <div class="nav-item-left"><span class="nav-icon">🚀</span><span class="nav-label">Onboarding</span></div>
+    </div>
+    <div class="nav-item" id="nav-watchdog" onclick="switchSection('watchdog')">
+      <div class="nav-item-left"><span class="nav-icon">🆕</span><span class="nav-label">Watchdog</span></div>
+      <span class="nav-badge nb-orange" id="navBadge-watchdog">–</span>
+    </div>
+  </div>
+
+  <!-- Work Queue -->
+  <div class="nav-group">
+    <span class="nav-group-label">Work Queue</span>
+    <div class="nav-item" id="nav-video" onclick="switchSection('video')">
+      <div class="nav-item-left"><span class="nav-icon">🎬</span><span class="nav-label">Video Tickets</span></div>
+      <span class="nav-badge nb-purple" id="navBadge-video">–</span>
+    </div>
+    <div class="nav-item" id="nav-tech" onclick="switchSection('tech')">
+      <div class="nav-item-left"><span class="nav-icon">⚙️</span><span class="nav-label">Tech Tickets</span></div>
+      <span class="nav-badge nb-red" id="navBadge-tech">–</span>
+    </div>
+    <div class="nav-item" id="nav-slack" onclick="switchSection('slack')">
+      <div class="nav-item-left"><span class="nav-icon">💬</span><span class="nav-label">Slack</span></div>
+      <span class="nav-badge nb-yellow" id="navBadge-slack">–</span>
+    </div>
+    <div class="nav-item" id="nav-tasks" onclick="switchSection('tasks')">
+      <div class="nav-item-left"><span class="nav-icon">☑️</span><span class="nav-label">Tasks</span></div>
+      <span class="nav-badge nb-gray" id="navBadge-tasks">–</span>
+    </div>
+  </div>
+
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main-content" id="mainContent">
 
 <!-- ════════════════ META ADS ════════════════ -->
 <div id="panel-meta" class="panel content">
@@ -731,6 +807,42 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div id="retLoadingMsg" style="text-align:center;padding:48px;color:#555;font-size:14px">Set Client Management List ID in Config to load retention data.</div>
 </div>
+
+<div id="panel-crm" class="panel content">
+  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
+    <div style="font-size:32px;margin-bottom:12px">👥</div>
+    <div style="font-weight:600;margin-bottom:6px">CRM</div>
+    <div>Client relationship management — coming soon.</div>
+  </div>
+</div>
+
+<div id="panel-onboarding" class="panel content">
+  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
+    <div style="font-size:32px;margin-bottom:12px">🚀</div>
+    <div style="font-weight:600;margin-bottom:6px">Onboarding</div>
+    <div>New client onboarding tracker — coming soon.</div>
+  </div>
+</div>
+
+<div id="panel-watchdog" class="panel content">
+  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
+    <div style="font-size:32px;margin-bottom:12px">🐕</div>
+    <div style="font-weight:600;margin-bottom:6px">Watchdog</div>
+    <div>Automated anomaly monitoring — coming soon.</div>
+  </div>
+</div>
+
+<div id="panel-tech" class="panel content">
+  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
+    <div style="font-size:32px;margin-bottom:12px">🔧</div>
+    <div style="font-weight:600;margin-bottom:6px">Tech Tickets</div>
+    <div>Technical issue tracking — coming soon.</div>
+  </div>
+</div>
+
+</div><!-- /.main-content -->
+</div><!-- /.body-row -->
+</div><!-- /.app-shell -->
 
 <!-- ════════════════ SETTINGS MODAL ════════════════ -->
 <div class="modal-ov" id="settingsModal">
@@ -1042,8 +1154,9 @@ function saveCPLThresholds() {
   // Re-render everything live
   renderMeta();
   renderMaintenance();
-  renderBriefing();
   renderRetention();
+  renderCommandCenter();
+  updateNavBadges();
   updateAllCPLStrips();
 }
 
@@ -1333,15 +1446,21 @@ function buildSuggestions(cpl, cpb, leads7, client) {
 }
 
 // ══════════════════════════════════════════════════════════════
-// TAB NAVIGATION
+// NAVIGATION
 // ══════════════════════════════════════════════════════════════
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+function switchSection(section) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + tab).classList.add('active');
-  document.getElementById('panel-' + tab).classList.add('active');
-  if (tab === 'retention') renderRetention();
+  const navEl = document.getElementById('nav-' + section);
+  if (navEl) navEl.classList.add('active');
+  const panelEl = document.getElementById('panel-' + section);
+  if (panelEl) panelEl.classList.add('active');
+  if (section === 'retention') renderRetention();
+  if (section === 'command') { if (typeof renderCommandCenter === 'function') renderCommandCenter(); }
 }
+
+// Alias — keeps any remaining internal switchTab() calls working
+function switchTab(tab) { switchSection(tab); }
 
 // ══════════════════════════════════════════════════════════════
 // ══ META ADS ══
@@ -2287,158 +2406,6 @@ function filterChan(ch) { selectedChannel = ch; renderSlack(); }
 // ══════════════════════════════════════════════════════════════
 // ══ MORNING BRIEFING ══
 // ══════════════════════════════════════════════════════════════
-function renderBriefing() {
-  const now = Date.now();
-  const state = getDmState();
-
-  document.getElementById('briefDate').textContent =
-    new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-
-  // ═══ 1. FIRE ITEMS ═══
-  const allClients = buildDmClients();
-  const fireItems = [];
-  allClients.forEach(c => {
-    const cs = state[c.id] || {};
-    if (cs.complete) return;
-    const reasons = [];
-    if (c.cpl !== null && cplIsRed(c.cpl)) reasons.push(`CPL ${fmtCur(c.cpl)} — ${getCPLTier(c.cpl).label} (${getCPLTier(c.cpl).action})`);
-    if (c.cpb !== null && c.cpb > 100) reasons.push(`CPB ${fmtCur(c.cpb)} — booking funnel issue`);
-    if (c.leads7 === 0 && c.status === 'active') reasons.push('Zero leads this week');
-    if (cs.flagged) reasons.push('Manually flagged');
-    if (c.checkBackDate && Number(c.checkBackDate) < now) reasons.push('Check-back date overdue');
-    if ((c.requiresApproval || '').toLowerCase().includes('yes')) reasons.push('Needs ad approval');
-    // Enriched CM signals
-    if (c.refundNeeded) reasons.push('⚠️ REFUND NEEDED');
-    if (c.renewalDate) {
-      const rd = Math.ceil((Number(c.renewalDate) - now) / 86400000);
-      if (rd >= 0 && rd <= 14 && (c.clientHappiness||'').toLowerCase() !== 'happy')
-        reasons.push(`Renewal in ${rd}d — ${c.clientHappiness || 'status unknown'}`);
-    }
-    if ((c.clientHappiness||'').toLowerCase() === 'unhappy') reasons.push(`Client UNHAPPY`);
-    if (reasons.length) fireItems.push({ ...c, reasons, severity: reasons.length });
-  });
-  fireItems.sort((a, b) => b.severity - a.severity);
-
-  const fireGrid = document.getElementById('bFireGrid');
-  const fireSection = document.getElementById('bFireSection');
-  if (fireItems.length) {
-    fireSection.style.display = '';
-    fireGrid.innerHTML = fireItems.map(c => {
-      const cplBT = getCPLTier(c.cpl);
-      const cplB = c.cpl !== null ? `<span class="kbadge ${cplBT.className}" title="${cplBT.action}">CPL ${fmtCur(c.cpl)} <span style="opacity:.7;font-size:10px">${cplBT.label}</span></span>` : '';
-      const cpbB = c.cpb !== null ? `<span class="kbadge ${cpbKls(c.cpb)}">CPB ${fmtCur(c.cpb)}</span>` : '';
-      const adsUrl = c.adAccountUrl || `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id}`;
-      const safeName = esc(c.name).replace(/'/g,"\\'");
-      return `<div class="bfire-card">
-        <div class="bfire-name">${esc(c.name)}</div>
-        <div class="bfire-badges">${cplB}${cpbB}</div>
-        <div class="bfire-reason">${c.reasons.map(r => '• ' + esc(r)).join('<br>')}</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <a class="bfire-action" href="${esc(adsUrl)}" target="_blank">📈 Ads Manager</a>
-          <a class="bfire-action" href="#" onclick="switchTab('maintenance');document.getElementById('dmSearch').value='${safeName}';renderMaintenance();return false;">→ Maintenance</a>
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    fireSection.style.display = 'none';
-  }
-
-  // ═══ 2. VIDEO APPROVALS ═══
-  const vidSection = document.getElementById('bVideoSection');
-  const vidList    = document.getElementById('bVideoList');
-  const approvalTickets = (vidData && vidData.tasks || []).filter(t => {
-    const s = (typeof t.status === 'object' ? (t.status?.status||'') : (t.status||'')).toLowerCase();
-    return /approv|review|feedback|revision/.test(s);
-  });
-  if (approvalTickets.length) {
-    vidSection.style.display = '';
-    const priOrd = { urgent:0, high:1, normal:2, low:3 };
-    approvalTickets.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
-    const priColors = { urgent:'#f87171', high:'#fb923c', normal:'#818cf8', low:'#4ade80' };
-    vidList.innerHTML = approvalTickets.slice(0, 8).map(t => {
-      const clientName = t.client_name || extractClientFromName(t.name) || '(Unknown)';
-      const pri = t.priority || 'normal';
-      return `<div class="bvid-item">
-        <span class="vpri" style="background:${priColors[pri]}22;color:${priColors[pri]};border:1px solid ${priColors[pri]}44">${pri}</span>
-        <span class="bvid-client">${esc(clientName)}</span>
-        <span class="bvid-name">${esc(t.name)}</span>
-        ${t.url ? `<a class="bvid-link" href="${t.url}" target="_blank">↗</a>` : ''}
-      </div>`;
-    }).join('') +
-    (approvalTickets.length > 8 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('video');return false;">View all ${approvalTickets.length} tickets →</a></div>` : '');
-  } else {
-    vidSection.style.display = 'none';
-  }
-
-  // ═══ 3. URGENT & OVERDUE TASKS ═══
-  const taskSection = document.getElementById('bTaskSection');
-  const taskList    = document.getElementById('bTaskList');
-  let allTasks = (cuData && cuData.tasks || []).filter(isByronOrAnka);
-  if (!allTasks.length && cuData) allTasks = cuData.tasks || [];
-  const urgentTasks = allTasks.filter(t => {
-    const isUrgent  = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) === 'urgent';
-    const isOverdue = t.due_date && Number(t.due_date) < now;
-    const isDone    = /done|complet|closed/i.test(typeof t.status === 'object' ? (t.status?.status||'') : (t.status||''));
-    return (isUrgent || isOverdue) && !isDone;
-  });
-  if (urgentTasks.length) {
-    taskSection.style.display = '';
-    const priOrd = { urgent:0, high:1, normal:2, low:3 };
-    urgentTasks.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
-    taskList.innerHTML = urgentTasks.slice(0, 10).map(t => {
-      const pri = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) || 'normal';
-      const isOverdue = t.due_date && Number(t.due_date) < now;
-      let dueHtml = '';
-      if (t.due_date) {
-        const d = new Date(Number(t.due_date));
-        const dl = Math.ceil((d - now) / 86400000);
-        dueHtml = `<span class="${dl<0?'due-overdue':'due-soon'}" style="font-size:11px">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dl<0?' ('+Math.abs(dl)+'d ago)':''}</span>`;
-      }
-      return `<div class="btask-item${isOverdue?' overdue':''}">
-        <span class="pbadge p-${pri}">${pri}</span>
-        <span class="btask-name" title="${esc(t.name)}">${esc(t.name)}</span>
-        ${dueHtml}
-        ${t.url ? `<a class="olink" href="${t.url}" target="_blank">↗</a>` : ''}
-      </div>`;
-    }).join('') +
-    (urgentTasks.length > 10 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('tasks');return false;">View all ${urgentTasks.length} urgent tasks →</a></div>` : '');
-  } else {
-    taskSection.style.display = 'none';
-  }
-
-  // ═══ 4. SLACK ALERTS ═══
-  const slackSection = document.getElementById('bSlackSection');
-  const slackList    = document.getElementById('bSlackList');
-  const alertWords   = /urgent|asap|revision|issue|problem|help|fix|broken|wrong|mistake|redo|priority/i;
-  const slackMsgs    = (slData && slData.messages || []).filter(m => alertWords.test(m.text || ''));
-  if (slackMsgs.length) {
-    slackSection.style.display = '';
-    slackList.innerHTML = slackMsgs.slice(0, 6).map(m => {
-      const uname = m.user_name || m.user || 'Unknown';
-      const ts = m.ts_iso || (m.ts ? new Date(parseFloat(m.ts)*1000).toISOString() : null);
-      return `<div class="bslack-item">
-        <div class="bslack-hd">
-          <span class="bslack-user">${esc(uname)}</span>
-          <span class="bslack-chan">#${m.channel||'?'}</span>
-          <span class="bslack-time">${fmtTime(ts)}</span>
-        </div>
-        <div class="bslack-txt">${esc(m.text||'')}</div>
-      </div>`;
-    }).join('') +
-    (slackMsgs.length > 6 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('slack');return false;">View all ${slackMsgs.length} alerts →</a></div>` : '');
-  } else {
-    slackSection.style.display = 'none';
-  }
-
-  // ═══ SUMMARY ═══
-  const doneCount = allClients.filter(c => (state[c.id]||{}).complete).length;
-  document.getElementById('bDone').textContent   = doneCount;
-  document.getElementById('bRemain').textContent = allClients.length - doneCount;
-  const totalAlerts = fireItems.length + approvalTickets.length + urgentTasks.length + slackMsgs.length;
-  document.getElementById('briefBadge').textContent = totalAlerts || '✓';
-  document.getElementById('briefBadge').className   = 'tab-badge ' + (totalAlerts > 5 ? 'red' : totalAlerts > 0 ? 'orange' : 'green');
-  document.getElementById('bAllClear').style.display = totalAlerts === 0 ? '' : 'none';
-}
 
 // ══════════════════════════════════════════════════════════════
 // ══ SLACK → CLICKUP TASK BRIDGE ══
@@ -2542,6 +2509,241 @@ async function fetchCUListLive(listId, token, opts = {}) {
 }
 
 // ══════════════════════════════════════════════════════════════
+// COMMAND CENTER
+// ══════════════════════════════════════════════════════════════
+function updateNavBadges() {
+  // Meta — active accounts
+  if (metaData && metaData.clients) {
+    const active = metaData.clients.filter(c => c.status === 'ACTIVE').length;
+    const el = document.getElementById('navBadge-meta');
+    if (el) { el.textContent = active || '–'; el.className = 'nav-badge ' + (active > 0 ? 'nb-orange' : 'nb-gray'); }
+  }
+
+  // Video — pending approval tickets
+  if (vidData && vidData.tasks) {
+    const pending = vidData.tasks.filter(t => {
+      const s = (t.status && t.status.status || '').toLowerCase();
+      return s.includes('approval') || s.includes('review');
+    }).length;
+    const el = document.getElementById('navBadge-video');
+    if (el) { el.textContent = pending || '–'; el.className = 'nav-badge ' + (pending > 0 ? 'nb-purple' : 'nb-gray'); }
+  }
+
+  // Tasks — urgent + overdue
+  if (cuData && cuData.tasks) {
+    const now = Date.now();
+    const urgent = cuData.tasks.filter(t => {
+      const s = classifyStatus(t.status && t.status.status || '');
+      if (s === 'complete') return false;
+      const isUrgent = (t.priority && t.priority.priority === 'urgent');
+      const isOverdue = t.due_date && Number(t.due_date) < now;
+      return isUrgent || isOverdue;
+    }).length;
+    const el = document.getElementById('navBadge-tasks');
+    if (el) { el.textContent = urgent || '–'; el.className = 'nav-badge ' + (urgent > 0 ? 'nb-red' : 'nb-gray'); }
+  }
+
+  // Slack — unread messages
+  if (slData) {
+    const msgs = slData.messages || slData.items || [];
+    const count = msgs.length;
+    const el = document.getElementById('navBadge-slack');
+    if (el) { el.textContent = count || '–'; el.className = 'nav-badge ' + (count > 0 ? 'nb-yellow' : 'nb-gray'); }
+  }
+
+  // Maintenance — clients to review (has maintenance task assigned to Byron/Anka)
+  if (maintData && maintData.tasks && metaData && metaData.clients) {
+    const byronAnka = (a) => {
+      const u = (a.username || a.email || '').toLowerCase();
+      return u.includes('byron') || u.includes('anka') || u.includes('anca') || u.includes('alemparo') || u.includes('elamparo') || String(a.id) === '204101467';
+    };
+    const count = maintData.tasks.filter(t => t.assignees && t.assignees.some(byronAnka)).length;
+    const el = document.getElementById('navBadge-maintenance');
+    if (el) { el.textContent = count || '–'; el.className = 'nav-badge ' + (count > 0 ? 'nb-red' : 'nb-gray'); }
+  }
+
+  // Retention — at-risk clients
+  if (clientMgmtData && Object.keys(clientMgmtData).length) {
+    const atRisk = Object.values(clientMgmtData).filter(r => calculateChurnRisk(r) >= 30).length;
+    const el = document.getElementById('navBadge-retention');
+    if (el) { el.textContent = atRisk || '–'; el.className = 'nav-badge ' + (atRisk > 0 ? 'nb-orange' : 'nb-gray'); }
+  }
+}
+
+function renderCommandCenter() {
+  // Date greeting
+  const dateEl = document.getElementById('ccDate');
+  if (dateEl) {
+    const d = new Date();
+    const h = d.getHours();
+    const greeting = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    dateEl.textContent = `${greeting}, Byron — ${d.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'})}`;
+  }
+
+  // Stat cards
+  if (metaData && metaData.clients) {
+    const clients = metaData.clients;
+    const active = clients.filter(c => c.status === 'ACTIVE');
+    const spend7 = active.reduce((s, c) => s + (c.stats && c.stats.d7 && c.stats.d7.spend || 0), 0);
+    const el1 = document.getElementById('ccActiveAccounts');
+    const el2 = document.getElementById('ccSpend7');
+    if (el1) el1.textContent = active.length;
+    if (el2) el2.textContent = fmtMoney(spend7);
+  }
+
+  if (cuData && cuData.tasks) {
+    const now = Date.now();
+    const urgent = cuData.tasks.filter(t => {
+      const s = classifyStatus(t.status && t.status.status || '');
+      if (s === 'complete') return false;
+      return (t.priority && t.priority.priority === 'urgent') || (t.due_date && Number(t.due_date) < now);
+    });
+    const el = document.getElementById('ccUrgentCount');
+    if (el) { el.textContent = urgent.length; el.className = 'stat-value ' + (urgent.length > 0 ? 'red' : 'green'); }
+  }
+
+  if (vidData && vidData.tasks) {
+    const pending = vidData.tasks.filter(t => {
+      const s = (t.status && t.status.status || '').toLowerCase();
+      return s.includes('approval') || s.includes('review');
+    });
+    const el = document.getElementById('ccVideoCount');
+    if (el) { el.textContent = pending.length; el.className = 'stat-value ' + (pending.length > 0 ? 'purple' : 'green'); }
+  }
+
+  if (slData) {
+    const msgs = slData.messages || slData.items || [];
+    const el = document.getElementById('ccSlackCount');
+    if (el) { el.textContent = msgs.length; el.className = 'stat-value ' + (msgs.length > 0 ? 'yellow' : 'green'); }
+  }
+
+  // Fires — Meta accounts with significant drops or flags
+  const fireGrid = document.getElementById('ccFireGrid');
+  if (fireGrid && metaData && metaData.clients) {
+    const fires = metaData.clients.filter(c => {
+      if (c.status !== 'ACTIVE') return false;
+      const d7 = c.stats && c.stats.d7 || {};
+      const cpl = d7.cost_per_lead || 0;
+      const leads = d7.leads || 0;
+      const cm = clientMgmtData && (clientMgmtData[c.account_id] || null);
+      if (cm && cm.refundNeeded) return true;
+      if (cm && (cm.clientHappiness || '').toLowerCase() === 'unhappy') return true;
+      if (leads === 0 && d7.spend > 0) return true; // spending but no leads
+      if (cpl > 0 && cpl > 300) return true; // very high CPL
+      return false;
+    }).slice(0, 6);
+
+    if (fires.length === 0) {
+      fireGrid.innerHTML = '<div class="no-data" style="color:#34d399">No fires right now ✓</div>';
+    } else {
+      fireGrid.innerHTML = fires.map(c => {
+        const d7 = c.stats && c.stats.d7 || {};
+        const cm = clientMgmtData && (clientMgmtData[c.account_id] || null);
+        const why = [];
+        if (cm && cm.refundNeeded) why.push('<span class="kbadge kb-red">Refund</span>');
+        if (cm && (cm.clientHappiness || '').toLowerCase() === 'unhappy') why.push('<span class="kbadge kb-red">Unhappy</span>');
+        if ((d7.leads || 0) === 0 && d7.spend > 0) why.push('<span class="kbadge kb-orange">0 Leads</span>');
+        if ((d7.cost_per_lead || 0) > 300) why.push(`<span class="kbadge kb-orange">CPL $${Math.round(d7.cost_per_lead)}</span>`);
+        return `<div class="accard flagged" style="padding:14px">
+          <div class="ac-header">
+            <div class="ac-name" title="${esc(c.name)}">${esc(c.name)}</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap">${why.join('')}</div>
+          </div>
+          <div style="font-size:11px;color:#555">
+            7d Spend: <b style="color:#e0e0e0">${fmtMoney(d7.spend||0)}</b> &nbsp;|&nbsp;
+            Leads: <b style="color:#e0e0e0">${d7.leads||0}</b>
+            ${d7.cost_per_lead ? `&nbsp;|&nbsp; CPL: <b style="color:#f87171">$${Math.round(d7.cost_per_lead)}</b>` : ''}
+          </div>
+        </div>`;
+      }).join('');
+    }
+    document.getElementById('ccFireSection').style.display = fires.length === 0 ? 'none' : '';
+  }
+
+  // Video tickets needing review
+  const ccVideoList = document.getElementById('ccVideoList');
+  if (ccVideoList && vidData && vidData.tasks) {
+    const pending = vidData.tasks.filter(t => {
+      const s = (t.status && t.status.status || '').toLowerCase();
+      return s.includes('approval') || s.includes('review');
+    }).slice(0, 8);
+    if (pending.length === 0) {
+      ccVideoList.innerHTML = '<div class="no-data" style="color:#34d399">No video tickets awaiting review ✓</div>';
+      document.getElementById('ccVideoSection').style.display = 'none';
+    } else {
+      ccVideoList.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">${
+        pending.map(t => `<div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+          <span style="font-size:13px;color:#e0e0e0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            ${t.client_name ? `<span style="font-size:11px;color:#555">${esc(t.client_name)}</span>` : ''}
+            <span class="kbadge kb-approval">Needs Review</span>
+          </div>
+        </div>`).join('')
+      }</div>`;
+    }
+  }
+
+  // Urgent tasks
+  const ccTaskList = document.getElementById('ccTaskList');
+  if (ccTaskList && cuData && cuData.tasks) {
+    const now = Date.now();
+    const urgent = cuData.tasks.filter(t => {
+      const s = classifyStatus(t.status && t.status.status || '');
+      if (s === 'complete') return false;
+      return (t.priority && t.priority.priority === 'urgent') || (t.due_date && Number(t.due_date) < now);
+    }).slice(0, 8);
+    if (urgent.length === 0) {
+      ccTaskList.innerHTML = '<div class="no-data" style="color:#34d399">No urgent or overdue tasks ✓</div>';
+      document.getElementById('ccTaskSection').style.display = 'none';
+    } else {
+      ccTaskList.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">${
+        urgent.map(t => {
+          const overdue = t.due_date && Number(t.due_date) < now;
+          const isUrgent = t.priority && t.priority.priority === 'urgent';
+          return `<div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+            <span style="font-size:13px;color:#e0e0e0;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</span>
+            <div style="display:flex;gap:4px;flex-shrink:0">
+              ${isUrgent ? '<span class="kbadge kb-red">Urgent</span>' : ''}
+              ${overdue ? '<span class="kbadge kb-orange">Overdue</span>' : ''}
+            </div>
+          </div>`;
+        }).join('')
+      }</div>`;
+    }
+  }
+
+  // Slack
+  const ccSlackList = document.getElementById('ccSlackList');
+  if (ccSlackList && slData) {
+    const msgs = (slData.messages || slData.items || []).slice(0, 6);
+    if (msgs.length === 0) {
+      ccSlackList.innerHTML = '<div class="no-data" style="color:#34d399">No Slack alerts ✓</div>';
+      document.getElementById('ccSlackSection').style.display = 'none';
+    } else {
+      ccSlackList.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">${
+        msgs.map(m => `<div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px">
+          <div style="font-size:11px;color:#a78bfa;margin-bottom:3px;font-weight:600">${esc(m.user || m.username || 'Slack')}</div>
+          <div style="font-size:12px;color:#ccc;line-height:1.4">${esc((m.text || '').slice(0, 200))}</div>
+        </div>`).join('')
+      }</div>`;
+    }
+  }
+
+  // All clear?
+  const allClear = document.getElementById('ccAllClear');
+  if (allClear) {
+    const hasFires = document.getElementById('ccFireSection') && document.getElementById('ccFireSection').style.display !== 'none';
+    const hasVideo = document.getElementById('ccVideoSection') && document.getElementById('ccVideoSection').style.display !== 'none';
+    const hasTasks = document.getElementById('ccTaskSection') && document.getElementById('ccTaskSection').style.display !== 'none';
+    const hasSlack = document.getElementById('ccSlackSection') && document.getElementById('ccSlackSection').style.display !== 'none';
+    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack) ? '' : 'none';
+  }
+
+  // Update nav badges while we're here
+  updateNavBadges();
+}
+
+// ══════════════════════════════════════════════════════════════
 // LOAD ALL — smart: live API when token set, JSON fallback otherwise
 // ══════════════════════════════════════════════════════════════
 let isRefreshing = false;
@@ -2609,8 +2811,9 @@ async function loadAll() {
     }
 
     renderMaintenance();
-    renderBriefing();
     renderRetention();
+    renderCommandCenter();
+    updateNavBadges();
 
     lastSyncTime = Date.now();
     const t = new Date().toLocaleTimeString();
@@ -3174,7 +3377,7 @@ setInterval(() => {
 // INIT
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
-  switchTab('briefing');
+  switchSection('command');
   renderTasks();   // show loading placeholder immediately
   renderVideo();   // show loading placeholder immediately
   loadAll();
