@@ -701,7 +701,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div id="ccT4Section" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#f87171;margin-bottom:10px">⚡ T4 ACTION QUEUE</div>
-    <div id="ccT4List" style="display:flex;flex-direction:column;gap:8px"></div>`n  <div id="ccWinsSection" style="margin-bottom:20px;display:none">
+    <div id="ccT4List" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+  <div id="ccWinsSection" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#22c55e;margin-bottom:10px">🏆 CREATIVE WINS TO CLONE</div>
     <div id="ccWinsList"></div>
   </div>
@@ -4005,7 +4007,8 @@ function renderCommandCenter() {
     const hasTasks = document.getElementById('ccTaskSection') && document.getElementById('ccTaskSection').style.display !== 'none';
     const hasSlack = document.getElementById('ccSlackSection') && document.getElementById('ccSlackSection').style.display !== 'none';
     const hasWatch = document.getElementById('ccWatchSection') && document.getElementById('ccWatchSection').style.display !== 'none';
-    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack && !hasWatch) ? '' : 'none';
+    const hasT4    = document.getElementById('ccT4Section') && document.getElementById('ccT4Section').style.display !== 'none';
+    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack && !hasWatch && !hasT4) ? '' : 'none';
   }
 
   // Update nav badges while we're here
