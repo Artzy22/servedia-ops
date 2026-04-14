@@ -101,6 +101,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hs-yellow{color:#fbbf24;background:rgba(251,191,36,.1)}
 .hs-orange{color:#f97316;background:rgba(249,115,22,.1)}
 .hs-red{color:#ef4444;background:rgba(239,68,68,.1)}
+.badge-fatigue{background:#2a1a00;color:#fbbf24;border:1px solid #78350f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.badge-fatigue:hover{background:#3a2800}
 .ac-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .ac-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .st-active{background:#064e3b;color:#34d399}
@@ -966,6 +968,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div><!-- /.body-row -->
 </div><!-- /.app-shell -->
 
+<!-- ════════════════ CREATIVE FATIGUE CONFIRM MODAL ════════════════ -->
+<div class="modal-ov" id="fatigueModal" onclick="if(event.target===this)closeFatigueModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">
+      🟡 Creative Fatigue Detected
+      <button class="modal-close" onclick="closeFatigueModal()">✕</button>
+    </div>
+    <div id="fatigueModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeFatigueModal()">Cancel</button>
+      <button id="fatigueConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Create ClickUp Ticket</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════ POLICY VIOLATIONS MODAL ════════════════ -->
 <div class="modal-ov" id="violationsModal" onclick="if(event.target===this)closeViolationsModal()">
   <div class="modal" style="max-width:520px">
@@ -1109,7 +1126,8 @@ const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
 let paymentData = null, violationsData = null;
-let metaClientMap = {};  // account_id → client-map entry, for F5 suggestions
+let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
+let fatigueData   = null; // creative-fatigue.json (F7)
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -1515,6 +1533,74 @@ function cpbKls(v) {
   return 'kb-red';
 }
 
+function buildFatigueMap() {
+  const m = {};
+  if (!fatigueData) return m;
+  (fatigueData.accounts || []).forEach(a => { if (a.fatigued) m[a.account_id] = a; });
+  return m;
+}
+
+function openFatigueModal(accountId) {
+  const fatMap = buildFatigueMap();
+  const entry  = fatMap[accountId];
+  const modal  = document.getElementById('fatigueModal');
+  const body   = document.getElementById('fatigueModalBody');
+  const btn    = document.getElementById('fatigueConfirmBtn');
+  if (!modal || !body || !entry) return;
+
+  body.innerHTML = `
+    <p style="margin-bottom:12px">
+      <b style="color:#fbbf24">${esc(entry.account_name)}</b> has a <b style="color:#fbbf24">${entry.drop_pct}% CTR drop</b> over the last 3 days.
+    </p>
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;color:#888;margin-bottom:12px">
+      <div>Peak CTR: <b style="color:#ccc">${entry.peak_ctr}%</b></div>
+      <div>3-Day Avg: <b style="color:#fbbf24">${entry.avg_3day_ctr}%</b></div>
+      <div style="margin-top:6px;font-size:11px">This typically means your audience has seen these ads too many times. New creative is needed.</div>
+    </div>
+    <p style="color:#aaa;font-size:12px">Clicking <b style="color:#fff">Confirm &amp; Create</b> will create a ClickUp ticket in the Video Editing list assigned to Saquib requesting new creative.</p>`;
+
+  btn.onclick = () => confirmFatigueTicket(accountId, entry);
+  modal.classList.add('open');
+}
+
+function closeFatigueModal() {
+  const modal = document.getElementById('fatigueModal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function confirmFatigueTicket(accountId, entry) {
+  const cfg = getCfg();
+  if (!cfg.token) {
+    alert('ClickUp API token required. Please configure in Settings (⚙).');
+    return;
+  }
+
+  const btn = document.getElementById('fatigueConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const taskName = `[Creative Fatigue] New creative needed — ${entry.account_name}`;
+  const desc = `Creative fatigue detected on ${new Date().toLocaleDateString()}.\n\nCTR dropped ${entry.drop_pct}% from peak ${entry.peak_ctr}% to 3-day avg ${entry.avg_3day_ctr}%.\n\nPlease create new ad creative for this account.`;
+
+  try {
+    // Video editing list: 901512331541
+    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2 }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.err || 'HTTP ' + r.status);
+    }
+    const task = await r.json();
+    closeFatigueModal();
+    alert(`✅ ClickUp ticket created!\n\n${taskName}\n\nView: ${task.url || 'ClickUp > Video Editing'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create ClickUp Ticket'; btn.disabled = false; }
+    alert('❌ Failed to create ticket: ' + e.message);
+  }
+}
+
 function openViolationsModal(accountId) {
   const accounts = (violationsData && violationsData.accounts) || [];
   const entry = accounts.find(a => a.account_id === accountId);
@@ -1834,6 +1920,10 @@ function calculateHealthScore(c) {
   const vioMap = buildViolationsMap();
   if (vioMap[id]) score -= 15;
 
+  // Creative fatigue (F7 data)
+  const fatMap2 = buildFatigueMap();
+  if (fatMap2[id]) score -= 10;
+
   // Video tickets stuck in "Needs Approval" > 5 days — match by name
   if (vidData) {
     const name = (c.account_name || '').toLowerCase();
@@ -1988,6 +2078,7 @@ function renderMeta() {
 
   const payMap = buildPaymentMap();
   const vioMap = buildViolationsMap();
+  const fatMap = buildFatigueMap();
 
   grid.innerHTML = list.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
@@ -2027,6 +2118,9 @@ function renderMeta() {
     const billingBadge = payMap[id] ? `<span class="badge-billing" title="${esc(payMap[id].payment_status||'Billing issue detected')}">⛔ BILLING PAUSED</span>` : '';
     const violBadge    = vioMap[id] ? `<span class="badge-violation" onclick="openViolationsModal('${id}')" title="Click to view policy issues">${vioMap[id].violations.length} POLICY ISSUE${vioMap[id].violations.length !== 1 ? 'S' : ''}</span>` : '';
 
+    const fatEntry = fatMap[id];
+    const fatBadge = fatEntry ? `<span class="badge-fatigue" onclick="openFatigueModal('${id}')" title="CTR dropped ${fatEntry.drop_pct}% — click to create ticket">🎨 CREATIVE FATIGUE</span>` : '';
+
     const hs     = calculateHealthScore(c);
     const hsCls  = healthScoreTierClass(hs);
     const hsTip  = hs >= 80 ? 'Healthy' : hs >= 60 ? 'Needs Monitoring' : hs >= 40 ? 'At Risk' : 'Critical';
@@ -2041,7 +2135,7 @@ function renderMeta() {
     return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         <div class="ac-name" title="${nameE}">${nameE}</div>
-        ${billingBadge}${violBadge}
+        ${billingBadge}${violBadge}${fatBadge}
         <span class="ac-status ${active?'st-active':'st-nodata'}">${active?'Active':'No Data'}</span>
         ${hsBadge}
       </div>
@@ -3253,7 +3347,8 @@ async function loadAll() {
       fetchJ(`${BASE}/drive-folders.json?_=${ts}`),    // 2 — Drive folders
       fetchJ(`${BASE}/payment-status.json?_=${ts}`),   // 3 — Payment failures (F2)
       fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
-      fetchJ(`${BASE}/client-map.json?_=${ts}`),       // 5 — Client map (F5 suggestions)
+      fetchJ(`${BASE}/client-map.json?_=${ts}`),         // 5 — Client map (F5 suggestions)
+      fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`), // 6 — Creative fatigue (F7)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -3268,6 +3363,7 @@ async function loadAll() {
         metaClientMap[id] = e;
       });
     }
+    if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData = staticFetches[6].value; }
     if (metaData) renderMeta();
 
     if (hasToken) {

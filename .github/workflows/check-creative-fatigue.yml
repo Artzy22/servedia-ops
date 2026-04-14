@@ -1,0 +1,143 @@
+name: Check Creative Fatigue
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Daily 9am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Detect fatigued creatives
+        env:
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          SLACK_BOT_TOKEN:   ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, urllib.request, urllib.parse, os, time
+          from datetime import datetime, timedelta, timezone
+
+          token       = os.environ['META_ACCESS_TOKEN']
+          slack_token = os.environ.get('SLACK_BOT_TOKEN', '')
+
+          # Load active accounts from meta.json
+          with open('data/meta.json') as f:
+              meta = json.load(f)
+          accounts = [(c['account_id'], c['account_name'])
+                      for c in meta.get('clients', []) if c.get('status') == 'active']
+
+          now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          today   = datetime.utcnow()
+          since   = (today - timedelta(days=14)).strftime('%Y-%m-%d')
+          until   = today.strftime('%Y-%m-%d')
+
+          results   = []
+          flagged   = []
+
+          FATIGUE_THRESHOLD = 0.60  # 3-day avg < peak * 0.60
+
+          for account_id, account_name in accounts:
+              # Fetch daily CTR for last 14 days at account level
+              params = urllib.parse.urlencode({
+                  'access_token': token,
+                  'fields': 'ctr,impressions,spend',
+                  'time_range': json.dumps({'since': since, 'until': until}),
+                  'time_increment': '1',
+                  'level': 'account',
+              })
+              url = f'https://graph.facebook.com/v19.0/act_{account_id}/insights?{params}'
+              try:
+                  with urllib.request.urlopen(urllib.request.Request(url), timeout=25) as resp:
+                      data = json.loads(resp.read())
+              except Exception as e:
+                  print(f'  Error fetching {account_name}: {e}')
+                  time.sleep(0.4)
+                  continue
+
+              daily = data.get('data', [])
+              if len(daily) < 5:
+                  time.sleep(0.4)
+                  continue
+
+              ctrs = [float(d.get('ctr', 0)) for d in daily]
+
+              # Peak CTR over 14-day window
+              peak = max(ctrs) if ctrs else 0
+              if peak < 0.2:  # skip accounts with near-zero CTR (no real traffic)
+                  time.sleep(0.4)
+                  continue
+
+              # 3-day average (most recent 3 days)
+              recent3 = ctrs[-3:] if len(ctrs) >= 3 else ctrs
+              avg3    = sum(recent3) / len(recent3) if recent3 else 0
+
+              fatigued = avg3 < peak * FATIGUE_THRESHOLD
+
+              entry = {
+                  'account_id':    account_id,
+                  'account_name':  account_name,
+                  'fatigued':      fatigued,
+                  'peak_ctr':      round(peak, 4),
+                  'avg_3day_ctr':  round(avg3, 4),
+                  'drop_pct':      round((1 - avg3 / peak) * 100, 1) if peak else 0,
+                  'daily_ctrs':    [round(v, 4) for v in ctrs],
+                  'last_checked':  now_iso,
+              }
+              results.append(entry)
+
+              if fatigued:
+                  flagged.append(entry)
+                  print(f'  FATIGUED: {account_name} — peak {peak:.2f}% → 3d avg {avg3:.2f}% ({entry["drop_pct"]}% drop)')
+              else:
+                  print(f'  OK: {account_name} — CTR {avg3:.2f}%')
+
+              time.sleep(0.4)
+
+          output = {
+              'pulled_at':         now_iso,
+              'total_checked':     len(results),
+              'fatigued_accounts': len(flagged),
+              'accounts':          results,
+          }
+          with open('data/creative-fatigue.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'\nDone: {len(flagged)} fatigued account(s) out of {len(results)} checked')
+
+          # Slack alert if fatigue found
+          if flagged and slack_token:
+              import urllib.request as ur
+              lines = '\n'.join(
+                  f'  • {a["account_name"]} — CTR dropped {a["drop_pct"]}% '
+                  f'(peak {a["peak_ctr"]:.2f}% → 3d avg {a["avg_3day_ctr"]:.2f}%)'
+                  for a in flagged
+              )
+              text = f':yellow_circle: *Creative Fatigue Detected* — {len(flagged)} account(s):\n{lines}'
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = ur.Request('https://slack.com/api/chat.postMessage', data=payload,
+                               headers={'Authorization': 'Bearer ' + slack_token,
+                                        'Content-Type': 'application/json'})
+              try:
+                  with ur.urlopen(req, timeout=15) as resp:
+                      r = json.loads(resp.read())
+                      if not r.get('ok'):
+                          print(f'Slack error: {r.get("error")}')
+              except Exception as e:
+                  print(f'Slack failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/creative-fatigue.json
+          git diff --staged --quiet || git commit -m "check creative fatigue [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push
