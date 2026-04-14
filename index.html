@@ -1154,8 +1154,9 @@ function saveCPLThresholds() {
   // Re-render everything live
   renderMeta();
   renderMaintenance();
-  renderBriefing();
   renderRetention();
+  renderCommandCenter();
+  updateNavBadges();
   updateAllCPLStrips();
 }
 
@@ -2405,158 +2406,6 @@ function filterChan(ch) { selectedChannel = ch; renderSlack(); }
 // ══════════════════════════════════════════════════════════════
 // ══ MORNING BRIEFING ══
 // ══════════════════════════════════════════════════════════════
-function renderBriefing() {
-  const now = Date.now();
-  const state = getDmState();
-
-  document.getElementById('briefDate').textContent =
-    new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
-
-  // ═══ 1. FIRE ITEMS ═══
-  const allClients = buildDmClients();
-  const fireItems = [];
-  allClients.forEach(c => {
-    const cs = state[c.id] || {};
-    if (cs.complete) return;
-    const reasons = [];
-    if (c.cpl !== null && cplIsRed(c.cpl)) reasons.push(`CPL ${fmtCur(c.cpl)} — ${getCPLTier(c.cpl).label} (${getCPLTier(c.cpl).action})`);
-    if (c.cpb !== null && c.cpb > 100) reasons.push(`CPB ${fmtCur(c.cpb)} — booking funnel issue`);
-    if (c.leads7 === 0 && c.status === 'active') reasons.push('Zero leads this week');
-    if (cs.flagged) reasons.push('Manually flagged');
-    if (c.checkBackDate && Number(c.checkBackDate) < now) reasons.push('Check-back date overdue');
-    if ((c.requiresApproval || '').toLowerCase().includes('yes')) reasons.push('Needs ad approval');
-    // Enriched CM signals
-    if (c.refundNeeded) reasons.push('⚠️ REFUND NEEDED');
-    if (c.renewalDate) {
-      const rd = Math.ceil((Number(c.renewalDate) - now) / 86400000);
-      if (rd >= 0 && rd <= 14 && (c.clientHappiness||'').toLowerCase() !== 'happy')
-        reasons.push(`Renewal in ${rd}d — ${c.clientHappiness || 'status unknown'}`);
-    }
-    if ((c.clientHappiness||'').toLowerCase() === 'unhappy') reasons.push(`Client UNHAPPY`);
-    if (reasons.length) fireItems.push({ ...c, reasons, severity: reasons.length });
-  });
-  fireItems.sort((a, b) => b.severity - a.severity);
-
-  const fireGrid = document.getElementById('bFireGrid');
-  const fireSection = document.getElementById('bFireSection');
-  if (fireItems.length) {
-    fireSection.style.display = '';
-    fireGrid.innerHTML = fireItems.map(c => {
-      const cplBT = getCPLTier(c.cpl);
-      const cplB = c.cpl !== null ? `<span class="kbadge ${cplBT.className}" title="${cplBT.action}">CPL ${fmtCur(c.cpl)} <span style="opacity:.7;font-size:10px">${cplBT.label}</span></span>` : '';
-      const cpbB = c.cpb !== null ? `<span class="kbadge ${cpbKls(c.cpb)}">CPB ${fmtCur(c.cpb)}</span>` : '';
-      const adsUrl = c.adAccountUrl || `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${c.id}`;
-      const safeName = esc(c.name).replace(/'/g,"\\'");
-      return `<div class="bfire-card">
-        <div class="bfire-name">${esc(c.name)}</div>
-        <div class="bfire-badges">${cplB}${cpbB}</div>
-        <div class="bfire-reason">${c.reasons.map(r => '• ' + esc(r)).join('<br>')}</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <a class="bfire-action" href="${esc(adsUrl)}" target="_blank">📈 Ads Manager</a>
-          <a class="bfire-action" href="#" onclick="switchTab('maintenance');document.getElementById('dmSearch').value='${safeName}';renderMaintenance();return false;">→ Maintenance</a>
-        </div>
-      </div>`;
-    }).join('');
-  } else {
-    fireSection.style.display = 'none';
-  }
-
-  // ═══ 2. VIDEO APPROVALS ═══
-  const vidSection = document.getElementById('bVideoSection');
-  const vidList    = document.getElementById('bVideoList');
-  const approvalTickets = (vidData && vidData.tasks || []).filter(t => {
-    const s = (typeof t.status === 'object' ? (t.status?.status||'') : (t.status||'')).toLowerCase();
-    return /approv|review|feedback|revision/.test(s);
-  });
-  if (approvalTickets.length) {
-    vidSection.style.display = '';
-    const priOrd = { urgent:0, high:1, normal:2, low:3 };
-    approvalTickets.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
-    const priColors = { urgent:'#f87171', high:'#fb923c', normal:'#818cf8', low:'#4ade80' };
-    vidList.innerHTML = approvalTickets.slice(0, 8).map(t => {
-      const clientName = t.client_name || extractClientFromName(t.name) || '(Unknown)';
-      const pri = t.priority || 'normal';
-      return `<div class="bvid-item">
-        <span class="vpri" style="background:${priColors[pri]}22;color:${priColors[pri]};border:1px solid ${priColors[pri]}44">${pri}</span>
-        <span class="bvid-client">${esc(clientName)}</span>
-        <span class="bvid-name">${esc(t.name)}</span>
-        ${t.url ? `<a class="bvid-link" href="${t.url}" target="_blank">↗</a>` : ''}
-      </div>`;
-    }).join('') +
-    (approvalTickets.length > 8 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('video');return false;">View all ${approvalTickets.length} tickets →</a></div>` : '');
-  } else {
-    vidSection.style.display = 'none';
-  }
-
-  // ═══ 3. URGENT & OVERDUE TASKS ═══
-  const taskSection = document.getElementById('bTaskSection');
-  const taskList    = document.getElementById('bTaskList');
-  let allTasks = (cuData && cuData.tasks || []).filter(isByronOrAnka);
-  if (!allTasks.length && cuData) allTasks = cuData.tasks || [];
-  const urgentTasks = allTasks.filter(t => {
-    const isUrgent  = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) === 'urgent';
-    const isOverdue = t.due_date && Number(t.due_date) < now;
-    const isDone    = /done|complet|closed/i.test(typeof t.status === 'object' ? (t.status?.status||'') : (t.status||''));
-    return (isUrgent || isOverdue) && !isDone;
-  });
-  if (urgentTasks.length) {
-    taskSection.style.display = '';
-    const priOrd = { urgent:0, high:1, normal:2, low:3 };
-    urgentTasks.sort((a, b) => (priOrd[a.priority||'normal']||2) - (priOrd[b.priority||'normal']||2));
-    taskList.innerHTML = urgentTasks.slice(0, 10).map(t => {
-      const pri = (typeof t.priority === 'object' ? t.priority?.priority : t.priority) || 'normal';
-      const isOverdue = t.due_date && Number(t.due_date) < now;
-      let dueHtml = '';
-      if (t.due_date) {
-        const d = new Date(Number(t.due_date));
-        const dl = Math.ceil((d - now) / 86400000);
-        dueHtml = `<span class="${dl<0?'due-overdue':'due-soon'}" style="font-size:11px">${d.toLocaleDateString('en-US',{month:'short',day:'numeric'})}${dl<0?' ('+Math.abs(dl)+'d ago)':''}</span>`;
-      }
-      return `<div class="btask-item${isOverdue?' overdue':''}">
-        <span class="pbadge p-${pri}">${pri}</span>
-        <span class="btask-name" title="${esc(t.name)}">${esc(t.name)}</span>
-        ${dueHtml}
-        ${t.url ? `<a class="olink" href="${t.url}" target="_blank">↗</a>` : ''}
-      </div>`;
-    }).join('') +
-    (urgentTasks.length > 10 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('tasks');return false;">View all ${urgentTasks.length} urgent tasks →</a></div>` : '');
-  } else {
-    taskSection.style.display = 'none';
-  }
-
-  // ═══ 4. SLACK ALERTS ═══
-  const slackSection = document.getElementById('bSlackSection');
-  const slackList    = document.getElementById('bSlackList');
-  const alertWords   = /urgent|asap|revision|issue|problem|help|fix|broken|wrong|mistake|redo|priority/i;
-  const slackMsgs    = (slData && slData.messages || []).filter(m => alertWords.test(m.text || ''));
-  if (slackMsgs.length) {
-    slackSection.style.display = '';
-    slackList.innerHTML = slackMsgs.slice(0, 6).map(m => {
-      const uname = m.user_name || m.user || 'Unknown';
-      const ts = m.ts_iso || (m.ts ? new Date(parseFloat(m.ts)*1000).toISOString() : null);
-      return `<div class="bslack-item">
-        <div class="bslack-hd">
-          <span class="bslack-user">${esc(uname)}</span>
-          <span class="bslack-chan">#${m.channel||'?'}</span>
-          <span class="bslack-time">${fmtTime(ts)}</span>
-        </div>
-        <div class="bslack-txt">${esc(m.text||'')}</div>
-      </div>`;
-    }).join('') +
-    (slackMsgs.length > 6 ? `<div style="text-align:center;margin-top:6px"><a class="bfire-action" href="#" onclick="switchTab('slack');return false;">View all ${slackMsgs.length} alerts →</a></div>` : '');
-  } else {
-    slackSection.style.display = 'none';
-  }
-
-  // ═══ SUMMARY ═══
-  const doneCount = allClients.filter(c => (state[c.id]||{}).complete).length;
-  document.getElementById('bDone').textContent   = doneCount;
-  document.getElementById('bRemain').textContent = allClients.length - doneCount;
-  const totalAlerts = fireItems.length + approvalTickets.length + urgentTasks.length + slackMsgs.length;
-  document.getElementById('briefBadge').textContent = totalAlerts || '✓';
-  document.getElementById('briefBadge').className   = 'tab-badge ' + (totalAlerts > 5 ? 'red' : totalAlerts > 0 ? 'orange' : 'green');
-  document.getElementById('bAllClear').style.display = totalAlerts === 0 ? '' : 'none';
-}
 
 // ══════════════════════════════════════════════════════════════
 // ══ SLACK → CLICKUP TASK BRIDGE ══
