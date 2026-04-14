@@ -597,6 +597,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="no_data">No Data</option>
     </select>
     <select class="filter-select" id="metaSort" onchange="renderMeta()">
+      <option value="attention">Needs Attention</option>
       <option value="worst">Worst CPL First</option>
       <option value="best">Best CPL First</option>
       <option value="spend">Most Spend (7d)</option>
@@ -1480,6 +1481,22 @@ function cplIsRed(v)   { return ['kb-watch','kb-cut'].includes(cplKls(v)); }
 function cplIsYellow(v){ return cplKls(v) === 'kb-ok'; }
 function cplIsGreen(v) { return ['kb-great','kb-good'].includes(cplKls(v)); }
 
+// Composite urgency score — higher = more attention needed (used by "Needs Attention" sort)
+function sortScore(c) {
+  let s = 0;
+  const d7 = c.last_7_days || {};
+  const cpl = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
+  const tier = cplKls(cpl);
+  if (tier === 'kb-cut')        s += 100;
+  else if (tier === 'kb-watch') s += 60;
+  else if (tier === 'kb-ok')    s += 30;
+  if (c.payment_issue)                          s += 80;
+  if (c.violations && c.violations.length)      s += 50;
+  if (d7.leads === 0 && (d7.spend || 0) > 0)    s += 50;
+  else if (d7.leads > 0 && d7.leads < 7)        s += 25;
+  return s;
+}
+
 function cpbKls(v) {
   if (v === null || v === undefined) return 'kb-gray';
   if (v < 50) return 'kb-green';
@@ -1779,6 +1796,7 @@ function renderMeta() {
   list.sort((a, b) => {
     const ac = (a.last_7_days?.leads > 0 && a.last_7_days?.cost_per_lead) ? a.last_7_days.cost_per_lead : null;
     const bc = (b.last_7_days?.leads > 0 && b.last_7_days?.cost_per_lead) ? b.last_7_days.cost_per_lead : null;
+    if (sort === 'attention') return sortScore(b) - sortScore(a);
     if (sort === 'worst') return cplScore(ac) - cplScore(bc);
     if (sort === 'best')  return cplScore(bc) - cplScore(ac);
     if (sort === 'spend') return (b.last_7_days?.spend || 0) - (a.last_7_days?.spend || 0);

@@ -1,0 +1,146 @@
+name: Build Client Map
+
+on:
+  schedule:
+    - cron: '0 6 * * 0'  # Weekly Sunday 6am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build client-map.json
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, re
+          from difflib import SequenceMatcher
+
+          STOP_WORDS = {'medspa','med spa','spa','aesthetics','aesthetic','wellness',
+                        'clinic','center','centre','by','and','the','llc','inc','co',
+                        '&','of','at','in','for','-','|'}
+
+          def normalize(name):
+              n = (name or '').lower()
+              n = re.sub(r'[^a-z0-9 ]', ' ', n)
+              tokens = [t for t in n.split() if t not in STOP_WORDS and len(t) > 1]
+              return ' '.join(tokens)
+
+          def similarity(a, b):
+              na, nb = normalize(a), normalize(b)
+              if not na or not nb:
+                  return 0.0
+              return SequenceMatcher(None, na, nb).ratio()
+
+          # Load meta accounts
+          with open('data/meta.json') as f:
+              meta = json.load(f)
+          meta_accounts = [(c['account_id'], c['account_name']) for c in meta.get('clients', [])]
+
+          # Load ClickUp tasks
+          with open('data/clickup.json') as f:
+              cu = json.load(f)
+          cu_tasks = [(t['id'], t['name']) for t in cu.get('tasks', []) if t.get('id') and t.get('name')]
+
+          # Load existing client-map to preserve manual fields
+          existing = {}
+          try:
+              with open('data/client-map.json') as f:
+                  for entry in json.load(f):
+                      existing[entry.get('meta_account_id', '')] = entry
+          except (FileNotFoundError, json.JSONDecodeError):
+              pass
+
+          MANUAL_FIELDS = ['niche','target_cpl','daily_budget','onboarded_date',
+                           'special_rules','funnel_url','drive_folder','assignee']
+
+          results = []
+          matched_count = 0
+          unmatched = []
+
+          for account_id, account_name in meta_accounts:
+              best_task_id, best_task_name, best_score = None, None, 0.0
+              for task_id, task_name in cu_tasks:
+                  score = similarity(account_name, task_name)
+                  if score > best_score:
+                      best_score = score
+                      best_task_id = task_id
+                      best_task_name = task_name
+
+              matched = best_score >= 0.75
+              if matched:
+                  matched_count += 1
+              else:
+                  unmatched.append(account_name)
+                  best_task_id = None
+                  best_task_name = None
+
+              entry = {
+                  'meta_account_id': account_id,
+                  'meta_name': account_name,
+                  'clickup_task_id': best_task_id,
+                  'clickup_name': best_task_name,
+                  'matched': matched,
+                  'confidence': round(best_score, 4),
+              }
+
+              # Preserve manual fields from existing entry
+              prev = existing.get(account_id, {})
+              for field in MANUAL_FIELDS:
+                  if field in prev:
+                      entry[field] = prev[field]
+                  else:
+                      entry[field] = None
+
+              results.append(entry)
+
+          with open('data/client-map.json', 'w') as f:
+              json.dump(results, f, indent=2)
+
+          total = len(meta_accounts)
+          print(f'Matched {matched_count}/{total} accounts (confidence >= 0.75)')
+          if unmatched:
+              print(f'Unmatched ({len(unmatched)}): {", ".join(unmatched)}')
+
+          # Post to Slack #media-ads
+          token = os.environ.get('SLACK_BOT_TOKEN', '')
+          if not token:
+              print('No SLACK_BOT_TOKEN — skipping Slack notification')
+          else:
+              import urllib.request
+              unmatched_list = '\n'.join(f'  • {n}' for n in unmatched) if unmatched else '  None'
+              text = (
+                  f':white_check_mark: *Client Map Rebuilt* — {matched_count}/{total} accounts matched\n'
+                  f'Confidence threshold: 0.75\n'
+                  f'*Unmatched ({len(unmatched)}):*\n{unmatched_list}'
+              )
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = urllib.request.Request(
+                  'https://slack.com/api/chat.postMessage',
+                  data=payload,
+                  headers={'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json'}
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=15) as resp:
+                      result = json.loads(resp.read())
+                      if not result.get('ok'):
+                          print(f'Slack error: {result.get("error")}')
+              except Exception as e:
+                  print(f'Slack post failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/client-map.json
+          git diff --staged --quiet || git commit -m "build client map [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push
