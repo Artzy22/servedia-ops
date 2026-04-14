@@ -101,8 +101,12 @@ jobs:
 
               results.append(entry)
 
+          import subprocess
+          pulled_at = subprocess.check_output(['date','-u','+%Y-%m-%dT%H:%M:%SZ']).decode().strip()
+          output = {'clients': results, 'total': len(meta_accounts),
+                    'matched': matched_count, 'unmatched': len(unmatched), 'pulled_at': pulled_at}
           with open('data/client-map.json', 'w') as f:
-              json.dump(results, f, indent=2)
+              json.dump(output, f, indent=2)
 
           total = len(meta_accounts)
           print(f'Matched {matched_count}/{total} accounts (confidence >= 0.75)')

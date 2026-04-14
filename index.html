@@ -1104,6 +1104,7 @@ const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
 let paymentData = null, violationsData = null;
+let metaClientMap = {};  // account_id → client-map entry, for F5 suggestions
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -1805,6 +1806,57 @@ function buildSuggestions(cpl, cpb, leads7, client) {
   return tips;
 }
 
+// F5: Per-account suggestions using target_cpl from client-map
+function buildMetaSuggestions(c, allClients) {
+  const tips = [];
+  const d7   = c.last_7_days || {};
+  const cpl  = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
+  const spend = d7.spend || 0;
+  const leads = d7.leads || 0;
+
+  const cmEntry   = metaClientMap[String(c.account_id)] || {};
+  const targetCpl = cmEntry.target_cpl || 12;
+
+  const cutThresh   = targetCpl * 2.33;   // default ~$28
+  const watchThresh = targetCpl * 1.67;   // default ~$20
+  const scaleBelow  = targetCpl * 0.83;   // default ~$10
+
+  // 0 leads with real spend → pause
+  if (leads === 0 && spend > 50) {
+    tips.push(`0 leads this week — pause all active ad sets and check pixel + conversion event setup.`);
+  }
+
+  // CPL actions
+  if (cpl !== null) {
+    if (cpl > cutThresh)
+      tips.push(`CPL ${fmtCur(cpl)} exceeds cut threshold (${fmtCur(cutThresh)}) — pause worst ad sets immediately.`);
+    else if (cpl > watchThresh)
+      tips.push(`CPL ${fmtCur(cpl)} above watch threshold (${fmtCur(watchThresh)}) — diagnose and test a new creative angle.`);
+    else if (cpl < scaleBelow)
+      tips.push(`CPL ${fmtCur(cpl)} is strong (target ${fmtCur(targetCpl)}) — scale budget by 15% on best-performing ad set.`);
+    else
+      tips.push(`CPL ${fmtCur(cpl)} within target range — monitor frequency and refresh creative if CTR drops.`);
+  }
+
+  // Budget reallocation signal — compare to portfolio average
+  if (allClients && allClients.length > 1) {
+    const activeCpls = allClients
+      .filter(a => a.account_id !== c.account_id && (a.last_7_days?.leads||0) > 0 && a.last_7_days?.cost_per_lead)
+      .map(a => a.last_7_days.cost_per_lead);
+    if (activeCpls.length > 0) {
+      const portfolioAvg = activeCpls.reduce((s, v) => s + v, 0) / activeCpls.length;
+      if (cpl !== null && cpl < portfolioAvg * 0.6 && spend > 0) {
+        tips.push(`CPL ${fmtCur(cpl)} is 40%+ below portfolio average (${fmtCur(portfolioAvg)}) — candidate for budget reallocation from underperformers.`);
+      } else if (cpl !== null && cpl > portfolioAvg * 1.5) {
+        tips.push(`CPL ${fmtCur(cpl)} is 50%+ above portfolio average (${fmtCur(portfolioAvg)}) — consider reallocating budget to better-performing accounts.`);
+      }
+    }
+  }
+
+  if (tips.length === 0) tips.push('Metrics on target — no actions needed.');
+  return tips;
+}
+
 // ══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════════════
@@ -1923,6 +1975,12 @@ function renderMeta() {
     const billingBadge = payMap[id] ? `<span class="badge-billing" title="${esc(payMap[id].payment_status||'Billing issue detected')}">⛔ BILLING PAUSED</span>` : '';
     const violBadge    = vioMap[id] ? `<span class="badge-violation" onclick="openViolationsModal('${id}')" title="Click to view policy issues">${vioMap[id].violations.length} POLICY ISSUE${vioMap[id].violations.length !== 1 ? 'S' : ''}</span>` : '';
 
+    const metaSuggTips = buildMetaSuggestions(c, list);
+    const metaSuggHtml = `<div class="dmc-sugg" style="margin-top:10px;margin-bottom:0">
+      <div class="dmc-sugg-title">💡 AI Suggestions</div>
+      ${metaSuggTips.map(s => `<div class="dmc-sugg-item">${esc(s)}</div>`).join('')}
+    </div>`;
+
     return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         <div class="ac-name" title="${nameE}">${nameE}</div>
@@ -1935,6 +1993,7 @@ function renderMeta() {
       </div>
       <div id="mg-${id}-7d">${mkGrid(rows7)}</div>
       <div id="mg-${id}-30d" style="display:none">${mkGrid(rows30)}</div>
+      ${metaSuggHtml}
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="dmc-link-btn" href="${adsUrl}" target="_blank">📈 Ads Manager</a>
         <button class="dmc-link-btn ci-btn" onclick="openClientModal('${id}','${nameE}')">ℹ Client Info</button>
@@ -3131,11 +3190,12 @@ async function loadAll() {
   try {
     // Always fetch static sources from JSON
     const staticFetches = await Promise.allSettled([
-      fetchJ(`${BASE}/meta.json?_=${ts}`),            // 0 — Meta Ads (GitHub Actions)
-      fetchJ(`${BASE}/slack.json?_=${ts}`),            // 1 — Slack
-      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),   // 2 — Drive folders
-      fetchJ(`${BASE}/payment-status.json?_=${ts}`),  // 3 — Payment failures (F2)
+      fetchJ(`${BASE}/meta.json?_=${ts}`),             // 0 — Meta Ads (GitHub Actions)
+      fetchJ(`${BASE}/slack.json?_=${ts}`),             // 1 — Slack
+      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),    // 2 — Drive folders
+      fetchJ(`${BASE}/payment-status.json?_=${ts}`),   // 3 — Payment failures (F2)
       fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
+      fetchJ(`${BASE}/client-map.json?_=${ts}`),       // 5 — Client map (F5 suggestions)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -3143,6 +3203,13 @@ async function loadAll() {
     if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData      = staticFetches[2].value; }
     if (staticFetches[3].status === 'fulfilled' && staticFetches[3].value) { paymentData    = staticFetches[3].value; }
     if (staticFetches[4].status === 'fulfilled' && staticFetches[4].value) { violationsData = staticFetches[4].value; }
+    if (staticFetches[5].status === 'fulfilled' && staticFetches[5].value) {
+      metaClientMap = {};
+      ((staticFetches[5].value.clients) || []).forEach(e => {
+        const id = String(e.meta_account_id || '').replace('act_', '');
+        metaClientMap[id] = e;
+      });
+    }
     if (metaData) renderMeta();
 
     if (hasToken) {
