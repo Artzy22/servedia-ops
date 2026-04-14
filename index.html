@@ -356,6 +356,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ret-title-yellow{background:#2a1a00;color:#fbbf24}
 .ret-title-green{background:#052e16;color:#34d399}
 .ret-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px;padding:2px 0}
+.crm-card{background:#0f0f14;border:1px solid #1e1e1e;border-radius:10px;overflow:hidden}
+.crm-card-hd{display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;transition:background .15s}
+.crm-card-hd:hover{background:#141420}
+.crm-card-body{padding:14px 16px;border-top:1px solid #1a1a1a;background:#0a0a0f}
 .ret-card{background:#111;border:1px solid #1e1e1e;border-radius:0 0 10px 10px;padding:14px;margin-bottom:0}
 .ret-card.critical{border-color:#7f1d1d;background:#120505}
 .ret-card.guarantee{border-color:#7c2d12}
@@ -524,8 +528,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <span class="nav-badge nb-red" id="navBadge-maintenance">–</span>
     </div>
     <div class="nav-item" id="nav-retention" onclick="switchSection('retention')">
-      <div class="nav-item-left"><span class="nav-icon">🏆</span><span class="nav-label">Creative Intel</span></div>
+      <div class="nav-item-left"><span class="nav-icon">📉</span><span class="nav-label">Retention Risk</span></div>
       <span class="nav-badge nb-gray" id="navBadge-retention">–</span>
+    </div>
+    <div class="nav-item" id="nav-creative" onclick="switchSection('creative')">
+      <div class="nav-item-left"><span class="nav-icon">✍️</span><span class="nav-label">Creative Intel</span></div>
     </div>
   </div>
 
@@ -812,35 +819,136 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div id="retLoadingMsg" style="text-align:center;padding:48px;color:#555;font-size:14px">Set Client Management List ID in Config to load retention data.</div>
 </div>
 
+<!-- ════════════════ CRM ════════════════ -->
 <div id="panel-crm" class="panel content">
-  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
-    <div style="font-size:32px;margin-bottom:12px">👥</div>
-    <div style="font-weight:600;margin-bottom:6px">CRM</div>
-    <div>Client relationship management — coming soon.</div>
+  <div class="stat-grid" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Total Clients</div><div class="stat-value purple" id="crmTotal">–</div></div>
+    <div class="stat-card"><div class="stat-label">Active</div><div class="stat-value green" id="crmActive">–</div></div>
+    <div class="stat-card"><div class="stat-label">At Risk</div><div class="stat-value red" id="crmAtRisk">–</div></div>
+    <div class="stat-card"><div class="stat-label">Renewing ≤14d</div><div class="stat-value orange" id="crmRenewing">–</div></div>
+    <div class="stat-card"><div class="stat-label">Refund Needed</div><div class="stat-value red" id="crmRefunds">–</div></div>
+  </div>
+  <div class="filters" style="margin-bottom:14px">
+    <input class="filter-input" id="crmSearch" placeholder="Search clients..." oninput="renderCRM()">
+    <button class="fbtn active" id="crmf-all" onclick="setCRMFilter('all')">All</button>
+    <button class="fbtn" id="crmf-active" onclick="setCRMFilter('active')">Active</button>
+    <button class="fbtn" id="crmf-atrisk" onclick="setCRMFilter('atrisk')">⚠️ At Risk</button>
+    <button class="fbtn" id="crmf-refund" onclick="setCRMFilter('refund')">🔴 Refund</button>
+    <button class="fbtn" id="crmf-renewing" onclick="setCRMFilter('renewing')">📅 Renewing</button>
+  </div>
+  <div id="crmGrid" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div id="crmEmpty" style="display:none;text-align:center;padding:40px;color:#555">
+    <div style="font-size:28px;margin-bottom:10px">👥</div>
+    <div>No clients found. Add your Client Management List ID in ⚙ Settings.</div>
   </div>
 </div>
 
+<!-- ════════════════ ONBOARDING ════════════════ -->
 <div id="panel-onboarding" class="panel content">
-  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
-    <div style="font-size:32px;margin-bottom:12px">🚀</div>
-    <div style="font-weight:600;margin-bottom:6px">Onboarding</div>
-    <div>New client onboarding tracker — coming soon.</div>
+  <div class="stat-grid" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">In Onboarding</div><div class="stat-value purple" id="obTotal">–</div></div>
+    <div class="stat-card"><div class="stat-label">Awaiting Ad Access</div><div class="stat-value orange" id="obAccess">–</div></div>
+    <div class="stat-card"><div class="stat-label">Ads Live</div><div class="stat-value green" id="obLive">–</div></div>
+    <div class="stat-card"><div class="stat-label">Overdue Launch</div><div class="stat-value red" id="obOverdue">–</div></div>
+  </div>
+  <div id="obList" style="display:flex;flex-direction:column;gap:10px"></div>
+  <div id="obEmpty" style="display:none;text-align:center;padding:40px;color:#555">
+    <div style="font-size:28px;margin-bottom:10px">🚀</div>
+    <div>No clients currently in onboarding. Make sure your Client Management List ID is set in ⚙ Settings.</div>
   </div>
 </div>
 
+<!-- ════════════════ WATCHDOG ════════════════ -->
 <div id="panel-watchdog" class="panel content">
-  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
-    <div style="font-size:32px;margin-bottom:12px">🐕</div>
-    <div style="font-weight:600;margin-bottom:6px">Watchdog</div>
-    <div>Automated anomaly monitoring — coming soon.</div>
+  <div class="stat-grid" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">🔥 Critical</div><div class="stat-value red" id="wdCritical">–</div></div>
+    <div class="stat-card"><div class="stat-label">⚠️ Warning</div><div class="stat-value orange" id="wdWarning">–</div></div>
+    <div class="stat-card"><div class="stat-label">📅 Renewal Alerts</div><div class="stat-value yellow" id="wdRenewal">–</div></div>
+    <div class="stat-card"><div class="stat-label">✅ Healthy</div><div class="stat-value green" id="wdHealthy">–</div></div>
+  </div>
+  <div id="wdAlerts" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div id="wdAllClear" style="display:none;text-align:center;padding:40px">
+    <div style="font-size:40px;margin-bottom:12px">🐕</div>
+    <div style="font-size:16px;font-weight:700;color:#34d399">All clear — no anomalies detected.</div>
+    <div style="font-size:12px;color:#555;margin-top:6px">Watchdog is watching 24/7. Check back after the next sync.</div>
   </div>
 </div>
 
+<!-- ════════════════ TECH TICKETS ════════════════ -->
 <div id="panel-tech" class="panel content">
-  <div style="text-align:center;padding:64px;color:#555;font-size:14px">
-    <div style="font-size:32px;margin-bottom:12px">🔧</div>
-    <div style="font-weight:600;margin-bottom:6px">Tech Tickets</div>
-    <div>Technical issue tracking — coming soon.</div>
+  <div class="stat-grid" style="margin-bottom:16px">
+    <div class="stat-card"><div class="stat-label">Total</div><div class="stat-value purple" id="techTotal">–</div></div>
+    <div class="stat-card"><div class="stat-label">To Do</div><div class="stat-value" id="techTodo">–</div></div>
+    <div class="stat-card"><div class="stat-label">In Progress</div><div class="stat-value blue" id="techWorking">–</div></div>
+    <div class="stat-card"><div class="stat-label">Needs Approval</div><div class="stat-value orange" id="techApproval">–</div></div>
+    <div class="stat-card"><div class="stat-label">Done</div><div class="stat-value green" id="techDone">–</div></div>
+  </div>
+  <div class="filters" style="margin-bottom:12px">
+    <input class="filter-input" id="techSearch" placeholder="Search tickets..." oninput="renderTech()">
+    <div style="font-size:11px;color:#555;margin-left:auto" id="techUpdated"></div>
+  </div>
+  <div id="techBoard"></div>
+  <div id="techEmpty" style="display:none;text-align:center;padding:40px;color:#555">
+    <div style="font-size:28px;margin-bottom:10px">🔧</div>
+    <div>Add your Tech Tickets List ID in ⚙ Settings to load tickets.</div>
+  </div>
+</div>
+
+<!-- ════════════════ CREATIVE INTEL ════════════════ -->
+<div id="panel-creative" class="panel content">
+  <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap">
+    <!-- Left: Builder -->
+    <div style="flex:1;min-width:300px">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px">✍️ Ad Copy Prompt Builder</div>
+      <div class="mfield" style="margin-bottom:10px">
+        <label class="mlabel">Client</label>
+        <select class="minput" id="ciClient" onchange="ciLoadClient()" style="cursor:pointer">
+          <option value="">— Select a client —</option>
+        </select>
+      </div>
+      <div id="ciClientSnapshot" style="display:none;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:8px;padding:12px;margin-bottom:12px;font-size:12px;color:#888;line-height:1.7"></div>
+      <div class="mfield" style="margin-bottom:10px">
+        <label class="mlabel">Campaign Type</label>
+        <select class="minput" id="ciType" style="cursor:pointer">
+          <option value="lead_gen">Lead Generation</option>
+          <option value="retargeting">Retargeting</option>
+          <option value="scale">Scale a Winner</option>
+          <option value="awareness">Brand Awareness</option>
+          <option value="reactivate">Reactivate Leads</option>
+        </select>
+      </div>
+      <div class="mfield" style="margin-bottom:10px">
+        <label class="mlabel">Platform</label>
+        <select class="minput" id="ciPlatform" style="cursor:pointer">
+          <option value="facebook_instagram">Facebook + Instagram</option>
+          <option value="facebook">Facebook only</option>
+          <option value="instagram">Instagram only</option>
+        </select>
+      </div>
+      <div class="mfield" style="margin-bottom:10px">
+        <label class="mlabel">Goal</label>
+        <select class="minput" id="ciGoal" style="cursor:pointer">
+          <option value="reduce_cpl">Reduce CPL</option>
+          <option value="volume">Maximize Lead Volume</option>
+          <option value="quality">Higher Quality Leads</option>
+          <option value="reactivate">Reactivate Old Leads</option>
+          <option value="upsell">Upsell / Retention</option>
+        </select>
+      </div>
+      <div class="mfield" style="margin-bottom:14px">
+        <label class="mlabel">Additional Context <span style="color:#555;font-weight:400">(angles, hooks, seasonal, etc.)</span></label>
+        <textarea class="minput" id="ciContext" rows="3" placeholder="e.g. Focus on summer body confidence angle. Client recently launched a new laser treatment..." style="resize:vertical;font-family:inherit"></textarea>
+      </div>
+      <button class="msave" style="width:100%" onclick="generateCreativePrompt()">⚡ Generate Gemini Prompt</button>
+    </div>
+    <!-- Right: Output -->
+    <div style="flex:1;min-width:300px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:15px;font-weight:700;color:#fff">📋 Prompt Output</div>
+        <button class="fbtn" id="ciCopyBtn" onclick="ciCopyPrompt()" style="display:none">Copy Prompt</button>
+      </div>
+      <div id="ciOutput" style="background:#0a0a0a;border:1px solid #1e1e1e;border-radius:10px;padding:16px;min-height:300px;font-size:12px;color:#888;line-height:1.7;white-space:pre-wrap;font-family:monospace">Select a client and click Generate to build your Gemini prompt.</div>
+    </div>
   </div>
 </div>
 
@@ -931,6 +1039,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="mhint">If set, tasks will be fetched from this ClickUp list instead of the JSON file.</div>
     </div>
     <div class="mfield">
+      <label class="mlabel">Tech Tickets List ID <span style="color:#3b82f6;font-size:10px">— powers Tech Tickets panel</span></label>
+      <input class="minput" id="cfTechListId" placeholder="e.g. 901234567894">
+      <div class="mhint">Your ClickUp list for technical tickets (GHL setup, integrations, etc.). Find the ID in the list URL.</div>
+    </div>
+    <div class="mfield">
       <label class="mlabel">Client Management List ID <span style="color:#fb923c;font-size:10px">— powers Retention Risk + Auto-Mapping</span></label>
       <input class="minput" id="cfClientMgmtListId" placeholder="e.g. 901234567893">
       <div class="mhint">The ClickUp "Client Management" list ID. Enables auto client mapping, enriched Daily Maintenance cards, and the Retention Risk tab. Find it in the list URL.</div>
@@ -965,7 +1078,9 @@ const BASE = 'https://raw.githubusercontent.com/Artzy22/servedia-ops/main/data';
 const CU_API = 'https://api.clickup.com/api/v2';
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
-let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null;
+let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
+let crmFilter = 'all';
+let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
 let clientMgmtByName = {};    // normalized client name → enriched client record (fallback lookup)
 let clientMgmtAllTasks = [];  // all tasks from Client Management list (for Retention tab)
@@ -999,6 +1114,7 @@ function getCfg() {
     ghPat:             localStorage.getItem('gh_pat') || '',
     metaAppId:         localStorage.getItem('meta_app_id') || '',
     metaAppSecret:     localStorage.getItem('meta_app_secret') || '',
+    techListId:        localStorage.getItem('cu_tech_list') || '',
   };
 }
 
@@ -1012,6 +1128,7 @@ function openSettings() {
   document.getElementById('cfGhPat').value           = c.ghPat;
   document.getElementById('cfMetaAppId').value       = c.metaAppId;
   document.getElementById('cfMetaAppSecret').value   = c.metaAppSecret;
+  document.getElementById('cfTechListId').value      = c.techListId;
   document.getElementById('cfgStatus').textContent   = '';
   loadCPLSettings();
   document.getElementById('settingsModal').classList.add('open');
@@ -1030,6 +1147,7 @@ function saveSettings() {
   localStorage.setItem('gh_pat',              document.getElementById('cfGhPat').value.trim());
   localStorage.setItem('meta_app_id',         document.getElementById('cfMetaAppId').value.trim());
   localStorage.setItem('meta_app_secret',     document.getElementById('cfMetaAppSecret').value.trim());
+  localStorage.setItem('cu_tech_list',        document.getElementById('cfTechListId').value.trim());
   localStorage.removeItem('cu_client_mgmt_cache'); // invalidate cache on save
   document.getElementById('cfgStatus').textContent = '✓ Saved! Refreshing data...';
   setTimeout(() => { closeSettings(); loadAll(); }, 800);
@@ -1477,7 +1595,12 @@ function switchSection(section) {
   const panelEl = document.getElementById('panel-' + section);
   if (panelEl) panelEl.classList.add('active');
   if (section === 'retention') renderRetention();
-  if (section === 'command') { if (typeof renderCommandCenter === 'function') renderCommandCenter(); }
+  if (section === 'command')  { if (typeof renderCommandCenter === 'function') renderCommandCenter(); }
+  if (section === 'crm')      renderCRM();
+  if (section === 'onboarding') renderOnboarding();
+  if (section === 'watchdog') renderWatchdog();
+  if (section === 'tech')     renderTech();
+  if (section === 'creative') renderCreativeIntel();
 }
 
 // Alias — keeps any remaining internal switchTab() calls working
@@ -2798,6 +2921,7 @@ async function loadAll() {
         fetchCUListLive('901515083916', cfg.token, { includeClosed: true }),                  // tasks (Media Tickets)
         fetchCUListLive('901514441223', cfg.token, {}),                                       // maintenance
         loadClientMgmtData(),  // Client Management (enrichment + retention)
+        cfg.techListId ? fetchCUListLive(cfg.techListId, cfg.token, { includeClosed: true }) : Promise.resolve(null), // tech tickets
       ]);
 
       if (liveFetches[0].status === 'fulfilled' && liveFetches[0].value) {
@@ -2812,6 +2936,7 @@ async function loadAll() {
       if (liveFetches[1].status === 'fulfilled' && liveFetches[1].value) { cuData    = liveFetches[1].value; renderTasks(); }
       if (liveFetches[2].status === 'fulfilled' && liveFetches[2].value) { maintData = liveFetches[2].value; }
       // [3] loadClientMgmtData updates clientMgmtData + clientMgmtAllTasks as side effects
+      if (liveFetches[4].status === 'fulfilled' && liveFetches[4].value) { techData  = liveFetches[4].value; }
 
       liveFetches.forEach((r, i) => {
         if (r.status === 'rejected') console.warn(`Live fetch [${i}] failed:`, r.reason);
@@ -2832,6 +2957,10 @@ async function loadAll() {
 
     renderMaintenance();
     renderRetention();
+    renderCRM();
+    renderOnboarding();
+    renderWatchdog();
+    renderTech();
     renderCommandCenter();
     updateNavBadges();
 
@@ -2983,6 +3112,557 @@ function renderRetention() {
   renderSection('retGuaranteeSection', 'retGuaranteeGrid', guarantee, 'guarantee');
   renderSection('retWatchSection',     'retWatchGrid',     watch,     'watch');
   renderSection('retWinsSection',      'retWinsGrid',      wins,      '');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ CRM ══
+// ══════════════════════════════════════════════════════════════
+function setCRMFilter(f) {
+  crmFilter = f;
+  document.querySelectorAll('[id^="crmf-"]').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('crmf-' + f);
+  if (btn) btn.classList.add('active');
+  renderCRM();
+}
+
+function renderCRM() {
+  const grid  = document.getElementById('crmGrid');
+  const empty = document.getElementById('crmEmpty');
+  if (!grid) return;
+
+  const records = clientMgmtAllTasks.map(t => buildCMRecord(t));
+  const now = Date.now();
+  const search = (document.getElementById('crmSearch')?.value || '').toLowerCase();
+
+  // Stats
+  const total    = records.length;
+  const active   = records.filter(r => (r.lifecycleStatus || '').toLowerCase().includes('active')).length;
+  const atRisk   = records.filter(r => r.refundNeeded || (r.clientHappiness || '').toLowerCase() === 'unhappy').length;
+  const renewing = records.filter(r => r.renewalDate && (r.renewalDate - now) < 14 * 86400000 && r.renewalDate > now).length;
+  const refunds  = records.filter(r => r.refundNeeded).length;
+
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('crmTotal', total); el('crmActive', active); el('crmAtRisk', atRisk);
+  el('crmRenewing', renewing); el('crmRefunds', refunds);
+
+  let list = records.filter(r => {
+    if (search && !(r.taskName || '').toLowerCase().includes(search) && !(r.contactName || '').toLowerCase().includes(search)) return false;
+    if (crmFilter === 'active'   && !(r.lifecycleStatus || '').toLowerCase().includes('active')) return false;
+    if (crmFilter === 'atrisk'   && !(r.refundNeeded || (r.clientHappiness || '').toLowerCase() === 'unhappy')) return false;
+    if (crmFilter === 'refund'   && !r.refundNeeded) return false;
+    if (crmFilter === 'renewing' && !(r.renewalDate && (r.renewalDate - now) < 14 * 86400000 && r.renewalDate > now)) return false;
+    return true;
+  });
+
+  // Sort: at-risk first, then by renewal date
+  list.sort((a, b) => {
+    const aRisk = (a.refundNeeded || (a.clientHappiness||'').toLowerCase()==='unhappy') ? 0 : 1;
+    const bRisk = (b.refundNeeded || (b.clientHappiness||'').toLowerCase()==='unhappy') ? 0 : 1;
+    if (aRisk !== bRisk) return aRisk - bRisk;
+    return (a.renewalDate || 9e15) - (b.renewalDate || 9e15);
+  });
+
+  if (list.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = list.map(r => {
+    const hClass = r.refundNeeded ? 'kb-red' : (r.clientHappiness||'').toLowerCase()==='unhappy' ? 'kb-red' : (r.clientHappiness||'').toLowerCase()==='happy' ? 'kb-green' : 'kb-gray';
+    const renewDays = r.renewalDate ? Math.ceil((r.renewalDate - now) / 86400000) : null;
+    const renewStr  = renewDays !== null ? (renewDays < 0 ? `<span class="kbadge kb-red">Expired ${Math.abs(renewDays)}d ago</span>` : renewDays <= 14 ? `<span class="kbadge kb-orange">Renews in ${renewDays}d</span>` : `<span style="font-size:11px;color:#555">${fmtDate(r.renewalDate)}</span>`) : '';
+    const metaAcc = clientMgmtData && Object.values(clientMgmtData).find(x => x.taskId === r.taskId);
+    const metaId  = metaAcc ? Object.keys(clientMgmtData).find(k => clientMgmtData[k].taskId === r.taskId) : null;
+    const metaClient = metaId && metaData?.clients ? metaData.clients.find(c => String(c.account_id) === String(metaId)) : null;
+    const cpl7 = metaClient?.stats?.d7?.cost_per_lead;
+    const leads7 = metaClient?.stats?.d7?.leads;
+
+    return `<div class="crm-card" id="crmCard_${r.taskId}">
+      <div class="crm-card-hd" onclick="toggleCRMCard('${r.taskId}')">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:700;color:#e0e0e0;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.taskName)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">
+            ${r.clientHappiness||r.refundNeeded ? `<span class="kbadge ${hClass}">${r.refundNeeded?'🔴 Refund':esc(r.clientHappiness)}</span>` : ''}
+            ${r.lifecycleStatus ? `<span class="kbadge kb-gray">${esc(r.lifecycleStatus)}</span>` : ''}
+            ${r.niche ? `<span style="font-size:11px;color:#666">${esc(r.niche)}</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          ${r.monthly ? `<span style="font-size:13px;font-weight:700;color:#a78bfa">${fmtCur(r.monthly)}/mo</span>` : ''}
+          ${renewStr}
+          <span style="font-size:18px;color:#555;line-height:1">▾</span>
+        </div>
+      </div>
+      <div class="crm-card-body" id="crmBody_${r.taskId}" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px 20px;margin-bottom:14px">
+          ${r.contactName ? `<div><div class="stat-label">Contact</div><div style="font-size:12px;color:#ccc">${esc(r.contactName)}</div></div>` : ''}
+          ${r.phone ? `<div><div class="stat-label">Phone</div><a href="tel:${esc(r.phone)}" style="font-size:12px;color:#7c3aed">${esc(r.phone)}</a></div>` : ''}
+          ${r.offer ? `<div><div class="stat-label">Offer</div><div style="font-size:12px;color:#ccc">${esc(r.offer)}</div></div>` : ''}
+          ${r.dailyBudget ? `<div><div class="stat-label">Daily Budget</div><div style="font-size:12px;color:#ccc">${fmtCur(r.dailyBudget)}</div></div>` : ''}
+          ${r.ltv ? `<div><div class="stat-label">Net LTV</div><div style="font-size:12px;color:#34d399">${fmtCur(r.ltv)}</div></div>` : ''}
+          ${r.billingType ? `<div><div class="stat-label">Billing</div><div style="font-size:12px;color:#ccc">${esc(r.billingType)}</div></div>` : ''}
+          ${r.launchDate ? `<div><div class="stat-label">Launch Date</div><div style="font-size:12px;color:#ccc">${fmtDate(r.launchDate)}</div></div>` : ''}
+          ${r.lastOptimized ? `<div><div class="stat-label">Last Optimized</div><div style="font-size:12px;color:#ccc">${fmtDate(r.lastOptimized)}</div></div>` : ''}
+          ${r.checkBackDate ? `<div><div class="stat-label">Check Back</div><div style="font-size:12px;color:#fbbf24">${fmtDate(r.checkBackDate)}</div></div>` : ''}
+          ${r.adStatus ? `<div><div class="stat-label">Ad Status</div><div style="font-size:12px;color:#ccc">${esc(r.adStatus)}</div></div>` : ''}
+          ${r.team ? `<div><div class="stat-label">Team</div><div style="font-size:12px;color:#ccc">${esc(r.team)}</div></div>` : ''}
+          ${metaClient ? `<div><div class="stat-label">7d CPL</div><div style="font-size:12px;color:${cpl7>20?'#f87171':cpl7>10?'#fbbf24':'#34d399'}">${cpl7?'$'+Math.round(cpl7):'—'} (${leads7||0} leads)</div></div>` : ''}
+        </div>
+        ${r.adDosDonts ? `<div style="margin-bottom:12px"><div class="stat-label" style="margin-bottom:4px">Ad Rules</div><div style="font-size:12px;color:#888;background:#0d0d0d;border:1px solid #1e1e1e;border-radius:6px;padding:8px;line-height:1.6">${esc(r.adDosDonts)}</div></div>` : ''}
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+          ${r.taskUrl ? `<a class="dmc-link-btn cu" href="${esc(r.taskUrl)}" target="_blank">📋 ClickUp</a>` : ''}
+          ${r.phone ? `<a class="dmc-link-btn" href="tel:${esc(r.phone)}">📞 Call</a>` : ''}
+          ${r.adAccountUrl ? `<a class="dmc-link-btn" href="${esc(r.adAccountUrl)}" target="_blank">📊 Ads Manager</a>` : ''}
+          <button class="dmc-link-btn" onclick="switchSection('creative');setTimeout(()=>ciSelectClient('${r.taskId}'),100)">✍️ Creative Intel</button>
+        </div>
+        <!-- Comments -->
+        <div style="border-top:1px solid #1a1a1a;padding-top:12px">
+          <div style="font-size:12px;font-weight:600;color:#888;margin-bottom:8px">💬 ClickUp Comments</div>
+          <div id="crmComments_${r.taskId}" style="margin-bottom:10px"><button class="fbtn" style="font-size:11px" onclick="loadCRMComments('${r.taskId}')">Load Comments</button></div>
+          <div style="display:flex;gap:8px">
+            <textarea id="crmNote_${r.taskId}" class="minput" rows="2" placeholder="Add a comment to ClickUp..." style="flex:1;resize:vertical;font-size:12px;font-family:inherit"></textarea>
+            <button class="cpl-save" style="align-self:flex-end;white-space:nowrap;padding:6px 12px" onclick="postCRMComment('${r.taskId}', this)">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleCRMCard(taskId) {
+  const body = document.getElementById('crmBody_' + taskId);
+  if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+}
+
+async function loadCRMComments(taskId) {
+  const container = document.getElementById('crmComments_' + taskId);
+  if (!container) return;
+  const cfg = getCfg();
+  if (!cfg.token) { container.innerHTML = '<div style="font-size:11px;color:#555">ClickUp token required to load comments.</div>'; return; }
+  container.innerHTML = '<div style="font-size:11px;color:#555">Loading...</div>';
+  try {
+    const resp = await fetch(`${CU_API}/task/${taskId}/comment`, { headers: { Authorization: cfg.token } });
+    const data = await resp.json();
+    const comments = data.comments || [];
+    if (!comments.length) { container.innerHTML = '<div style="font-size:11px;color:#555">No comments yet.</div>'; return; }
+    container.innerHTML = comments.map(c => {
+      const author = c.comment_author?.username || c.comment_author?.email || 'Unknown';
+      const text   = (c.comment_text || (c.comment || []).map(x => x.text || '').join('')).slice(0, 500);
+      const ts     = c.date ? fmtTime(Number(c.date)) : '';
+      return `<div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:6px;padding:8px 10px;margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:11px;font-weight:600;color:#7c3aed">${esc(author)}</span>
+          <span style="font-size:10px;color:#444">${esc(ts)}</span>
+        </div>
+        <div style="font-size:12px;color:#bbb;line-height:1.5">${esc(text)}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="font-size:11px;color:#f87171">Error loading comments: ${esc(e.message)}</div>`;
+  }
+}
+
+async function postCRMComment(taskId, btn) {
+  const cfg  = getCfg();
+  const note = document.getElementById('crmNote_' + taskId);
+  if (!cfg.token || !note || !note.value.trim()) return;
+  btn.disabled = true; btn.textContent = '⏳';
+  try {
+    const resp = await fetch(`${CU_API}/task/${taskId}/comment`, {
+      method: 'POST',
+      headers: { Authorization: cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ comment_text: note.value.trim(), notify_all: false }),
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    note.value = '';
+    btn.textContent = '✅';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Send'; }, 2000);
+    loadCRMComments(taskId);
+  } catch(e) {
+    btn.textContent = '❌';
+    setTimeout(() => { btn.disabled = false; btn.textContent = 'Send'; }, 2000);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ ONBOARDING ══
+// ══════════════════════════════════════════════════════════════
+function renderOnboarding() {
+  const list  = document.getElementById('obList');
+  const empty = document.getElementById('obEmpty');
+  if (!list) return;
+
+  const onboardingStatuses = ['onboarding', 'in onboarding', 'new client', 'setup', 'launching'];
+  const clients = clientMgmtAllTasks.filter(t => {
+    const s = (t.status || '').toLowerCase();
+    return onboardingStatuses.some(kw => s.includes(kw));
+  }).map(t => buildCMRecord(t));
+
+  const now = Date.now();
+  const adAccessMissing = clients.filter(r => !r.adAccountUrl).length;
+  const liveCount = clients.filter(r => {
+    const metaId = r.adAccountUrl ? String(r.adAccountUrl).match(/act[_=]?(\d+)/)?.[1] : null;
+    const mc = metaId && metaData?.clients ? metaData.clients.find(c => String(c.account_id) === metaId) : null;
+    return mc && mc.status === 'ACTIVE';
+  }).length;
+  const overdue = clients.filter(r => r.launchDate && r.launchDate < now && !liveCount).length;
+
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('obTotal', clients.length); el('obAccess', adAccessMissing);
+  el('obLive', liveCount); el('obOverdue', overdue);
+
+  if (!clients.length) { list.innerHTML = ''; empty.style.display = ''; return; }
+  empty.style.display = 'none';
+
+  list.innerHTML = clients.map(r => {
+    const metaId = r.adAccountUrl ? String(r.adAccountUrl).match(/act[_=]?(\d+)/)?.[1] : null;
+    const mc     = metaId && metaData?.clients ? metaData.clients.find(c => String(c.account_id) === metaId) : null;
+    const isLive = mc && mc.status === 'ACTIVE';
+
+    const checks = [
+      { label: 'ClickUp Record Created',    done: true },
+      { label: 'Ad Account Access',          done: !!r.adAccountUrl },
+      { label: 'Daily Budget Set',           done: !!r.dailyBudget },
+      { label: 'Offer / Niche Defined',      done: !!(r.offer && r.niche) },
+      { label: 'Ad Rules Documented',        done: !!r.adDosDonts },
+      { label: 'First Campaign Live',        done: isLive },
+    ];
+    const done  = checks.filter(c => c.done).length;
+    const pct   = Math.round(done / checks.length * 100);
+
+    return `<div style="background:#0f0f14;border:1px solid #1e1e1e;border-radius:10px;padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:#e0e0e0">${esc(r.taskName)}</div>
+          <div style="font-size:11px;color:#555;margin-top:2px">${r.launchDate ? 'Launch: ' + fmtDate(r.launchDate) : 'No launch date set'} ${r.contactName ? '· ' + esc(r.contactName) : ''}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:18px;font-weight:800;color:${pct===100?'#34d399':pct>50?'#fbbf24':'#f87171'}">${pct}%</div>
+          <div style="font-size:10px;color:#555">${done}/${checks.length} steps</div>
+        </div>
+      </div>
+      <div style="background:#1a1a1a;border-radius:4px;height:4px;margin-bottom:12px"><div style="background:${pct===100?'#34d399':pct>50?'#fbbf24':'#7c3aed'};height:4px;border-radius:4px;width:${pct}%"></div></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px;margin-bottom:10px">
+        ${checks.map(c => `<div style="font-size:12px;color:${c.done?'#34d399':'#555'}">${c.done?'✅':'⬜'} ${esc(c.label)}</div>`).join('')}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${r.taskUrl ? `<a class="dmc-link-btn cu" href="${esc(r.taskUrl)}" target="_blank" style="font-size:11px">📋 ClickUp</a>` : ''}
+        ${r.phone   ? `<a class="dmc-link-btn" href="tel:${esc(r.phone)}" style="font-size:11px">📞 Call</a>` : ''}
+        <button class="dmc-link-btn" style="font-size:11px" onclick="showGHLPrompt('${esc(r.taskName).replace(/'/g,"\\'")}','${esc(r.niche||'').replace(/'/g,"\\'")}','${esc(r.offer||'').replace(/'/g,"\\'")}')">🤖 GHL Setup Prompt</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showGHLPrompt(name, niche, offer) {
+  const prompt = `You are a GoHighLevel setup expert. Set up a complete GHL sub-account for a new medspa client.
+
+CLIENT: ${name}
+NICHE: ${niche || 'Medspa / Medical Spa'}
+OFFER: ${offer || 'Not specified'}
+
+Please build out the following in GoHighLevel:
+1. Sub-account creation with correct timezone and business info
+2. Pipeline stages: New Lead → Contacted → Appointment Set → Showed → Sold → Active Client
+3. Automated SMS sequence (immediate, 2hr, 24hr, 3-day follow-up)
+4. Email nurture sequence (welcome + 3 follow-ups)
+5. Appointment booking calendar setup
+6. Lead form connected to pipeline
+7. Missed call text-back automation
+8. Review request automation (post-appointment)
+9. Tag structure: new-lead, appointment-set, showed, no-show, closed, active
+10. Reporting dashboard
+
+Output each step with the exact GHL settings and configuration needed.`;
+
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(`<html><body style="background:#0a0a0a;color:#e0e0e0;font-family:monospace;padding:20px;white-space:pre-wrap">${esc(prompt)}<br><br><button onclick="navigator.clipboard.writeText(document.body.innerText.replace(this.textContent,'').trim()).then(()=>this.textContent='Copied!')" style="background:#7c3aed;color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;margin-top:12px">Copy to Clipboard</button></body></html>`);
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ WATCHDOG ══
+// ══════════════════════════════════════════════════════════════
+function renderWatchdog() {
+  const alertsEl  = document.getElementById('wdAlerts');
+  const allClear  = document.getElementById('wdAllClear');
+  if (!alertsEl) return;
+
+  const now = Date.now();
+  const alerts = [];
+
+  // Cross-reference Meta accounts with CRM data
+  if (metaData?.clients) {
+    metaData.clients.forEach(c => {
+      if (c.status !== 'ACTIVE') return;
+      const d7    = c.stats?.d7 || {};
+      const spend = d7.spend || 0;
+      const leads = d7.leads || 0;
+      const cpl   = d7.cost_per_lead || 0;
+      const cm    = clientMgmtData?.[c.account_id] || null;
+
+      if (spend > 50 && leads === 0) {
+        alerts.push({ level: 'critical', icon: '🔥', title: esc(c.account_name || c.name), msg: `Spent ${fmtCur(spend)} in 7 days with 0 leads`, action: 'Check ad sets — budget burning with no conversions' });
+      }
+      if (cpl > 300 && leads > 0) {
+        alerts.push({ level: 'critical', icon: '🔥', title: esc(c.account_name || c.name), msg: `CPL at ${fmtCur(cpl)} — extremely high`, action: 'Pause underperformers immediately, test new creative' });
+      }
+      if (cm?.refundNeeded) {
+        alerts.push({ level: 'critical', icon: '🚨', title: esc(c.account_name || c.name), msg: 'Refund requested by client', action: 'Escalate immediately — contact client today' });
+      }
+      if (cm && (cm.clientHappiness || '').toLowerCase() === 'unhappy' && !cm.refundNeeded) {
+        alerts.push({ level: 'warning', icon: '😟', title: esc(c.account_name || c.name), msg: 'Client marked as Unhappy', action: 'Schedule check-in call, review performance together' });
+      }
+      if (cm?.lastOptimized) {
+        const daysSince = Math.floor((now - Number(cm.lastOptimized)) / 86400000);
+        if (daysSince > 7) {
+          alerts.push({ level: 'warning', icon: '⏰', title: esc(c.account_name || c.name), msg: `No optimization in ${daysSince} days`, action: 'Review and optimize ad sets today' });
+        }
+      }
+      if (cm?.renewalDate) {
+        const daysLeft = Math.ceil((Number(cm.renewalDate) - now) / 86400000);
+        if (daysLeft >= 0 && daysLeft <= 14) {
+          alerts.push({ level: 'renewal', icon: '📅', title: esc(c.account_name || c.name), msg: `Renewal in ${daysLeft} day${daysLeft===1?'':'s'}`, action: 'Confirm renewal, prepare performance report' });
+        } else if (daysLeft < 0) {
+          alerts.push({ level: 'critical', icon: '⚠️', title: esc(c.account_name || c.name), msg: `Agreement expired ${Math.abs(daysLeft)} days ago`, action: 'Contact client immediately to renew or offboard' });
+        }
+      }
+    });
+  }
+
+  // Non-Meta CRM alerts (clients without Meta accounts)
+  clientMgmtAllTasks.forEach(t => {
+    const r = buildCMRecord(t);
+    if (r.renewalDate) {
+      const daysLeft = Math.ceil((r.renewalDate - now) / 86400000);
+      if (daysLeft >= 0 && daysLeft <= 14) {
+        const alreadyCovered = alerts.some(a => a.title === esc(r.taskName) && a.icon === '📅');
+        if (!alreadyCovered) alerts.push({ level: 'renewal', icon: '📅', title: esc(r.taskName), msg: `Renewal in ${daysLeft} day${daysLeft===1?'':'s'}`, action: 'Confirm renewal, prepare performance report' });
+      }
+    }
+  });
+
+  const critical = alerts.filter(a => a.level === 'critical');
+  const warning  = alerts.filter(a => a.level === 'warning');
+  const renewal  = alerts.filter(a => a.level === 'renewal');
+  const healthy  = (metaData?.clients?.filter(c => c.status === 'ACTIVE').length || 0) - critical.length;
+
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('wdCritical', critical.length); el('wdWarning', warning.length);
+  el('wdRenewal', renewal.length);   el('wdHealthy', Math.max(0, healthy));
+
+  if (!alerts.length) {
+    alertsEl.innerHTML = '';
+    allClear.style.display = '';
+    return;
+  }
+  allClear.style.display = 'none';
+
+  const levelOrder = { critical: 0, renewal: 1, warning: 2 };
+  alerts.sort((a, b) => (levelOrder[a.level] || 3) - (levelOrder[b.level] || 3));
+
+  alertsEl.innerHTML = alerts.map(a => {
+    const color = a.level === 'critical' ? '#f87171' : a.level === 'renewal' ? '#fbbf24' : '#fb923c';
+    return `<div style="background:#0f0f14;border:1px solid ${color}33;border-left:3px solid ${color};border-radius:8px;padding:12px 14px;display:flex;align-items:flex-start;gap:12px">
+      <span style="font-size:20px;line-height:1;flex-shrink:0">${a.icon}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:700;color:#e0e0e0;margin-bottom:2px">${a.title}</div>
+        <div style="font-size:12px;color:${color};margin-bottom:4px">${a.msg}</div>
+        <div style="font-size:11px;color:#666">→ ${a.action}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ TECH TICKETS ══
+// ══════════════════════════════════════════════════════════════
+function renderTech() {
+  const board = document.getElementById('techBoard');
+  const empty = document.getElementById('techEmpty');
+  if (!board) return;
+
+  const cfg = getCfg();
+  if (!techData || !techData.tasks) {
+    board.innerHTML = '';
+    empty.style.display = '';
+    if (techData?.pulled_at) document.getElementById('techUpdated').textContent = 'Synced: ' + fmtTime(techData.pulled_at);
+    return;
+  }
+  empty.style.display = 'none';
+
+  const search = (document.getElementById('techSearch')?.value || '').toLowerCase();
+  let tasks = techData.tasks.filter(t => !search || (t.name||'').toLowerCase().includes(search));
+
+  const statusMap = s => {
+    const v = (s||'').toLowerCase();
+    if (v.includes('done') || v.includes('complete')) return 'done';
+    if (v.includes('approval') || v.includes('review')) return 'approval';
+    if (v.includes('progress') || v.includes('working')) return 'inprogress';
+    if (v.includes('wait')) return 'waiting';
+    return 'todo';
+  };
+
+  const groups = { todo: [], inprogress: [], approval: [], waiting: [], done: [] };
+  tasks.forEach(t => { const g = statusMap(t.status?.status); groups[g].push(t); });
+
+  const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  el('techTotal', tasks.length);
+  el('techTodo', groups.todo.length);
+  el('techWorking', groups.inprogress.length + groups.waiting.length);
+  el('techApproval', groups.approval.length);
+  el('techDone', groups.done.length);
+  if (techData.pulled_at) { const e = document.getElementById('techUpdated'); if (e) e.textContent = 'Synced: ' + fmtTime(techData.pulled_at); }
+
+  const groupOrder = [
+    { key: 'approval',  label: '👀 Needs Approval', color: '#fb923c' },
+    { key: 'inprogress',label: '⚡ In Progress',    color: '#3b82f6' },
+    { key: 'waiting',   label: '⏳ Waiting On',     color: '#fbbf24' },
+    { key: 'todo',      label: '📋 To Do',          color: '#888' },
+    { key: 'done',      label: '✅ Done',           color: '#34d399' },
+  ];
+
+  board.innerHTML = groupOrder.filter(g => groups[g.key].length > 0).map(g =>
+    `<div style="margin-bottom:20px">
+      <div class="section-title" style="color:${g.color};margin-bottom:8px">${g.label} <span style="color:#555;font-size:11px">(${groups[g.key].length})</span></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${groups[g.key].map(t => {
+          const due = t.due_date ? fmtDate(Number(t.due_date)) : null;
+          const assignees = (t.assignees || []).map(a => a.username || a.email || '').filter(Boolean).join(', ');
+          const prio = t.priority?.priority;
+          const prioClass = prio === 'urgent' ? 'kb-red' : prio === 'high' ? 'kb-orange' : 'kb-gray';
+          return `<div style="background:#0f0f14;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;color:#e0e0e0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.name)}</div>
+              ${assignees ? `<div style="font-size:11px;color:#555;margin-top:2px">${esc(assignees)}</div>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+              ${prio && prio !== 'normal' ? `<span class="kbadge ${prioClass}">${esc(prio)}</span>` : ''}
+              ${due ? `<span style="font-size:11px;color:#555">${esc(due)}</span>` : ''}
+              ${t.url ? `<a class="dmc-link-btn cu" href="${esc(t.url)}" target="_blank" style="font-size:11px">↗</a>` : ''}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ CREATIVE INTEL ══
+// ══════════════════════════════════════════════════════════════
+function renderCreativeIntel() {
+  const sel = document.getElementById('ciClient');
+  if (!sel) return;
+  const current = sel.value;
+  // Repopulate client dropdown from CRM data
+  const clients = clientMgmtAllTasks.map(t => buildCMRecord(t)).sort((a,b) => (a.taskName||'').localeCompare(b.taskName||''));
+  sel.innerHTML = '<option value="">— Select a client —</option>' +
+    clients.map(r => `<option value="${esc(r.taskId)}" ${r.taskId === current ? 'selected' : ''}>${esc(r.taskName)}</option>`).join('');
+  if (current) ciLoadClient();
+}
+
+function ciSelectClient(taskId) {
+  const sel = document.getElementById('ciClient');
+  if (sel) { sel.value = taskId; ciLoadClient(); }
+}
+
+function ciLoadClient() {
+  const taskId   = document.getElementById('ciClient')?.value;
+  const snapshot = document.getElementById('ciClientSnapshot');
+  if (!snapshot) return;
+  if (!taskId) { snapshot.style.display = 'none'; return; }
+
+  const rec = clientMgmtAllTasks.map(t => buildCMRecord(t)).find(r => r.taskId === taskId);
+  if (!rec) { snapshot.style.display = 'none'; return; }
+
+  const metaId = rec.adAccountUrl ? String(rec.adAccountUrl).match(/act[_=]?(\d+)/)?.[1] : null;
+  const mc     = metaId && metaData?.clients ? metaData.clients.find(c => String(c.account_id) === metaId) : null;
+  const d7     = mc?.stats?.d7 || {};
+  const thr    = getCPLThresholds();
+
+  snapshot.style.display = '';
+  snapshot.innerHTML = [
+    rec.niche        ? `<b style="color:#aaa">Niche:</b> ${esc(rec.niche)}` : null,
+    rec.offer        ? `<b style="color:#aaa">Offer:</b> ${esc(rec.offer)}` : null,
+    mc               ? `<b style="color:#aaa">7d CPL:</b> <span style="color:${(d7.cost_per_lead||0)>thr.watch?'#f87171':'#34d399'}">${d7.cost_per_lead ? '$'+Math.round(d7.cost_per_lead) : 'N/A'}</span>` : null,
+    mc               ? `<b style="color:#aaa">7d Leads:</b> ${d7.leads||0}` : null,
+    mc               ? `<b style="color:#aaa">7d Spend:</b> ${fmtCur(d7.spend||0)}` : null,
+    rec.clientHappiness ? `<b style="color:#aaa">Happiness:</b> ${esc(rec.clientHappiness)}` : null,
+    rec.adDosDonts   ? `<b style="color:#aaa">Ad Rules:</b> ${esc((rec.adDosDonts||'').slice(0,120))}${(rec.adDosDonts||'').length>120?'…':''}` : null,
+  ].filter(Boolean).join('&nbsp;&nbsp;·&nbsp;&nbsp;');
+}
+
+function generateCreativePrompt() {
+  const taskId   = document.getElementById('ciClient')?.value;
+  const type     = document.getElementById('ciType')?.value;
+  const platform = document.getElementById('ciPlatform')?.value;
+  const goal     = document.getElementById('ciGoal')?.value;
+  const context  = document.getElementById('ciContext')?.value?.trim() || '';
+  const output   = document.getElementById('ciOutput');
+  const copyBtn  = document.getElementById('ciCopyBtn');
+  if (!output) return;
+
+  if (!taskId) { output.textContent = 'Please select a client first.'; return; }
+
+  const rec = clientMgmtAllTasks.map(t => buildCMRecord(t)).find(r => r.taskId === taskId);
+  if (!rec) { output.textContent = 'Client data not found.'; return; }
+
+  const metaId = rec.adAccountUrl ? String(rec.adAccountUrl).match(/act[_=]?(\d+)/)?.[1] : null;
+  const mc     = metaId && metaData?.clients ? metaData.clients.find(c => String(c.account_id) === metaId) : null;
+  const d7     = mc?.stats?.d7 || {};
+
+  const typeLabels    = { lead_gen:'Lead Generation', retargeting:'Retargeting', scale:'Scale a Winner', awareness:'Brand Awareness', reactivate:'Reactivate Old Leads' };
+  const platformLabels= { facebook_instagram:'Facebook + Instagram', facebook:'Facebook only', instagram:'Instagram only' };
+  const goalLabels    = { reduce_cpl:'Reduce CPL', volume:'Maximize Lead Volume', quality:'Higher Quality Leads', reactivate:'Reactivate Old Leads', upsell:'Upsell / Retention' };
+
+  const prompt = `You are an expert Meta Ads copywriter specializing in medspa and medical spa marketing. Your job is to write high-converting ad copy for a real client campaign.
+
+══ CLIENT BRIEF ══
+Client: ${rec.taskName}
+Niche: ${rec.niche || 'Medspa / Medical Spa'}
+Offer: ${rec.offer || 'Not specified'}
+Campaign Type: ${typeLabels[type] || type}
+Platform: ${platformLabels[platform] || platform}
+Goal: ${goalLabels[goal] || goal}
+
+══ PERFORMANCE CONTEXT ══
+${mc ? `• 7-Day Spend: ${fmtCur(d7.spend||0)}
+• 7-Day Leads: ${d7.leads||0}
+• 7-Day CPL: ${d7.cost_per_lead ? '$'+Math.round(d7.cost_per_lead) : 'No data'}
+• Account Status: ${mc.status}` : '• No Meta performance data linked yet — base copy on niche/offer alone'}
+• Client Happiness: ${rec.clientHappiness || 'Not specified'}
+
+══ AD RULES (MUST FOLLOW) ══
+${rec.adDosDonts || 'No specific rules set. Use general medspa best practices.'}
+
+══ ADDITIONAL CONTEXT ══
+${context || 'None provided.'}
+
+══ YOUR TASK ══
+Write 3 distinct ad copy variations. For EACH variation provide:
+
+1. PRIMARY TEXT (150 words max) — the main body of the ad
+2. HEADLINE (40 characters max) — punchy, benefit-driven
+3. DESCRIPTION (25 characters max) — supporting line
+4. HOOK STRATEGY — 1 sentence explaining why this angle should convert
+
+Make each variation use a different psychological angle (e.g., fear of missing out, social proof, direct offer, story-led, curiosity). All copy must feel authentic for a ${rec.niche || 'medspa'} — never generic.`;
+
+  output.textContent = prompt;
+  if (copyBtn) copyBtn.style.display = '';
+}
+
+function ciCopyPrompt() {
+  const output  = document.getElementById('ciOutput');
+  const copyBtn = document.getElementById('ciCopyBtn');
+  if (!output) return;
+  navigator.clipboard.writeText(output.textContent).then(() => {
+    if (copyBtn) { copyBtn.textContent = '✅ Copied!'; setTimeout(() => { copyBtn.textContent = 'Copy Prompt'; }, 2000); }
+  });
 }
 
 // ══════════════════════════════════════════════════════════════
