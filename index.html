@@ -1109,6 +1109,124 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 // ══════════════════════════════════════════════════════════════
 const BASE = 'https://raw.githubusercontent.com/Artzy22/servedia-ops/main/data';
 const CU_API = 'https://api.clickup.com/api/v2';
+
+// ══════════════════════════════════════════════════════════════
+// T4 ACTION QUEUE — audit snapshot 2026-04-14
+// ══════════════════════════════════════════════════════════════
+const T4_ACTIONS = [
+  {
+    id: 'fire-1',
+    label: 'Video queue — 29 tasks blocked on approval',
+    severity: 'critical',
+    type: 'bulk_comment',
+    taskIds: ['86c955edb','86c94aygp','86c94buv2','86c94caw5','86c94fg9e','86c93k20n','86c91gfy4','86c91gnfk','86c8x1wyn','86c8vp44z','86c8tvv3q','86c8tw0ea','86c8trve9','86c94df4a','86c9060q3','86c8zgxmn','86c8zgxxc','86c8xzu7q','86c8vn4p1','86c8vp6p7','86c8trn2r','86c8pmwb3','86c8rxwa5','86c8my5gt','86c8vp9gm','86c8rbpp4','86c90tff2','86c8zgz4d','86c8pbacx'],
+    confirmText: 'Post comment on all 29 video tasks flagging the approval bottleneck?',
+    commentText: '[T4 Audit 2026-04-14] Video queue blocked — this task is 1 of 29 stuck at needs-approval. Escalating approval bottleneck to team lead for immediate unblock.'
+  },
+  {
+    id: 'fire-2',
+    label: 'Thorpe Wellness 2.0 — Meta 403 error + onboarding overdue',
+    severity: 'critical',
+    type: 'comment',
+    taskId: '86c8uee2j',
+    confirmText: 'Post comment on Thorpe Wellness onboarding task?',
+    commentText: '[T4 Audit 2026-04-14] CRITICAL: Meta API returning HTTP 403 Forbidden — ad account access has been lost. Needs immediate Business Manager audit. Also 16 days past due on post-onboarding call.'
+  },
+  {
+    id: 'fire-3',
+    label: 'Ideal Weightloss — $919 spent, 0 leads (30 days)',
+    severity: 'critical',
+    type: 'create_task',
+    listId: '901515083916',
+    confirmText: 'Create ClickUp task: "Audit Ideal Weightloss — 0 leads / $919 spend"?',
+    payload: {
+      name: 'Audit Ideal Weightloss — 0 leads / $919 spend',
+      description: '[T4 Audit 2026-04-14] Account spent $919.63 over 30 days with 0 leads generated. 7-day spend $137.26 also 0 leads. CTR 1.69% below portfolio average. Recommend pause pending creative/offer audit.',
+      priority: 1
+    }
+  },
+  {
+    id: 'fire-4',
+    label: 'Delray Laser — launch ready for 34 days, never launched',
+    severity: 'critical',
+    type: 'comment',
+    taskId: '86c7g0uke',
+    confirmText: 'Post comment on Delray Laser task flagging 34-day stall?',
+    commentText: '[T4 Audit 2026-04-14] CRITICAL: Task has been "launch ready" for 34 days with no action (due 2026-03-11). Launch immediately or document hold reason by EOD today. Tagging: Julianne Navarro, Felipe Guimaraes.'
+  },
+  {
+    id: 'fire-5',
+    label: 'About Face & Body MedSpa — 47 days stuck, waiting on client',
+    severity: 'high',
+    type: 'comment',
+    taskId: '86c6wyvym',
+    confirmText: 'Post comment on About Face & Body task for final outreach?',
+    commentText: '[T4 Audit 2026-04-14] HIGH: 47 days stuck at "waiting on client" (due 2026-02-26). Final outreach required within 48 hours or reclassify as ghosting/churned. Tagging: Autumn Ismirnioglou, Felipe Guimaraes.'
+  },
+  {
+    id: 'fire-6',
+    label: 'Body Slim WLC — CPL $69–81, highest spend account',
+    severity: 'high',
+    type: 'create_task',
+    listId: '901515083916',
+    confirmText: 'Create ClickUp task: "Body Slim WLC — CPL Audit ($69–81)"?',
+    payload: {
+      name: 'Body Slim WLC — CPL Audit ($69–81)',
+      description: '[T4 Audit 2026-04-14] CPL: $69.37 (7d) / $81.18 (30d). Highest spend account at $4,231/week and $14,693/month. CPM $42.38 above portfolio average. CTR 2.13% below average. Creative refresh and audience expansion audit required.',
+      priority: 2
+    }
+  },
+  {
+    id: 'fire-7',
+    label: 'Servedia B2B — $101 CPL on $23k/month spend',
+    severity: 'high',
+    type: 'create_task',
+    listId: '901515083916',
+    confirmText: 'Create ClickUp task: "Servedia B2B CHF — CPL Audit ($101)"?',
+    payload: {
+      name: 'Servedia B2B CHF — CPL Audit ($101)',
+      description: '[T4 Audit 2026-04-14] Internal B2B account: $6,068 this week at $101.13 CPL. 30-day: $23,377 at $89.23 CPL. CTR 0.38%. Review offer and landing page conversion, verify lead quality definition.',
+      priority: 2
+    }
+  },
+  {
+    id: 'fire-8',
+    label: '4 orphaned new sign-ups — unassigned, no due date',
+    severity: 'high',
+    type: 'bulk_comment',
+    taskIds: ['86c95u3h0','86c93targ','86c93kmfu','86c93hccm'],
+    confirmText: 'Post comment on 4 orphaned new sign-up tasks to flag for assignment?',
+    commentText: '[T4 Audit 2026-04-14] HIGH: This client has no assignee and no due date set. Requires immediate triage and assignment by Felipe Guimaraes. Due date target: 2026-04-16.'
+  },
+  {
+    id: 'fire-9',
+    label: 'The MAC OKC — 0 leads this week, $498 spent',
+    severity: 'medium',
+    type: 'create_task',
+    listId: '901515083916',
+    confirmText: 'Create ClickUp task: "The MAC OKC — 24hr Monitor Flag"?',
+    payload: {
+      name: 'The MAC OKC — 24hr Monitor Flag (0 leads / $498 this week)',
+      description: '[T4 Audit 2026-04-14] Account spent $498.52 this week with 0 leads. Last 30 days: $52.91 CPL on 60 leads — performance has degraded sharply. Media buyer to review campaign delivery by 2026-04-15 EOD.',
+      priority: 3
+    }
+  },
+  {
+    id: 'fire-10',
+    label: '5 accounts went dark — verify pause intent',
+    severity: 'medium',
+    type: 'create_task',
+    listId: '901515083916',
+    confirmText: 'Create ClickUp task: "Verify 5 Dark Accounts — Pause Intent Check"?',
+    payload: {
+      name: 'Verify 5 Dark Accounts — Pause Intent Check',
+      description: '[T4 Audit 2026-04-14] 5 accounts show no data this week but had activity last 30 days: Luminous Laser ($18.75 CPL, 36 leads), MLA Ad Account ($80.48 CPL, 8 leads), Skinholic 2025, Cosmetic Surgery of NY, Dr. Michelle Zubair. Confirm whether pauses are intentional before taking action.',
+      priority: 3
+    }
+  }
+];
+
+const t4Executed = new Map(); // actionId → { state: 'idle'|'confirming'|'executing'|'done'|'error', msg?: string }
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
