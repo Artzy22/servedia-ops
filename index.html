@@ -496,6 +496,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div class="topbar-right">
     <span class="topbar-sync" id="syncInfo">Loading...</span>
+    <button class="topbar-btn" onclick="syncMetaNow()" id="metaSyncBtn" title="Fetch live Meta data now" style="display:none">⟳ Meta</button>
     <button class="topbar-btn" onclick="openSettings()">⚙ Settings</button>
   </div>
 </div>
@@ -1050,6 +1051,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <hr class="msep">
     <div class="mfield">
+      <label class="mlabel">Meta Access Token <span style="color:#34d399;font-size:10px">— enables Live Meta sync (bypasses 30-min GitHub Actions delay)</span></label>
+      <input class="minput" id="cfMetaAccessToken" type="password" placeholder="EAAxxxxxxxxxxxxx...">
+      <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+        <div class="mhint" style="margin:0;flex:1">Your long-lived User Access Token from Meta for Developers → Tools → Graph API Explorer. Same token used in the META_ACCESS_TOKEN GitHub Secret. Stored in localStorage only.</div>
+        <button class="cpl-save" style="white-space:nowrap;padding:5px 12px;font-size:11px" onclick="closeSettings();syncMetaNow()">⟳ Sync Now</button>
+      </div>
+    </div>
+    <div class="mfield">
       <label class="mlabel">Meta App ID <span style="color:#3b82f6;font-size:10px">— Meta Business API credentials</span></label>
       <input class="minput" id="cfMetaAppId" placeholder="e.g. 1234567890123456">
       <div class="mhint">Found in Meta for Developers → Your App → App ID. Used to authenticate Meta Ads API requests.</div>
@@ -1102,6 +1111,145 @@ const CLIENT_RULES = [
 const BUDGETS = { 'rebalance': 150, 'celebrity body sculpting': 60, 'ra sculpt': 70 };
 
 // ══════════════════════════════════════════════════════════════
+// META DATA NORMALIZER
+// Transforms raw meta.json OR live Graph API response into a
+// consistent internal shape so all render functions work with
+// both cached JSON and live-fetched data identically.
+// ══════════════════════════════════════════════════════════════
+function normalizeMetaData() {
+  if (!metaData || !Array.isArray(metaData.clients)) return;
+  metaData.clients = metaData.clients.map(c => {
+    // Normalize status to uppercase so all === 'ACTIVE' checks work
+    const status = (c.status || '').toUpperCase();
+    // Accept both last_7_days (JSON file) and stats.d7 (legacy) shapes
+    const d7  = c.last_7_days  || c.stats?.d7  || {};
+    const d30 = c.last_30_days || c.stats?.d30 || {};
+    // Extract leads from actions array (live API shape) or direct field (JSON shape)
+    const extractLeads = (row) => {
+      if (typeof row.leads === 'number') return row.leads;
+      for (const a of (row.actions || [])) { if (a.action_type === 'lead') return parseInt(a.value || 0); }
+      return 0;
+    };
+    const extractCPL = (row) => {
+      if (typeof row.cost_per_lead === 'number') return row.cost_per_lead;
+      for (const a of (row.cost_per_action_type || [])) { if (a.action_type === 'lead') return parseFloat(a.value || 0); }
+      return 0;
+    };
+    const norm7  = { spend: parseFloat(d7.spend  || 0), impressions: parseInt(d7.impressions || 0), clicks: parseInt(d7.clicks || 0), cpc: parseFloat(d7.cpc || 0), cpm: parseFloat(d7.cpm || 0), ctr: parseFloat(d7.ctr || 0), reach: parseInt(d7.reach || 0), leads: extractLeads(d7), cost_per_lead: extractCPL(d7) };
+    const norm30 = { spend: parseFloat(d30.spend || 0), impressions: parseInt(d30.impressions || 0), clicks: parseInt(d30.clicks || 0), cpc: parseFloat(d30.cpc || 0), cpm: parseFloat(d30.cpm || 0), ctr: parseFloat(d30.ctr || 0), reach: parseInt(d30.reach || 0), leads: extractLeads(d30), cost_per_lead: extractCPL(d30) };
+    return {
+      ...c,
+      account_name: c.account_name || c.name || '',
+      status,
+      last_7_days:  norm7,
+      last_30_days: norm30,
+      stats: { d7: norm7, d30: norm30 },  // legacy path — renderCommandCenter uses this
+    };
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// META LIVE FETCH — calls Graph API directly from browser
+// Uses batch requests: 37 accounts × 2 periods = 2 batch calls
+// ══════════════════════════════════════════════════════════════
+const META_GRAPH = 'https://graph.facebook.com/v19.0';
+
+async function fetchMetaLive() {
+  const token = localStorage.getItem('meta_access_token') || '';
+  if (!token) return null;
+
+  const syncEl = document.getElementById('syncInfo');
+  if (syncEl) syncEl.innerHTML = '<b>Last sync</b><br><span style="color:#a78bfa">⟳ Meta live…</span>';
+
+  try {
+    // Step 1: discover all accessible ad accounts
+    const acctResp = await fetch(`${META_GRAPH}/me/adaccounts?fields=name,account_id,account_status&limit=200&access_token=${encodeURIComponent(token)}`);
+    if (!acctResp.ok) throw new Error('Meta accounts fetch failed: ' + acctResp.status);
+    const acctData = await acctResp.json();
+    if (acctData.error) throw new Error(acctData.error.message);
+    const accounts = acctData.data || [];
+    if (!accounts.length) return null;
+
+    // Step 2: build batch insight requests (50 per batch max)
+    const today   = new Date().toISOString().slice(0, 10);
+    const d7ago   = new Date(Date.now() - 7  * 86400000).toISOString().slice(0, 10);
+    const d30ago  = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+    const fields  = 'spend,impressions,clicks,cpc,cpm,ctr,reach,actions,cost_per_action_type';
+
+    const batchItems = [];
+    accounts.forEach(acc => {
+      const actId = acc.account_id; // already has act_ prefix from /me/adaccounts
+      const qry7  = `fields=${encodeURIComponent(fields)}&time_range=${encodeURIComponent(JSON.stringify({since:d7ago,  until:today}))}&level=account`;
+      const qry30 = `fields=${encodeURIComponent(fields)}&time_range=${encodeURIComponent(JSON.stringify({since:d30ago, until:today}))}&level=account`;
+      batchItems.push({ method: 'GET', relative_url: `${actId}/insights?${qry7}`,  name: `d7_${actId}` });
+      batchItems.push({ method: 'GET', relative_url: `${actId}/insights?${qry30}`, name: `d30_${actId}` });
+    });
+
+    // Split into chunks of 50
+    const chunks = [];
+    for (let i = 0; i < batchItems.length; i += 50) chunks.push(batchItems.slice(i, i + 50));
+
+    const batchResults = {};
+    for (const chunk of chunks) {
+      const body = new URLSearchParams({ access_token: token, batch: JSON.stringify(chunk) });
+      const resp = await fetch(META_GRAPH, { method: 'POST', body });
+      if (!resp.ok) throw new Error('Meta batch failed: ' + resp.status);
+      const results = await resp.json();
+      chunk.forEach((item, idx) => {
+        try { batchResults[item.name] = JSON.parse(results[idx]?.body || '{}'); } catch { batchResults[item.name] = {}; }
+      });
+    }
+
+    // Step 3: assemble into meta.json-compatible shape
+    const clients = accounts.map(acc => {
+      const actId  = acc.account_id;
+      const d7raw  = (batchResults[`d7_${actId}`]?.data  || [{}])[0] || {};
+      const d30raw = (batchResults[`d30_${actId}`]?.data || [{}])[0] || {};
+      const acctStatus = acc.account_status;
+      // account_status: 1=ACTIVE, 2=DISABLED, 3=UNSETTLED, 7=PENDING_RISK_REVIEW, 101=CLOSED
+      const status = acctStatus === 1 ? 'ACTIVE' : acctStatus === 2 ? 'DISABLED' : 'INACTIVE';
+      return {
+        account_id:   actId.replace(/^act_/, ''),
+        account_name: acc.name || '',
+        status,
+        last_7_days:  d7raw,
+        last_30_days: d30raw,
+      };
+    });
+
+    return {
+      clients,
+      total_accounts:      accounts.length,
+      accounts_with_data:  clients.filter(c => c.status === 'ACTIVE').length,
+      accounts_with_errors: 0,
+      errors: [],
+      pulled_at: new Date().toISOString(),
+      source: 'live',
+    };
+  } catch (e) {
+    console.error('fetchMetaLive error:', e);
+    return null;
+  }
+}
+
+async function syncMetaNow() {
+  const result = await fetchMetaLive();
+  if (result) {
+    metaData = result;
+    normalizeMetaData();
+    renderMeta();
+    renderMaintenance();
+    renderCommandCenter();
+    renderWatchdog();
+    updateNavBadges();
+    const t = new Date().toLocaleTimeString();
+    document.getElementById('syncInfo').innerHTML = `<b>Last sync</b><br><span style="color:#34d399">🟢 Live Meta</span> ${t}`;
+  } else {
+    document.getElementById('syncInfo').innerHTML = '<b>Last sync</b><br><span style="color:#f87171">⚠ Meta Error</span>';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════
 function getCfg() {
@@ -1112,6 +1260,7 @@ function getCfg() {
     tasksListId:       localStorage.getItem('cu_tasks_list') || '',
     clientMgmtListId:  localStorage.getItem('cu_client_mgmt_list') || '',
     ghPat:             localStorage.getItem('gh_pat') || '',
+    metaAccessToken:   localStorage.getItem('meta_access_token') || '',
     metaAppId:         localStorage.getItem('meta_app_id') || '',
     metaAppSecret:     localStorage.getItem('meta_app_secret') || '',
     techListId:        localStorage.getItem('cu_tech_list') || '',
@@ -1126,6 +1275,7 @@ function openSettings() {
   document.getElementById('cfTasksListId').value     = c.tasksListId;
   document.getElementById('cfClientMgmtListId').value = c.clientMgmtListId;
   document.getElementById('cfGhPat').value           = c.ghPat;
+  document.getElementById('cfMetaAccessToken').value = c.metaAccessToken;
   document.getElementById('cfMetaAppId').value       = c.metaAppId;
   document.getElementById('cfMetaAppSecret').value   = c.metaAppSecret;
   document.getElementById('cfTechListId').value      = c.techListId;
@@ -1145,10 +1295,13 @@ function saveSettings() {
   localStorage.setItem('cu_tasks_list',       document.getElementById('cfTasksListId').value.trim());
   localStorage.setItem('cu_client_mgmt_list', document.getElementById('cfClientMgmtListId').value.trim());
   localStorage.setItem('gh_pat',              document.getElementById('cfGhPat').value.trim());
+  localStorage.setItem('meta_access_token',    document.getElementById('cfMetaAccessToken').value.trim());
   localStorage.setItem('meta_app_id',         document.getElementById('cfMetaAppId').value.trim());
   localStorage.setItem('meta_app_secret',     document.getElementById('cfMetaAppSecret').value.trim());
   localStorage.setItem('cu_tech_list',        document.getElementById('cfTechListId').value.trim());
   localStorage.removeItem('cu_client_mgmt_cache'); // invalidate cache on save
+  const metaSyncBtn = document.getElementById('metaSyncBtn');
+  if (metaSyncBtn) metaSyncBtn.style.display = localStorage.getItem('meta_access_token') ? '' : 'none';
   document.getElementById('cfgStatus').textContent = '✓ Saved! Refreshing data...';
   setTimeout(() => { closeSettings(); loadAll(); }, 800);
 }
@@ -2789,7 +2942,7 @@ function renderCommandCenter() {
         if ((d7.cost_per_lead || 0) > 300) why.push(`<span class="kbadge kb-orange">CPL $${Math.round(d7.cost_per_lead)}</span>`);
         return `<div class="accard flagged" style="padding:14px">
           <div class="ac-header">
-            <div class="ac-name" title="${esc(c.name)}">${esc(c.name)}</div>
+            <div class="ac-name" title="${esc(c.account_name||c.name)}">${esc(c.account_name||c.name)}</div>
             <div style="display:flex;gap:4px;flex-wrap:wrap">${why.join('')}</div>
           </div>
           <div style="font-size:11px;color:#555">
@@ -2909,7 +3062,7 @@ async function loadAll() {
       fetchJ(`${BASE}/drive-folders.json?_=${ts}`),  // 2 — Drive folders
     ]);
 
-    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData  = staticFetches[0].value; renderMeta(); }
+    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData  = staticFetches[0].value; normalizeMetaData(); renderMeta(); }
     if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData    = staticFetches[1].value; renderSlack(); }
     if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData = staticFetches[2].value; }
 
@@ -4080,6 +4233,11 @@ document.addEventListener('DOMContentLoaded', () => {
   switchSection('command');
   renderTasks();   // show loading placeholder immediately
   renderVideo();   // show loading placeholder immediately
+  // Show ⟳ Meta button if token is saved
+  if (localStorage.getItem('meta_access_token')) {
+    const btn = document.getElementById('metaSyncBtn');
+    if (btn) btn.style.display = '';
+  }
   loadAll();
 });
 </script>
