@@ -937,6 +937,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     </div>
     <hr class="msep">
     <div class="mfield">
+      <label class="mlabel">Meta App ID <span style="color:#3b82f6;font-size:10px">— Meta Business API credentials</span></label>
+      <input class="minput" id="cfMetaAppId" placeholder="e.g. 1234567890123456">
+      <div class="mhint">Found in Meta for Developers → Your App → App ID. Used to authenticate Meta Ads API requests.</div>
+    </div>
+    <div class="mfield">
+      <label class="mlabel">Meta App Secret</label>
+      <input class="minput" id="cfMetaAppSecret" type="password" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="mhint">Found in Meta for Developers → Your App → App Secret. Stored in localStorage only, never sent anywhere except the Meta API.</div>
+    </div>
+    <hr class="msep">
+    <div class="mfield">
       <label class="mlabel">GitHub PAT (optional — for notes sync)</label>
       <input class="minput" id="cfGhPat" type="password" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
       <div class="mhint">Allows pushing notes to the GitHub repo. Requires repo write scope.</div>
@@ -986,6 +997,8 @@ function getCfg() {
     tasksListId:       localStorage.getItem('cu_tasks_list') || '',
     clientMgmtListId:  localStorage.getItem('cu_client_mgmt_list') || '',
     ghPat:             localStorage.getItem('gh_pat') || '',
+    metaAppId:         localStorage.getItem('meta_app_id') || '',
+    metaAppSecret:     localStorage.getItem('meta_app_secret') || '',
   };
 }
 
@@ -997,6 +1010,8 @@ function openSettings() {
   document.getElementById('cfTasksListId').value     = c.tasksListId;
   document.getElementById('cfClientMgmtListId').value = c.clientMgmtListId;
   document.getElementById('cfGhPat').value           = c.ghPat;
+  document.getElementById('cfMetaAppId').value       = c.metaAppId;
+  document.getElementById('cfMetaAppSecret').value   = c.metaAppSecret;
   document.getElementById('cfgStatus').textContent   = '';
   loadCPLSettings();
   document.getElementById('settingsModal').classList.add('open');
@@ -1013,6 +1028,8 @@ function saveSettings() {
   localStorage.setItem('cu_tasks_list',       document.getElementById('cfTasksListId').value.trim());
   localStorage.setItem('cu_client_mgmt_list', document.getElementById('cfClientMgmtListId').value.trim());
   localStorage.setItem('gh_pat',              document.getElementById('cfGhPat').value.trim());
+  localStorage.setItem('meta_app_id',         document.getElementById('cfMetaAppId').value.trim());
+  localStorage.setItem('meta_app_secret',     document.getElementById('cfMetaAppSecret').value.trim());
   localStorage.removeItem('cu_client_mgmt_cache'); // invalidate cache on save
   document.getElementById('cfgStatus').textContent = '✓ Saved! Refreshing data...';
   setTimeout(() => { closeSettings(); loadAll(); }, 800);
