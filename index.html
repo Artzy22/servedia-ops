@@ -96,6 +96,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .badge-billing{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;animation:ccPulse 1.8s ease-in-out infinite;white-space:nowrap;cursor:default}
 .badge-violation{background:#2a1a00;color:#f97316;border:1px solid #9a3412;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
 .badge-violation:hover{background:#3a2200}
+.health-score{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid currentColor;opacity:.9}
+.hs-green{color:#22c55e;background:rgba(34,197,94,.1)}
+.hs-yellow{color:#fbbf24;background:rgba(251,191,36,.1)}
+.hs-orange{color:#f97316;background:rgba(249,115,22,.1)}
+.hs-red{color:#ef4444;background:rgba(239,68,68,.1)}
 .ac-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .ac-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .st-active{background:#064e3b;color:#34d399}
@@ -1499,18 +1504,8 @@ function cplIsGreen(v) { return ['kb-great','kb-good'].includes(cplKls(v)); }
 
 // Composite urgency score — higher = more attention needed (used by "Needs Attention" sort)
 function sortScore(c) {
-  let s = 0;
-  const d7 = c.last_7_days || {};
-  const cpl = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
-  const tier = cplKls(cpl);
-  if (tier === 'kb-cut')        s += 100;
-  else if (tier === 'kb-watch') s += 60;
-  else if (tier === 'kb-ok')    s += 30;
-  if (c.payment_issue)                          s += 80;
-  if (c.violations && c.violations.length)      s += 50;
-  if (d7.leads === 0 && (d7.spend || 0) > 0)    s += 50;
-  else if (d7.leads > 0 && d7.leads < 7)        s += 25;
-  return s;
+  // Primary: invert health score (0–100 health → 0–100 urgency)
+  return 100 - calculateHealthScore(c);
 }
 
 function cpbKls(v) {
@@ -1806,6 +1801,63 @@ function buildSuggestions(cpl, cpb, leads7, client) {
   return tips;
 }
 
+// F11: Client health score — 0–100, higher = healthier
+function calculateHealthScore(c) {
+  let score = 100;
+  const d7    = c.last_7_days || {};
+  const cpl   = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
+  const leads = d7.leads || 0;
+  const spend = d7.spend  || 0;
+  const id    = String(c.account_id);
+
+  // CPL deductions (map to configurable tier classes)
+  if (cpl !== null) {
+    const tier = cplKls(cpl);
+    if      (tier === 'kb-cut')   score -= 40;
+    else if (tier === 'kb-watch') score -= 25;
+    else if (tier === 'kb-ok')    score -= 15;
+    else if (tier === 'kb-good')  score -= 5;
+  }
+
+  // Lead velocity: < 1/day over 7 days = <7 leads
+  if (spend > 0) {
+    const perDay = leads / 7;
+    if      (perDay < 0.5) score -= 30;
+    else if (perDay < 1)   score -= 20;
+  }
+
+  // Payment issue (F2 data)
+  const payMap = buildPaymentMap();
+  if (payMap[id]) score -= 40;
+
+  // Policy violations (F3 data)
+  const vioMap = buildViolationsMap();
+  if (vioMap[id]) score -= 15;
+
+  // Video tickets stuck in "Needs Approval" > 5 days — match by name
+  if (vidData) {
+    const name = (c.account_name || '').toLowerCase();
+    const approvalTasks = (vidData.tasks || []).filter(t => {
+      const s = (t.status || '').toLowerCase();
+      if (!s.includes('approval')) return false;
+      const client = (t.client_name || t.name || '').toLowerCase();
+      return client.includes(name.slice(0, 5)) || name.includes((client || '').slice(0, 5));
+    });
+    const now2 = Date.now();
+    const stale = approvalTasks.filter(t => t.date_updated && (now2 - Number(t.date_updated)) > 5 * 86400000);
+    if (stale.length > 0) score -= 10;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function healthScoreTierClass(score) {
+  if (score >= 80) return 'hs-green';
+  if (score >= 60) return 'hs-yellow';
+  if (score >= 40) return 'hs-orange';
+  return 'hs-red';
+}
+
 // F5: Per-account suggestions using target_cpl from client-map
 function buildMetaSuggestions(c, allClients) {
   const tips = [];
@@ -1975,6 +2027,11 @@ function renderMeta() {
     const billingBadge = payMap[id] ? `<span class="badge-billing" title="${esc(payMap[id].payment_status||'Billing issue detected')}">⛔ BILLING PAUSED</span>` : '';
     const violBadge    = vioMap[id] ? `<span class="badge-violation" onclick="openViolationsModal('${id}')" title="Click to view policy issues">${vioMap[id].violations.length} POLICY ISSUE${vioMap[id].violations.length !== 1 ? 'S' : ''}</span>` : '';
 
+    const hs     = calculateHealthScore(c);
+    const hsCls  = healthScoreTierClass(hs);
+    const hsTip  = hs >= 80 ? 'Healthy' : hs >= 60 ? 'Needs Monitoring' : hs >= 40 ? 'At Risk' : 'Critical';
+    const hsBadge = `<div class="health-score ${hsCls}" title="Health Score: ${hs}/100 — ${hsTip}">${hs}</div>`;
+
     const metaSuggTips = buildMetaSuggestions(c, list);
     const metaSuggHtml = `<div class="dmc-sugg" style="margin-top:10px;margin-bottom:0">
       <div class="dmc-sugg-title">💡 AI Suggestions</div>
@@ -1986,6 +2043,7 @@ function renderMeta() {
         <div class="ac-name" title="${nameE}">${nameE}</div>
         ${billingBadge}${violBadge}
         <span class="ac-status ${active?'st-active':'st-nodata'}">${active?'Active':'No Data'}</span>
+        ${hsBadge}
       </div>
       <div class="mtabs" id="mt-${id}">
         <button class="mtab-btn active" onclick="switchMT(this)" data-id="${id}" data-p="7d">7 Days</button>
