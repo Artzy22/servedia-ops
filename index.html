@@ -1773,8 +1773,6 @@ function switchSection(section) {
   if (section === 'creative') renderCreativeIntel();
 }
 
-// Alias — keeps any remaining internal switchTab() calls working
-function switchTab(tab) { switchSection(tab); }
 
 // ══════════════════════════════════════════════════════════════
 // ══ META ADS ══
@@ -3269,7 +3267,7 @@ function renderRetention() {
       <div class="ret-actions">
         ${rec.taskUrl ? `<a class="dmc-link-btn cu" href="${esc(rec.taskUrl)}" target="_blank" style="font-size:11px">📋 ClickUp</a>` : ''}
         ${rec.phone   ? `<a class="dmc-link-btn" href="tel:${esc(rec.phone)}" style="font-size:11px">📞 Call</a>` : ''}
-        <a class="dmc-link-btn" href="#" style="font-size:11px" onclick="switchTab('maintenance');document.getElementById('dmSearch').value='${esc(rec.taskName).replace(/'/g,"\\'")}';renderMaintenance();return false;">→ Maintenance</a>
+        <a class="dmc-link-btn" href="#" style="font-size:11px" onclick="switchSection('maintenance');document.getElementById('dmSearch').value='${esc(rec.taskName).replace(/'/g,"\\'")}';renderMaintenance();return false;">→ Maintenance</a>
       </div>
     </div>`;
   }
