@@ -1,0 +1,124 @@
+name: Slack Task Detector
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # Every 30 min (runs after sync-slack)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Scan Slack messages for urgent keywords
+        run: |
+          python3 << 'PYEOF'
+          import json, re, os
+          from datetime import datetime, timezone
+
+          URGENT_KEYWORDS = [
+              'urgent', 'revision', 'fix', 'redo', 'asap', 'please fix',
+              'reblast', 're-blast', 'remake', 'wrong', 'incorrect',
+              'not right', 'change this', 'fix this', 'need changes',
+          ]
+
+          CLICKUP_URL_PATTERN = re.compile(r'app\.clickup\.com/t/\S+', re.I)
+
+          # Channel → default assignee
+          CHANNEL_ASSIGNEES = {
+              'video-editing': 'Saquib',
+              'video':         'Saquib',
+              'media-ads':     'Byron / Anca',
+              'media':         'Byron / Anca',
+          }
+
+          def get_assignee(channel_name):
+              cn = (channel_name or '').lower()
+              for key, name in CHANNEL_ASSIGNEES.items():
+                  if key in cn:
+                      return name
+              return 'Byron'
+
+          def find_keywords(text):
+              tl = text.lower()
+              return [kw for kw in URGENT_KEYWORDS if kw in tl]
+
+          try:
+              with open('data/slack.json') as f:
+                  slack = json.load(f)
+          except (FileNotFoundError, json.JSONDecodeError):
+              slack = {}
+
+          messages = slack.get('messages', [])
+
+          # Load existing flagged file to preserve task_created flags
+          existing_flags = {}
+          try:
+              with open('data/slack-flagged.json') as f:
+                  old = json.load(f)
+              for m in old.get('flagged', []):
+                  key = m.get('channel','') + '|' + m.get('ts','')
+                  existing_flags[key] = m.get('task_created', False)
+          except (FileNotFoundError, json.JSONDecodeError):
+              pass
+
+          flagged = []
+          for msg in messages:
+              text    = msg.get('text', '')
+              channel = msg.get('channel', '')
+              ts      = msg.get('ts', '')
+              user    = msg.get('user', '')
+
+              keywords = find_keywords(text)
+              has_cu_url = bool(CLICKUP_URL_PATTERN.search(text))
+
+              # Flag if: has urgent keyword OR (has ClickUp URL and question mark)
+              is_urgent = bool(keywords) or (has_cu_url and '?' in text)
+              is_question = text.strip().endswith('?') and not is_urgent
+
+              if not (is_urgent or is_question):
+                  continue
+
+              key = channel + '|' + ts
+              flagged.append({
+                  'id':             key,
+                  'channel':        channel,
+                  'sender':         user,
+                  'text':           text[:500],
+                  'ts':             ts,
+                  'ts_iso':         msg.get('ts_iso', ''),
+                  'keywords_found': keywords,
+                  'has_cu_url':     has_cu_url,
+                  'type':           'urgent' if is_urgent else 'question',
+                  'assignee':       get_assignee(channel) if is_urgent else '',
+                  'task_created':   existing_flags.get(key, False),
+              })
+
+          now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          output = {
+              'pulled_at':       now_iso,
+              'total_flagged':   len(flagged),
+              'urgent_count':    sum(1 for m in flagged if m['type'] == 'urgent'),
+              'question_count':  sum(1 for m in flagged if m['type'] == 'question'),
+              'flagged':         flagged,
+          }
+
+          with open('data/slack-flagged.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'Flagged: {len(flagged)} messages ({output["urgent_count"]} urgent, {output["question_count"]} questions)')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/slack-flagged.json
+          git diff --staged --quiet || git commit -m "detect slack urgent messages [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push

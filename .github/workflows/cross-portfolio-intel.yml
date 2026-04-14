@@ -1,0 +1,147 @@
+name: Cross-Portfolio Creative Intelligence
+
+on:
+  schedule:
+    - cron: '0 10 * * *'  # Daily 10am UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Find creative wins across portfolio
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os
+          from datetime import datetime, timezone
+
+          slack_token = os.environ.get('SLACK_BOT_TOKEN', '')
+          now_iso = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+          # Load meta.json for CPL/spend/leads data
+          with open('data/meta.json') as f:
+              meta = json.load(f)
+          clients = meta.get('clients', [])
+
+          # Load client-map.json for niche data
+          try:
+              with open('data/client-map.json') as f:
+                  cm_data = json.load(f)
+              cm_list = cm_data.get('clients', []) if isinstance(cm_data, dict) else cm_data
+              niche_map = {
+                  e.get('meta_account_id','').replace('act_',''):
+                      (e.get('niche') or '').lower().strip()
+                  for e in cm_list
+              }
+          except (FileNotFoundError, json.JSONDecodeError):
+              niche_map = {}
+
+          # Compute portfolio average CPL (active accounts with leads)
+          cpls = []
+          for c in clients:
+              d7 = c.get('last_7_days', {})
+              if d7.get('leads', 0) >= 1 and d7.get('cost_per_lead', 0) > 0 and d7.get('spend', 0) > 0:
+                  cpls.append(d7['cost_per_lead'])
+
+          if not cpls:
+              print('No CPL data available — skipping')
+              import sys; sys.exit(0)
+
+          portfolio_avg = sum(cpls) / len(cpls)
+          print(f'Portfolio avg CPL: ${portfolio_avg:.2f} ({len(cpls)} accounts)')
+
+          # Find creative winners: CPL < portfolio_avg * 0.50, spend > $100, leads >= 5
+          winners = []
+          for c in clients:
+              d7 = c.get('last_7_days', {})
+              account_id   = str(c.get('account_id', '')).replace('act_', '')
+              account_name = c.get('account_name', '')
+              cpl   = d7.get('cost_per_lead', 0)
+              spend = d7.get('spend', 0)
+              leads = d7.get('leads', 0)
+
+              if cpl > 0 and cpl < portfolio_avg * 0.50 and spend > 100 and leads >= 5:
+                  niche = niche_map.get(account_id, 'unknown')
+                  winners.append({
+                      'account_id':   account_id,
+                      'account_name': account_name,
+                      'niche':        niche,
+                      'cpl':          round(cpl, 2),
+                      'spend':        round(spend, 2),
+                      'leads':        leads,
+                      'cpl_vs_avg':   round((1 - cpl / portfolio_avg) * 100, 1),
+                  })
+                  print(f'  WIN: {account_name} — CPL ${cpl:.2f} ({(1-cpl/portfolio_avg)*100:.0f}% below avg)')
+
+          # For each winner, find same-niche accounts that might benefit
+          clones = []
+          for w in winners:
+              if not w['niche'] or w['niche'] == 'unknown':
+                  continue
+              same_niche = []
+              for c in clients:
+                  if c.get('account_id') == w['account_id']:
+                      continue
+                  cid = str(c.get('account_id', '')).replace('act_', '')
+                  if niche_map.get(cid,'') == w['niche']:
+                      d7 = c.get('last_7_days', {})
+                      # Only suggest if they're underperforming
+                      their_cpl = d7.get('cost_per_lead', 0)
+                      if their_cpl > portfolio_avg * 0.8 or d7.get('leads', 0) < 3:
+                          same_niche.append(c.get('account_name', ''))
+              if same_niche:
+                  clones.append({
+                      **w,
+                      'suggest_cloning_for': same_niche,
+                  })
+
+          output = {
+              'pulled_at':        now_iso,
+              'portfolio_avg_cpl': round(portfolio_avg, 2),
+              'winners_count':    len(winners),
+              'clone_opps':       len(clones),
+              'winners':          winners,
+              'clone_opportunities': clones,
+          }
+          with open('data/creative-intel.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'\nDone: {len(winners)} winner(s), {len(clones)} clone opportunity(ies)')
+
+          # Slack alert for clone opportunities
+          if clones and slack_token:
+              import urllib.request as ur
+              lines = []
+              for c in clones:
+                  targets = ', '.join(c['suggest_cloning_for'][:3])
+                  lines.append(f'  • *{c["account_name"]}* (CPL ${c["cpl"]:.2f}, {c["cpl_vs_avg"]}% below avg) → test for: {targets}')
+              text = f':trophy: *Creative Wins to Clone* — {len(clones)} opportunity(ies) today:\n' + '\n'.join(lines)
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = ur.Request('https://slack.com/api/chat.postMessage', data=payload,
+                               headers={'Authorization': 'Bearer ' + slack_token,
+                                        'Content-Type': 'application/json'})
+              try:
+                  with ur.urlopen(req, timeout=15) as resp:
+                      r = json.loads(resp.read())
+                      if not r.get('ok'):
+                          print(f'Slack error: {r.get("error")}')
+              except Exception as e:
+                  print(f'Slack failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/creative-intel.json
+          git diff --staged --quiet || git commit -m "cross-portfolio intel [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push

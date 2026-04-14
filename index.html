@@ -92,7 +92,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .accard{background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:16px;transition:border-color .2s}
 .accard.flagged{border-color:#ef4444!important;border-width:2px!important}
 .accard.reviewed{border-color:#059669!important}
-.ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ac-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:6px;flex-wrap:wrap}
+.badge-billing{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;animation:ccPulse 1.8s ease-in-out infinite;white-space:nowrap;cursor:default}
+.badge-violation{background:#2a1a00;color:#f97316;border:1px solid #9a3412;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.badge-violation:hover{background:#3a2200}
+.health-score{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;border:2px solid currentColor;opacity:.9}
+.hs-green{color:#22c55e;background:rgba(34,197,94,.1)}
+.hs-yellow{color:#fbbf24;background:rgba(251,191,36,.1)}
+.hs-orange{color:#f97316;background:rgba(249,115,22,.1)}
+.hs-red{color:#ef4444;background:rgba(239,68,68,.1)}
+.badge-fatigue{background:#2a1a00;color:#fbbf24;border:1px solid #78350f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.badge-fatigue:hover{background:#3a2800}
+.badge-new-blue{background:#1e1b33;color:#a78bfa;border:1px solid #2d2b55;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.badge-new-orange{background:#2a1200;color:#f97316;border:1px solid #9a3412;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.badge-new-red{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
 .ac-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .ac-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .st-active{background:#064e3b;color:#34d399}
@@ -266,6 +279,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ══════════ SLACK ══════════ */
 .slack-layout{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden;min-height:480px}
+.slack-attn-panel{border:1px solid #2a1200;border-radius:10px;background:#0d0800;padding:12px 14px;margin-bottom:14px}
+.slack-attn-hd{font-size:11px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.slack-attn-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #1a1000}
+.slack-attn-item:last-child{border:none}
+.slack-attn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-red{background:#ef4444}.dot-yellow{background:#fbbf24}.dot-gray{background:#555}
+.slack-attn-body{flex:1;min-width:0}
+.slack-attn-meta{font-size:10px;color:#666;margin-bottom:3px}
+.slack-attn-text{font-size:12px;color:#ccc;word-break:break-word;line-height:1.45}
+.slack-attn-footer{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap}
+.slack-attn-kw{font-size:10px;background:#2a1200;color:#f97316;border-radius:4px;padding:1px 6px}
+.slack-create-btn{font-size:11px;background:#7c3aed;border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+.slack-create-btn:hover{background:#6d28d9}
+.slack-created-lbl{font-size:11px;color:#34d399;font-weight:600}
 .ch-list{background:#111;border-right:1px solid #1e1e1e;padding:10px 0}
 .ch-list-hd{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:5px 14px 9px;font-weight:600}
 .ch-item{padding:7px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .1s}
@@ -623,6 +650,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="leads">Most Leads</option>
       <option value="name">Name A–Z</option>
     </select>
+    <button style="background:#7c3aed;border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap" onclick="openOnboardingModal()">+ New Client</button>
   </div>
   <div class="section-title" id="metaSubtitle">Loading...</div>
   <div class="meta-grid" id="metaGrid"></div>
@@ -673,7 +701,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div id="ccT4Section" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#f87171;margin-bottom:10px">⚡ T4 ACTION QUEUE</div>
-    <div id="ccT4List" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div id="ccT4List" style="display:flex;flex-direction:column;gap:8px"></div>`n  <div id="ccWinsSection" style="margin-bottom:20px;display:none">
+    <div class="section-title" style="color:#22c55e;margin-bottom:10px">🏆 CREATIVE WINS TO CLONE</div>
+    <div id="ccWinsList"></div>
+  </div>
+  <div id="ccWatchSection" style="margin-bottom:20px;display:none">
+    <div class="section-title" style="color:#a78bfa;margin-bottom:10px">🐕 NEW CLIENT WATCH</div>
+    <div id="ccWatchList"></div>
   </div>
   <div id="ccAllClear" style="display:none;text-align:center;padding:40px">
     <div style="font-size:40px;margin-bottom:12px">🎉</div>
@@ -801,6 +835,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <input class="filter-input" id="slSearch" placeholder="Search messages..." oninput="renderSlack()">
     <div style="font-size:11px;color:#555;white-space:nowrap" id="slUpdated"></div>
   </div>
+  <!-- F10: Needs Attention panel -->
+  <div id="slackAttnPanel" style="display:none"></div>
   <div class="slack-layout">
     <div class="ch-list">
       <div class="ch-list-hd">Channels</div>
@@ -980,6 +1016,138 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div><!-- /.main-content -->
 </div><!-- /.body-row -->
 </div><!-- /.app-shell -->
+
+<!-- ════════════════ NEW CLIENT ONBOARDING MODAL (F12) ════════════════ -->
+<div class="modal-ov" id="onboardingModal" onclick="if(event.target===this)closeOnboardingModal()">
+  <div class="modal" style="max-width:580px;max-height:92vh">
+    <div class="modal-title">
+      🚀 New Client Onboarding
+      <button class="modal-close" onclick="closeOnboardingModal()">✕</button>
+    </div>
+    <!-- Step 1: Form -->
+    <div id="obStep1">
+      <p style="font-size:12px;color:#666;margin-bottom:14px">Fill in the details below. Click Preview to see the tasks that will be created.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Client Name *</label>
+          <input class="filter-input" id="ob-name" placeholder="e.g. Nunova Health" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Meta Account ID *</label>
+          <input class="filter-input" id="ob-account-id" placeholder="e.g. 2151825605165694" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Niche</label>
+          <input class="filter-input" id="ob-niche" placeholder="e.g. medspa" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Daily Ad Budget ($)</label>
+          <input class="filter-input" id="ob-budget" type="number" placeholder="e.g. 75" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Target CPL ($)</label>
+          <input class="filter-input" id="ob-target-cpl" type="number" placeholder="12" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Offer Price ($)</label>
+          <input class="filter-input" id="ob-offer-price" type="number" placeholder="e.g. 99" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Treatment / Service</label>
+          <input class="filter-input" id="ob-treatment" placeholder="e.g. Botox" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Assignee</label>
+          <select class="filter-select" id="ob-assignee" style="width:100%">
+            <option value="Byron">Byron</option>
+            <option value="Anca">Anca</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Funnel URL</label>
+        <input class="filter-input" id="ob-funnel" placeholder="https://..." style="width:100%">
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Drive Folder ID</label>
+        <input class="filter-input" id="ob-drive" placeholder="1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf" style="width:100%">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Special Rules</label>
+        <textarea class="filter-input" id="ob-rules" placeholder="e.g. No AI creatives, client must approve all" style="width:100%;height:56px;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="filter-select" style="cursor:pointer" onclick="closeOnboardingModal()">Cancel</button>
+        <button style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700" onclick="previewOnboarding()">Preview Tasks →</button>
+      </div>
+    </div>
+    <!-- Step 2: Preview -->
+    <div id="obStep2" style="display:none">
+      <p style="font-size:12px;color:#666;margin-bottom:10px">Review the checklist tasks that will be created in ClickUp:</p>
+      <div id="obTaskPreview" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="filter-select" style="cursor:pointer" onclick="document.getElementById('obStep1').style.display='';document.getElementById('obStep2').style.display='none'">← Back</button>
+        <button id="obConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700" onclick="confirmOnboarding()">Confirm &amp; Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ CREATIVE REQUEST MODAL (F12 step 2) ════════════════ -->
+<div class="modal-ov" id="creativeRequestModal" onclick="if(event.target===this)closeCreativeRequestModal()">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title">
+      🎨 First Creative Request
+      <button class="modal-close" onclick="closeCreativeRequestModal()">✕</button>
+    </div>
+    <div id="creativeRequestBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeCreativeRequestModal()">Skip for now</button>
+      <button id="creativeRequestBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Send to Saquib</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ SLACK TASK CONFIRM MODAL (F9) ════════════════ -->
+<div class="modal-ov" id="slackTaskModal" onclick="if(event.target===this)closeSlackTaskModal()">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">
+      ⚡ Create ClickUp Task from Slack
+      <button class="modal-close" onclick="closeSlackTaskModal()">✕</button>
+    </div>
+    <div id="slackTaskModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeSlackTaskModal()">Cancel</button>
+      <button id="slackTaskConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Create Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ CREATIVE FATIGUE CONFIRM MODAL ════════════════ -->
+<div class="modal-ov" id="fatigueModal" onclick="if(event.target===this)closeFatigueModal()">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-title">
+      🟡 Creative Fatigue Detected
+      <button class="modal-close" onclick="closeFatigueModal()">✕</button>
+    </div>
+    <div id="fatigueModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeFatigueModal()">Cancel</button>
+      <button id="fatigueConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Create ClickUp Ticket</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ POLICY VIOLATIONS MODAL ════════════════ -->
+<div class="modal-ov" id="violationsModal" onclick="if(event.target===this)closeViolationsModal()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-title">
+      ⚠ Policy Issues
+      <button class="modal-close" onclick="closeViolationsModal()">✕</button>
+    </div>
+    <div id="violationsModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+  </div>
+</div>
 
 <!-- ════════════════ SETTINGS MODAL ════════════════ -->
 <div class="modal-ov" id="settingsModal">
@@ -1230,6 +1398,12 @@ const t4Executed = new Map(); // actionId → { state: 'idle'|'confirming'|'exec
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
+let paymentData = null, violationsData = null;
+let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
+let fatigueData   = null; // creative-fatigue.json (F7)
+let slFlaggedData    = null; // slack-flagged.json (F9/F10)
+let creativeIntelData = null; // creative-intel.json (F8)
+let watchdogData      = null; // watchdog.json (F13)
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -1624,18 +1798,8 @@ function cplIsGreen(v) { return ['kb-great','kb-good'].includes(cplKls(v)); }
 
 // Composite urgency score — higher = more attention needed (used by "Needs Attention" sort)
 function sortScore(c) {
-  let s = 0;
-  const d7 = c.last_7_days || {};
-  const cpl = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
-  const tier = cplKls(cpl);
-  if (tier === 'kb-cut')        s += 100;
-  else if (tier === 'kb-watch') s += 60;
-  else if (tier === 'kb-ok')    s += 30;
-  if (c.payment_issue)                          s += 80;
-  if (c.violations && c.violations.length)      s += 50;
-  if (d7.leads === 0 && (d7.spend || 0) > 0)    s += 50;
-  else if (d7.leads > 0 && d7.leads < 7)        s += 25;
-  return s;
+  // Primary: invert health score (0–100 health → 0–100 urgency)
+  return 100 - calculateHealthScore(c);
 }
 
 function cpbKls(v) {
@@ -1643,6 +1807,459 @@ function cpbKls(v) {
   if (v < 50) return 'kb-green';
   if (v <= 100) return 'kb-yellow';
   return 'kb-red';
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ F12: New Client Onboarding ══
+// ══════════════════════════════════════════════════════════════
+
+const ONBOARDING_TASKS = [
+  { name: 'Get Meta Ad Account Admin Access', priority: 1 },
+  { name: 'Install Meta Pixel on Website', priority: 2 },
+  { name: 'Set Up Lead Form or Landing Page', priority: 2 },
+  { name: 'Create Campaign Structure (Campaign → Ad Set → Ads)', priority: 2 },
+  { name: 'Create First Creative Brief for Video Team', priority: 2 },
+  { name: 'Review and Approve First Creatives', priority: 3 },
+  { name: 'Launch First Campaign', priority: 1 },
+  { name: 'Set Up Weekly Reporting & Initial Optimization', priority: 3 },
+];
+
+let _obPendingData = null; // stores form data between step 1 and confirm
+
+function openOnboardingModal() {
+  // Reset form
+  ['ob-name','ob-account-id','ob-niche','ob-budget','ob-target-cpl',
+   'ob-offer-price','ob-treatment','ob-funnel','ob-drive','ob-rules'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'ob-drive' ? '1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf' : '';
+  });
+  document.getElementById('obStep1').style.display = '';
+  document.getElementById('obStep2').style.display = 'none';
+  document.getElementById('onboardingModal').classList.add('open');
+}
+
+function closeOnboardingModal() {
+  document.getElementById('onboardingModal').classList.remove('open');
+}
+
+function previewOnboarding() {
+  const name = (document.getElementById('ob-name').value || '').trim();
+  if (!name) { alert('Client name is required.'); return; }
+
+  const treatment = document.getElementById('ob-treatment').value.trim();
+  const offerPrice = document.getElementById('ob-offer-price').value.trim();
+
+  const preview = document.getElementById('obTaskPreview');
+  preview.innerHTML = ONBOARDING_TASKS.map((t, i) => {
+    const taskName = t.name.replace('{CLIENT}', name).replace('{TREATMENT}', treatment || 'treatment');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a">
+      <span style="width:20px;height:20px;border-radius:50%;background:#1e1b33;border:1px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#a78bfa;flex-shrink:0">${i+1}</span>
+      <span style="font-size:12px;color:#ccc">${esc(taskName)}</span>
+      <span class="kbadge" style="margin-left:auto;font-size:9px;background:${t.priority===1?'#450a0a':t.priority===2?'#2a1a00':'#1a1a2e'};color:${t.priority===1?'#f87171':t.priority===2?'#fb923c':'#818cf8'}">${t.priority===1?'urgent':t.priority===2?'high':'normal'}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('obStep1').style.display = 'none';
+  document.getElementById('obStep2').style.display = '';
+}
+
+async function confirmOnboarding() {
+  const cfg = getCfg();
+  if (!cfg.token) { alert('ClickUp API token required. Please configure in Settings (⚙).'); return; }
+
+  const data = {
+    name:       (document.getElementById('ob-name').value || '').trim(),
+    accountId:  (document.getElementById('ob-account-id').value || '').trim(),
+    niche:      (document.getElementById('ob-niche').value || '').trim(),
+    budget:     parseFloat(document.getElementById('ob-budget').value) || null,
+    targetCpl:  parseFloat(document.getElementById('ob-target-cpl').value) || 12,
+    offerPrice: parseFloat(document.getElementById('ob-offer-price').value) || null,
+    treatment:  (document.getElementById('ob-treatment').value || '').trim(),
+    assignee:   document.getElementById('ob-assignee').value,
+    funnel:     (document.getElementById('ob-funnel').value || '').trim(),
+    drive:      (document.getElementById('ob-drive').value || '1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf').trim(),
+    rules:      (document.getElementById('ob-rules').value || '').trim(),
+  };
+
+  if (!data.name) { alert('Client name is required.'); return; }
+
+  const btn = document.getElementById('obConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const listId = cfg.clientMgmtListId || '901514441223';
+  const headers = { 'Authorization': cfg.token, 'Content-Type': 'application/json' };
+
+  try {
+    // 1. Create main client task in ClickUp
+    const desc = [
+      data.treatment && `Treatment: ${data.treatment}`,
+      data.offerPrice && `Offer Price: $${data.offerPrice}`,
+      data.budget && `Daily Budget: $${data.budget}/day`,
+      `Target CPL: $${data.targetCpl}`,
+      data.funnel && `Funnel URL: ${data.funnel}`,
+      data.drive && `Drive Folder: https://drive.google.com/drive/folders/${data.drive}`,
+      data.rules && `Special Rules: ${data.rules}`,
+      data.niche && `Niche: ${data.niche}`,
+    ].filter(Boolean).join('\n');
+
+    const taskR = await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ name: data.name, description: desc, priority: 2, status: 'in onboarding' }),
+    });
+    if (!taskR.ok) throw new Error('Failed to create client task: ' + taskR.status);
+    const task = await taskR.json();
+
+    // 2. Create 8 onboarding checklist tasks as subtasks
+    for (const t of ONBOARDING_TASKS) {
+      await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name: t.name, priority: t.priority, parent: task.id }),
+      });
+    }
+
+    // 3. Update client-map.json via GitHub API
+    const newEntry = {
+      meta_account_id: data.accountId,
+      meta_name:       data.name,
+      clickup_task_id: task.id,
+      clickup_name:    data.name,
+      matched:         true,
+      confidence:      1.0,
+      niche:           data.niche || null,
+      target_cpl:      data.targetCpl,
+      daily_budget:    data.budget,
+      onboarded_date:  new Date().toISOString().split('T')[0],
+      special_rules:   data.rules || null,
+      funnel_url:      data.funnel || null,
+      drive_folder:    data.drive ? `https://drive.google.com/drive/folders/${data.drive}` : null,
+      assignee:        data.assignee,
+    };
+
+    try {
+      const pat = localStorage.getItem('gh_pat');
+      if (pat) {
+        const cmR = await fetch(`https://api.github.com/repos/Artzy22/servedia-ops/contents/data/client-map.json`,
+          { headers: { Authorization: 'token ' + pat } });
+        if (cmR.ok) {
+          const cmFile = await cmR.json();
+          const existing = JSON.parse(atob(cmFile.content.replace(/\n/g,'')));
+          const clients = (existing.clients || existing || []).filter(e => e.meta_account_id !== data.accountId);
+          clients.push(newEntry);
+          const updated = typeof existing.clients !== 'undefined'
+            ? { ...existing, clients }
+            : clients;
+          await fetch(`https://api.github.com/repos/Artzy22/servedia-ops/contents/data/client-map.json`, {
+            method: 'PUT',
+            headers: { Authorization: 'token ' + pat, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `onboard: add ${data.name}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(updated, null, 2)))), sha: cmFile.sha }),
+          });
+        }
+      }
+    } catch(e) { console.warn('client-map update failed:', e); }
+
+    // 4. Slack notification
+    const slCfg = localStorage.getItem('gh_pat'); // best we have without server
+    // (Slack post from browser requires CORS-enabled relay — note for Byron)
+
+    _obPendingData = { ...data, taskId: task.id, taskUrl: task.url };
+    closeOnboardingModal();
+    showCreativeRequestModal(data);
+
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create'; btn.disabled = false; }
+    alert('❌ Error: ' + e.message);
+  }
+}
+
+function showCreativeRequestModal(data) {
+  const modal = document.getElementById('creativeRequestModal');
+  const body  = document.getElementById('creativeRequestBody');
+  const btn   = document.getElementById('creativeRequestBtn');
+  if (!modal || !body) return;
+
+  body.innerHTML = `
+    <p style="margin-bottom:12px">Client <b style="color:#a78bfa">${esc(data.name)}</b> has been created in ClickUp with 8 onboarding tasks.</p>
+    <p style="margin-bottom:12px;color:#aaa;font-size:12px">Would you like to send a creative request to <b style="color:#fff">Saquib</b> for the first ad creative? This will create a ticket in the Video Editing list with a 3 business day deadline.</p>
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;color:#888">
+      <div><b style="color:#ccc">Client:</b> ${esc(data.name)}</div>
+      ${data.treatment ? `<div><b style="color:#ccc">Treatment:</b> ${esc(data.treatment)}</div>` : ''}
+      ${data.offerPrice ? `<div><b style="color:#ccc">Offer Price:</b> $${data.offerPrice}</div>` : ''}
+    </div>`;
+
+  btn.onclick = () => confirmCreativeRequest(data);
+  modal.classList.add('open');
+}
+
+function closeCreativeRequestModal() {
+  document.getElementById('creativeRequestModal').classList.remove('open');
+  alert('✅ Onboarding complete! Client added to ClickUp.');
+}
+
+async function confirmCreativeRequest(data) {
+  const cfg = getCfg();
+  if (!cfg.token) { alert('ClickUp token needed.'); return; }
+
+  const btn = document.getElementById('creativeRequestBtn');
+  if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
+
+  // Due date: 3 business days from now
+  const now = new Date();
+  let bizDays = 0, d = new Date(now);
+  while (bizDays < 3) {
+    d.setDate(d.getDate() + 1);
+    if (d.getDay() !== 0 && d.getDay() !== 6) bizDays++;
+  }
+
+  const taskName = `[New Client] First creative — ${data.name}${data.treatment ? ' | ' + data.treatment : ''}`;
+  const desc = `New client onboarding — first ad creative needed.\n\nClient: ${data.name}\n${data.treatment?'Treatment: '+data.treatment+'\n':''}${data.offerPrice?'Offer Price: $'+data.offerPrice+'\n':''}${data.funnel?'Funnel: '+data.funnel+'\n':''}\nPlease create 3 ad creative variations for this client's launch campaign.`;
+
+  try {
+    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2, due_date: d.getTime() }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const task = await r.json();
+    closeCreativeRequestModal();
+    document.getElementById('creativeRequestModal').classList.remove('open');
+    alert(`✅ Onboarding complete!\n\nCreative request sent to Saquib.\nDue: ${d.toLocaleDateString()}\n\nView: ${task.url || 'ClickUp → Video Editing'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Send to Saquib'; btn.disabled = false; }
+    alert('❌ Failed: ' + e.message);
+  }
+}
+
+// ── F9/F10: Slack urgent message detection ──
+
+function updateSlackBadge() {
+  if (!slFlaggedData) return;
+  const urgentCount = slFlaggedData.urgent_count || 0;
+  const slBadge = document.getElementById('slackBadge');
+  if (slBadge && urgentCount > 0) {
+    slBadge.textContent = urgentCount;
+    slBadge.style.background = '#ef4444';
+  }
+}
+
+function renderSlackAttention() {
+  const panel = document.getElementById('slackAttnPanel');
+  if (!panel) return;
+
+  const flagged = (slFlaggedData && slFlaggedData.flagged) || [];
+  if (!flagged.length) { panel.style.display = 'none'; return; }
+
+  const items = flagged.map(m => {
+    const dotCls  = m.type === 'urgent' ? 'dot-red' : m.type === 'question' ? 'dot-yellow' : 'dot-gray';
+    const kwHtml  = m.keywords_found.map(k => `<span class="slack-attn-kw">${esc(k)}</span>`).join('');
+    const timeStr = m.ts_iso ? fmtTime(m.ts_iso) : (m.ts ? fmtTime(new Date(parseFloat(m.ts)*1000).toISOString()) : '');
+    const assignee = m.assignee ? `<span style="font-size:10px;color:#777">→ ${esc(m.assignee)}</span>` : '';
+
+    const actionHtml = m.task_created
+      ? `<span class="slack-created-lbl">✅ Task created</span>`
+      : m.type === 'urgent'
+        ? `<button class="slack-create-btn" onclick="openSlackTaskModal(this.dataset.id)" data-id="${esc(m.id)}">+ Create Task</button>${assignee}`
+        : '';
+
+    return `<div class="slack-attn-item">
+      <div class="slack-attn-dot ${dotCls}"></div>
+      <div class="slack-attn-body">
+        <div class="slack-attn-meta">#${esc(m.channel)} · ${timeStr}</div>
+        <div class="slack-attn-text">${esc(m.text)}</div>
+        <div class="slack-attn-footer">${kwHtml}${actionHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const urgentN   = flagged.filter(m => m.type === 'urgent').length;
+  const questionN = flagged.filter(m => m.type === 'question').length;
+  const countStr  = [urgentN && `${urgentN} urgent`, questionN && `${questionN} question${questionN>1?'s':''}`].filter(Boolean).join(' · ');
+
+  panel.style.display = '';
+  panel.innerHTML = `<div class="slack-attn-panel">
+    <div class="slack-attn-hd">🚨 Needs Response <span style="font-weight:400;color:#888;text-transform:none;font-size:10px">${countStr}</span></div>
+    ${items}
+  </div>`;
+}
+
+function openSlackTaskModal(elOrId) {
+  const msgId = typeof elOrId === 'string' ? elOrId : elOrId.dataset.id;
+  const flagged = (slFlaggedData && slFlaggedData.flagged) || [];
+  const msg = flagged.find(m => m.id === msgId);
+  if (!msg) return;
+
+  const modal = document.getElementById('slackTaskModal');
+  const body  = document.getElementById('slackTaskModalBody');
+  const btn   = document.getElementById('slackTaskConfirmBtn');
+  if (!modal || !body) return;
+
+  const listName = msg.channel.toLowerCase().includes('video') ? 'Video Editing' : 'Media Tickets';
+  const listId   = msg.channel.toLowerCase().includes('video') ? '901512331541' : '901515083916';
+
+  body.innerHTML = `
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:#aaa">
+      <div style="font-size:10px;color:#555;margin-bottom:4px">#${esc(msg.channel)}</div>
+      <div style="color:#ccc">${esc(msg.text)}</div>
+    </div>
+    <div style="margin-bottom:10px;font-size:12px">
+      <b>List:</b> <span style="color:#a78bfa">${esc(listName)}</span><br>
+      <b>Assignee:</b> <span style="color:#ccc">${esc(msg.assignee || 'Byron')}</span>
+    </div>
+    <p style="color:#aaa;font-size:12px">A ClickUp task will be created in <b style="color:#fff">${esc(listName)}</b> with this message as the description.</p>`;
+
+  btn.onclick = () => confirmSlackTask(msg, listId, listName);
+  modal.classList.add('open');
+}
+
+function closeSlackTaskModal() {
+  const modal = document.getElementById('slackTaskModal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function confirmSlackTask(msg, listId, listName) {
+  const cfg = getCfg();
+  if (!cfg.token) {
+    alert('ClickUp API token required. Please configure in Settings (⚙).');
+    return;
+  }
+
+  const btn = document.getElementById('slackTaskConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const taskName = `[Slack] ${msg.text.slice(0, 80)}${msg.text.length > 80 ? '…' : ''}`;
+  const desc = `From Slack #${msg.channel}:\n\n${msg.text}\n\nKeywords detected: ${msg.keywords_found.join(', ')}`;
+
+  try {
+    const r = await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2 }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.err || 'HTTP ' + r.status);
+    }
+    const task = await r.json();
+
+    // Mark as task_created in local data
+    if (slFlaggedData) {
+      const m = (slFlaggedData.flagged || []).find(m => m.id === msg.id);
+      if (m) m.task_created = true;
+    }
+
+    closeSlackTaskModal();
+    renderSlackAttention();
+    alert(`✅ Task created in ${listName}!\n\nView: ${task.url || 'ClickUp'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create Task'; btn.disabled = false; }
+    alert('❌ Failed to create task: ' + e.message);
+  }
+}
+
+function buildFatigueMap() {
+  const m = {};
+  if (!fatigueData) return m;
+  (fatigueData.accounts || []).forEach(a => { if (a.fatigued) m[a.account_id] = a; });
+  return m;
+}
+
+function openFatigueModal(accountId) {
+  const fatMap = buildFatigueMap();
+  const entry  = fatMap[accountId];
+  const modal  = document.getElementById('fatigueModal');
+  const body   = document.getElementById('fatigueModalBody');
+  const btn    = document.getElementById('fatigueConfirmBtn');
+  if (!modal || !body || !entry) return;
+
+  body.innerHTML = `
+    <p style="margin-bottom:12px">
+      <b style="color:#fbbf24">${esc(entry.account_name)}</b> has a <b style="color:#fbbf24">${entry.drop_pct}% CTR drop</b> over the last 3 days.
+    </p>
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;color:#888;margin-bottom:12px">
+      <div>Peak CTR: <b style="color:#ccc">${entry.peak_ctr}%</b></div>
+      <div>3-Day Avg: <b style="color:#fbbf24">${entry.avg_3day_ctr}%</b></div>
+      <div style="margin-top:6px;font-size:11px">This typically means your audience has seen these ads too many times. New creative is needed.</div>
+    </div>
+    <p style="color:#aaa;font-size:12px">Clicking <b style="color:#fff">Confirm &amp; Create</b> will create a ClickUp ticket in the Video Editing list assigned to Saquib requesting new creative.</p>`;
+
+  btn.onclick = () => confirmFatigueTicket(accountId, entry);
+  modal.classList.add('open');
+}
+
+function closeFatigueModal() {
+  const modal = document.getElementById('fatigueModal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function confirmFatigueTicket(accountId, entry) {
+  const cfg = getCfg();
+  if (!cfg.token) {
+    alert('ClickUp API token required. Please configure in Settings (⚙).');
+    return;
+  }
+
+  const btn = document.getElementById('fatigueConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const taskName = `[Creative Fatigue] New creative needed — ${entry.account_name}`;
+  const desc = `Creative fatigue detected on ${new Date().toLocaleDateString()}.\n\nCTR dropped ${entry.drop_pct}% from peak ${entry.peak_ctr}% to 3-day avg ${entry.avg_3day_ctr}%.\n\nPlease create new ad creative for this account.`;
+
+  try {
+    // Video editing list: 901512331541
+    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2 }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.err || 'HTTP ' + r.status);
+    }
+    const task = await r.json();
+    closeFatigueModal();
+    alert(`✅ ClickUp ticket created!\n\n${taskName}\n\nView: ${task.url || 'ClickUp > Video Editing'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create ClickUp Ticket'; btn.disabled = false; }
+    alert('❌ Failed to create ticket: ' + e.message);
+  }
+}
+
+function openViolationsModal(accountId) {
+  const accounts = (violationsData && violationsData.accounts) || [];
+  const entry = accounts.find(a => a.account_id === accountId);
+  const modal = document.getElementById('violationsModal');
+  const body  = document.getElementById('violationsModalBody');
+  if (!modal || !body || !entry) return;
+  const rows = (entry.violations || []).map(v =>
+    `<div style="padding:8px 0;border-bottom:1px solid #1a1a1a">
+      <div style="font-weight:600;color:#f97316">${esc(v.effective_status)}</div>
+      <div style="color:#aaa;margin-top:3px">${esc(v.ad_name)}</div>
+      ${v.delivery_info ? `<div style="font-size:11px;color:#666;margin-top:2px">${esc(v.delivery_info)}</div>` : ''}
+    </div>`
+  ).join('');
+  body.innerHTML = `<p style="color:#aaa;margin-bottom:10px">${esc(entry.account_name)} — <b style="color:#f97316">${entry.violations.length} issue${entry.violations.length !== 1 ? 's' : ''}</b></p>${rows || '<p style="color:#555">No details available.</p>'}`;
+  modal.classList.add('open');
+}
+
+function closeViolationsModal() {
+  const modal = document.getElementById('violationsModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function buildPaymentMap() {
+  const m = {};
+  if (!paymentData) return m;
+  (paymentData.accounts || []).forEach(a => { if (a.payment_issue) m[a.account_id] = a; });
+  return m;
+}
+
+function buildViolationsMap() {
+  const m = {};
+  if (!violationsData) return m;
+  (violationsData.accounts || []).forEach(a => { if (a.violations && a.violations.length) m[a.account_id] = a; });
+  return m;
 }
 
 // Sort score: lower = worse (shown first in "worst CPL" view)
@@ -1895,6 +2512,118 @@ function buildSuggestions(cpl, cpb, leads7, client) {
   return tips;
 }
 
+// F11: Client health score — 0–100, higher = healthier
+function calculateHealthScore(c) {
+  let score = 100;
+  const d7    = c.last_7_days || {};
+  const cpl   = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
+  const leads = d7.leads || 0;
+  const spend = d7.spend  || 0;
+  const id    = String(c.account_id);
+
+  // CPL deductions (map to configurable tier classes)
+  if (cpl !== null) {
+    const tier = cplKls(cpl);
+    if      (tier === 'kb-cut')   score -= 40;
+    else if (tier === 'kb-watch') score -= 25;
+    else if (tier === 'kb-ok')    score -= 15;
+    else if (tier === 'kb-good')  score -= 5;
+  }
+
+  // Lead velocity: < 1/day over 7 days = <7 leads
+  if (spend > 0) {
+    const perDay = leads / 7;
+    if      (perDay < 0.5) score -= 30;
+    else if (perDay < 1)   score -= 20;
+  }
+
+  // Payment issue (F2 data)
+  const payMap = buildPaymentMap();
+  if (payMap[id]) score -= 40;
+
+  // Policy violations (F3 data)
+  const vioMap = buildViolationsMap();
+  if (vioMap[id]) score -= 15;
+
+  // Creative fatigue (F7 data)
+  const fatMap2 = buildFatigueMap();
+  if (fatMap2[id]) score -= 10;
+
+  // Video tickets stuck in "Needs Approval" > 5 days — match by name
+  if (vidData) {
+    const name = (c.account_name || '').toLowerCase();
+    const approvalTasks = (vidData.tasks || []).filter(t => {
+      const s = (t.status || '').toLowerCase();
+      if (!s.includes('approval')) return false;
+      const client = (t.client_name || t.name || '').toLowerCase();
+      return client.includes(name.slice(0, 5)) || name.includes((client || '').slice(0, 5));
+    });
+    const now2 = Date.now();
+    const stale = approvalTasks.filter(t => t.date_updated && (now2 - Number(t.date_updated)) > 5 * 86400000);
+    if (stale.length > 0) score -= 10;
+  }
+
+  return Math.max(0, Math.min(100, score));
+}
+
+function healthScoreTierClass(score) {
+  if (score >= 80) return 'hs-green';
+  if (score >= 60) return 'hs-yellow';
+  if (score >= 40) return 'hs-orange';
+  return 'hs-red';
+}
+
+// F5: Per-account suggestions using target_cpl from client-map
+function buildMetaSuggestions(c, allClients) {
+  const tips = [];
+  const d7   = c.last_7_days || {};
+  const cpl  = (d7.leads > 0 && d7.cost_per_lead) ? d7.cost_per_lead : null;
+  const spend = d7.spend || 0;
+  const leads = d7.leads || 0;
+
+  const cmEntry   = metaClientMap[String(c.account_id)] || {};
+  const targetCpl = cmEntry.target_cpl || 12;
+
+  const cutThresh   = targetCpl * 2.33;   // default ~$28
+  const watchThresh = targetCpl * 1.67;   // default ~$20
+  const scaleBelow  = targetCpl * 0.83;   // default ~$10
+
+  // 0 leads with real spend → pause
+  if (leads === 0 && spend > 50) {
+    tips.push(`0 leads this week — pause all active ad sets and check pixel + conversion event setup.`);
+  }
+
+  // CPL actions
+  if (cpl !== null) {
+    if (cpl > cutThresh)
+      tips.push(`CPL ${fmtCur(cpl)} exceeds cut threshold (${fmtCur(cutThresh)}) — pause worst ad sets immediately.`);
+    else if (cpl > watchThresh)
+      tips.push(`CPL ${fmtCur(cpl)} above watch threshold (${fmtCur(watchThresh)}) — diagnose and test a new creative angle.`);
+    else if (cpl < scaleBelow)
+      tips.push(`CPL ${fmtCur(cpl)} is strong (target ${fmtCur(targetCpl)}) — scale budget by 15% on best-performing ad set.`);
+    else
+      tips.push(`CPL ${fmtCur(cpl)} within target range — monitor frequency and refresh creative if CTR drops.`);
+  }
+
+  // Budget reallocation signal — compare to portfolio average
+  if (allClients && allClients.length > 1) {
+    const activeCpls = allClients
+      .filter(a => a.account_id !== c.account_id && (a.last_7_days?.leads||0) > 0 && a.last_7_days?.cost_per_lead)
+      .map(a => a.last_7_days.cost_per_lead);
+    if (activeCpls.length > 0) {
+      const portfolioAvg = activeCpls.reduce((s, v) => s + v, 0) / activeCpls.length;
+      if (cpl !== null && cpl < portfolioAvg * 0.6 && spend > 0) {
+        tips.push(`CPL ${fmtCur(cpl)} is 40%+ below portfolio average (${fmtCur(portfolioAvg)}) — candidate for budget reallocation from underperformers.`);
+      } else if (cpl !== null && cpl > portfolioAvg * 1.5) {
+        tips.push(`CPL ${fmtCur(cpl)} is 50%+ above portfolio average (${fmtCur(portfolioAvg)}) — consider reallocating budget to better-performing accounts.`);
+      }
+    }
+  }
+
+  if (tips.length === 0) tips.push('Metrics on target — no actions needed.');
+  return tips;
+}
+
 // ══════════════════════════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════════════════════════
@@ -1972,6 +2701,12 @@ function renderMeta() {
   const grid = document.getElementById('metaGrid');
   if (!list.length) { grid.innerHTML = '<div class="no-data">No accounts match filters</div>'; return; }
 
+  const payMap = buildPaymentMap();
+  const vioMap = buildViolationsMap();
+  const fatMap = buildFatigueMap();
+  const wdMap  = {};
+  ((watchdogData && watchdogData.new_clients) || []).forEach(c => { wdMap[c.account_id] = c; });
+
   grid.innerHTML = list.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
     const active = c.status === 'active';
@@ -2007,10 +2742,37 @@ function renderMeta() {
     const adsUrl = `https://adsmanager.facebook.com/adsmanager/manage/campaigns?act=${id}`;
     const nameE = esc(c.account_name);
 
+    const billingBadge = payMap[id] ? `<span class="badge-billing" title="${esc(payMap[id].payment_status||'Billing issue detected')}">⛔ BILLING PAUSED</span>` : '';
+    const violBadge    = vioMap[id] ? `<span class="badge-violation" onclick="openViolationsModal('${id}')" title="Click to view policy issues">${vioMap[id].violations.length} POLICY ISSUE${vioMap[id].violations.length !== 1 ? 'S' : ''}</span>` : '';
+
+    const fatEntry = fatMap[id];
+    const fatBadge = fatEntry ? `<span class="badge-fatigue" onclick="openFatigueModal('${id}')" title="CTR dropped ${fatEntry.drop_pct}% — click to create ticket">🎨 CREATIVE FATIGUE</span>` : '';
+
+    const wdEntry = wdMap[id];
+    const newBadge = wdEntry ? (() => {
+      const d = wdEntry.days_since;
+      const cls = wdEntry.badge_level === 'red' ? 'badge-new-red' : wdEntry.badge_level === 'orange' ? 'badge-new-orange' : 'badge-new-blue';
+      const tip = wdEntry.alerts.length ? wdEntry.alerts.join(' | ') : `Day ${d} of 30`;
+      return `<span class="${cls}" title="${esc(tip)}">NEW — Day ${d}</span>`;
+    })() : '';
+
+    const hs     = calculateHealthScore(c);
+    const hsCls  = healthScoreTierClass(hs);
+    const hsTip  = hs >= 80 ? 'Healthy' : hs >= 60 ? 'Needs Monitoring' : hs >= 40 ? 'At Risk' : 'Critical';
+    const hsBadge = `<div class="health-score ${hsCls}" title="Health Score: ${hs}/100 — ${hsTip}">${hs}</div>`;
+
+    const metaSuggTips = buildMetaSuggestions(c, list);
+    const metaSuggHtml = `<div class="dmc-sugg" style="margin-top:10px;margin-bottom:0">
+      <div class="dmc-sugg-title">💡 AI Suggestions</div>
+      ${metaSuggTips.map(s => `<div class="dmc-sugg-item">${esc(s)}</div>`).join('')}
+    </div>`;
+
     return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         <div class="ac-name" title="${nameE}">${nameE}</div>
+        ${billingBadge}${violBadge}${fatBadge}${newBadge}
         <span class="ac-status ${active?'st-active':'st-nodata'}">${active?'Active':'No Data'}</span>
+        ${hsBadge}
       </div>
       <div class="mtabs" id="mt-${id}">
         <button class="mtab-btn active" onclick="switchMT(this)" data-id="${id}" data-p="7d">7 Days</button>
@@ -2018,6 +2780,7 @@ function renderMeta() {
       </div>
       <div id="mg-${id}-7d">${mkGrid(rows7)}</div>
       <div id="mg-${id}-30d" style="display:none">${mkGrid(rows30)}</div>
+      ${metaSuggHtml}
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="dmc-link-btn" href="${adsUrl}" target="_blank">📈 Ads Manager</a>
         <button class="dmc-link-btn ci-btn" onclick="openClientModal('${id}','${nameE}')">ℹ Client Info</button>
@@ -2815,6 +3578,7 @@ function renderSlack() {
   const search = (document.getElementById('slSearch').value || '').toLowerCase();
   if (slData.pulled_at) document.getElementById('slUpdated').textContent = 'Synced: ' + fmtTime(slData.pulled_at);
   { const _e = document.getElementById('slackBadge'); if (_e) _e.textContent = msgs.length; }
+  renderSlackAttention();  // F10: Needs Attention panel
 
   // Channels
   const chanMap = {};
@@ -3182,6 +3946,57 @@ function renderCommandCenter() {
     }
   }
 
+  // F8: Creative Wins to Clone
+  const winsSection = document.getElementById('ccWinsSection');
+  const winsList    = document.getElementById('ccWinsList');
+  if (winsSection && winsList) {
+    const clones = (creativeIntelData && creativeIntelData.clone_opportunities) || [];
+    if (clones.length) {
+      winsSection.style.display = '';
+      const avgCpl = creativeIntelData.portfolio_avg_cpl ? ` (portfolio avg $${creativeIntelData.portfolio_avg_cpl})` : '';
+      winsList.innerHTML = clones.map(c => {
+        const targets = (c.suggest_cloning_for || []).slice(0, 4).map(n => `<span class="kbadge kb-gray">${esc(n)}</span>`).join(' ');
+        return `<div style="background:#0a1a0a;border:1px solid #166534;border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+            <span style="font-weight:700;color:#22c55e">${esc(c.account_name)}</span>
+            <span class="kbadge kb-great">CPL $${c.cpl} · ${c.cpl_vs_avg}% below avg</span>
+          </div>
+          <div style="font-size:11px;color:#555;margin-bottom:6px">${c.leads} leads · $${c.spend} spend this week${avgCpl}</div>
+          ${targets ? `<div style="font-size:11px;color:#888;margin-bottom:4px">Test this offer for:</div><div style="display:flex;flex-wrap:wrap;gap:4px">${targets}</div>` : ''}
+          <div style="font-size:11px;color:#555;margin-top:6px;font-style:italic">No action needed — Slack alert sent to #media-ads</div>
+        </div>`;
+      }).join('');
+    } else {
+      winsSection.style.display = 'none';
+    }
+  }
+
+  // F13: New Client Watch
+  const watchSection = document.getElementById('ccWatchSection');
+  const watchList    = document.getElementById('ccWatchList');
+  if (watchSection && watchList) {
+    const newClients = (watchdogData && watchdogData.new_clients) || [];
+    if (newClients.length) {
+      watchSection.style.display = '';
+      watchList.innerHTML = newClients.map(c => {
+        const badgeCls = c.badge_level === 'red' ? 'badge-new-red' : c.badge_level === 'orange' ? 'badge-new-orange' : 'badge-new-blue';
+        const alertHtml = c.alerts && c.alerts.length
+          ? `<div style="margin-top:6px">${c.alerts.map(a => `<div style="font-size:11px;color:#f97316">⚠ ${esc(a)}</div>`).join('')}</div>`
+          : '';
+        return `<div style="background:#12101f;border:1px solid #2d2b55;border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-weight:700;color:#e0e0e0">${esc(c.account_name)}</span>
+            <span class="${badgeCls}">NEW — Day ${c.days_since}</span>
+          </div>
+          <div style="font-size:11px;color:#555">${c.leads} leads · CPL ${c.cpl ? '$' + c.cpl : '—'} · $${c.spend} spend (7d)</div>
+          ${alertHtml}
+        </div>`;
+      }).join('');
+    } else {
+      watchSection.style.display = 'none';
+    }
+  }
+
   // All clear?
   const allClear = document.getElementById('ccAllClear');
   if (allClear) {
@@ -3189,7 +4004,8 @@ function renderCommandCenter() {
     const hasVideo = document.getElementById('ccVideoSection') && document.getElementById('ccVideoSection').style.display !== 'none';
     const hasTasks = document.getElementById('ccTaskSection') && document.getElementById('ccTaskSection').style.display !== 'none';
     const hasSlack = document.getElementById('ccSlackSection') && document.getElementById('ccSlackSection').style.display !== 'none';
-    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack) ? '' : 'none';
+    const hasWatch = document.getElementById('ccWatchSection') && document.getElementById('ccWatchSection').style.display !== 'none';
+    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack && !hasWatch) ? '' : 'none';
   }
 
   // Update nav badges while we're here
@@ -3214,14 +4030,36 @@ async function loadAll() {
   try {
     // Always fetch static sources from JSON
     const staticFetches = await Promise.allSettled([
-      fetchJ(`${BASE}/meta.json?_=${ts}`),          // 0 — Meta Ads (GitHub Actions)
-      fetchJ(`${BASE}/slack.json?_=${ts}`),          // 1 — Slack
-      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),  // 2 — Drive folders
+      fetchJ(`${BASE}/meta.json?_=${ts}`),             // 0 — Meta Ads (GitHub Actions)
+      fetchJ(`${BASE}/slack.json?_=${ts}`),             // 1 — Slack
+      fetchJ(`${BASE}/drive-folders.json?_=${ts}`),    // 2 — Drive folders
+      fetchJ(`${BASE}/payment-status.json?_=${ts}`),   // 3 — Payment failures (F2)
+      fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
+      fetchJ(`${BASE}/client-map.json?_=${ts}`),         // 5 — Client map (F5 suggestions)
+      fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`),  // 6 — Creative fatigue (F7)
+      fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),     // 7 — Slack flagged (F9/F10)
+      fetchJ(`${BASE}/creative-intel.json?_=${ts}`),  // 8 — Cross-portfolio intel (F8)
+      fetchJ(`${BASE}/watchdog.json?_=${ts}`),        // 9 — 30-day watchdog (F13)
     ]);
 
-    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData  = staticFetches[0].value; normalizeMetaData(); renderMeta(); }
-    if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData    = staticFetches[1].value; renderSlack(); }
-    if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData = staticFetches[2].value; }
+    if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
+    if (staticFetches[1].status === 'fulfilled' && staticFetches[1].value) { slData         = staticFetches[1].value; renderSlack(); }
+    if (staticFetches[2].status === 'fulfilled' && staticFetches[2].value) { driveData      = staticFetches[2].value; }
+    if (staticFetches[3].status === 'fulfilled' && staticFetches[3].value) { paymentData    = staticFetches[3].value; }
+    if (staticFetches[4].status === 'fulfilled' && staticFetches[4].value) { violationsData = staticFetches[4].value; }
+    if (staticFetches[5].status === 'fulfilled' && staticFetches[5].value) {
+      metaClientMap = {};
+      ((staticFetches[5].value.clients) || []).forEach(e => {
+        const id = String(e.meta_account_id || '').replace('act_', '');
+        metaClientMap[id] = e;
+      });
+    }
+    if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData    = staticFetches[6].value; }
+    if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData      = staticFetches[7].value; }
+    if (staticFetches[8].status === 'fulfilled' && staticFetches[8].value) { creativeIntelData = staticFetches[8].value; }
+    if (staticFetches[9].status === 'fulfilled' && staticFetches[9].value) { watchdogData      = staticFetches[9].value; }
+    if (metaData) renderMeta();
+    if (slFlaggedData) updateSlackBadge();
 
     if (hasToken) {
       // LIVE MODE — fetch directly from ClickUp API
