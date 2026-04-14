@@ -4135,6 +4135,8 @@ function renderCommandCenter() {
     }
   }
 
+  renderT4Actions();
+
   // All clear?
   const allClear = document.getElementById('ccAllClear');
   if (allClear) {
@@ -4148,7 +4150,6 @@ function renderCommandCenter() {
   }
 
   // Update nav badges while we're here
-  renderT4Actions();
   updateNavBadges();
 }
 
