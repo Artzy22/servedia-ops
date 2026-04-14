@@ -1,0 +1,157 @@
+name: 30-Day Watchdog
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Monitor new client performance
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os
+          from datetime import datetime, timezone, timedelta
+
+          slack_token = os.environ.get('SLACK_BOT_TOKEN', '')
+          now = datetime.now(timezone.utc)
+          now_iso = now.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+          # Load client-map for onboarded_date
+          try:
+              with open('data/client-map.json') as f:
+                  cm_data = json.load(f)
+              cm_list = cm_data.get('clients', cm_data) if isinstance(cm_data, dict) else cm_data
+          except (FileNotFoundError, json.JSONDecodeError):
+              cm_list = []
+
+          # Only clients onboarded within last 30 days
+          new_clients = []
+          for e in cm_list:
+              od = e.get('onboarded_date')
+              if not od:
+                  continue
+              try:
+                  onboard_dt = datetime.fromisoformat(od.replace('Z',''))
+                  days_since = (now.replace(tzinfo=None) - onboard_dt).days
+                  if 0 <= days_since <= 30:
+                      new_clients.append({**e, '_days_since': days_since})
+              except ValueError:
+                  pass
+
+          if not new_clients:
+              print('No new clients in 30-day window')
+              import json as js
+              output = {'pulled_at': now_iso, 'new_clients': [], 'alerts': []}
+              with open('data/watchdog.json', 'w') as f:
+                  js.dump(output, f, indent=2)
+              import sys; sys.exit(0)
+
+          # Load meta.json for performance data
+          try:
+              with open('data/meta.json') as f:
+                  meta = json.load(f)
+              meta_by_id = {str(c['account_id']).replace('act_',''): c
+                            for c in meta.get('clients', [])}
+          except (FileNotFoundError, json.JSONDecodeError):
+              meta_by_id = {}
+
+          alerts = []
+          client_statuses = []
+
+          for c in new_clients:
+              account_id = str(c.get('meta_account_id','')).replace('act_','')
+              name       = c.get('meta_name', c.get('clickup_name', 'Unknown'))
+              days       = c.get('_days_since', 0)
+              target_cpl = c.get('target_cpl') or 20
+
+              meta_c = meta_by_id.get(account_id, {})
+              d7 = meta_c.get('last_7_days', {})
+              spend  = d7.get('spend', 0) or 0
+              leads  = d7.get('leads', 0) or 0
+              cpl    = d7.get('cost_per_lead', 0) or 0
+              status = meta_c.get('status', 'unknown')
+
+              alert_msgs = []
+
+              # 0 leads after 5 days with real spend
+              if days >= 5 and leads == 0 and spend > 0:
+                  alert_msgs.append(f'0 leads after Day {days} (${spend:.0f} spent)')
+
+              # CPL > $20 in first week
+              if days <= 7 and cpl > 20 and leads > 0:
+                  alert_msgs.append(f'CPL ${cpl:.2f} in week 1 (above $20 threshold)')
+
+              # No active ads
+              if status not in ('active', 'ACTIVE') and days >= 3:
+                  alert_msgs.append(f'No active ads detected on Day {days}')
+
+              for msg in alert_msgs:
+                  alerts.append({'account_name': name, 'account_id': account_id, 'days_since': days, 'msg': msg})
+                  print(f'  ALERT ({name}, Day {days}): {msg}')
+
+              # Determine badge level
+              if days >= 21 and leads == 0:
+                  level = 'red'
+              elif days >= 14 and cpl > 20:
+                  level = 'orange'
+              else:
+                  level = 'blue'
+
+              client_statuses.append({
+                  'account_id':   account_id,
+                  'account_name': name,
+                  'days_since':   days,
+                  'leads':        leads,
+                  'spend':        round(spend, 2),
+                  'cpl':          round(cpl, 2),
+                  'badge_level':  level,
+                  'alerts':       alert_msgs,
+              })
+
+          output = {
+              'pulled_at':   now_iso,
+              'new_clients': client_statuses,
+              'alerts':      alerts,
+          }
+          with open('data/watchdog.json', 'w') as f:
+              json.dump(output, f, indent=2)
+
+          print(f'Watchdog: {len(client_statuses)} new client(s), {len(alerts)} alert(s)')
+
+          # Slack alerts
+          if alerts and slack_token:
+              import urllib.request as ur
+              lines = '\n'.join(f'  • *{a["account_name"]}* (Day {a["days_since"]}): {a["msg"]}' for a in alerts)
+              text = f':dog: *30-Day Watchdog Alert* — {len(alerts)} new client issue(s):\n{lines}'
+              payload = json.dumps({'channel': '#media-ads', 'text': text}).encode()
+              req = ur.Request('https://slack.com/api/chat.postMessage', data=payload,
+                               headers={'Authorization': 'Bearer ' + slack_token,
+                                        'Content-Type': 'application/json'})
+              try:
+                  with ur.urlopen(req, timeout=15) as resp:
+                      r = json.loads(resp.read())
+                      if not r.get('ok'):
+                          print(f'Slack error: {r.get("error")}')
+              except Exception as e:
+                  print(f'Slack failed: {e}')
+          PYEOF
+
+      - name: Commit & push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/watchdog.json
+          git diff --staged --quiet || git commit -m "watchdog check [$(date -u +%Y-%m-%dT%H:%M:%SZ)]"
+          git pull --rebase origin main
+          git push

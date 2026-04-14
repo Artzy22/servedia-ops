@@ -103,6 +103,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .hs-red{color:#ef4444;background:rgba(239,68,68,.1)}
 .badge-fatigue{background:#2a1a00;color:#fbbf24;border:1px solid #78350f;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap;cursor:pointer}
 .badge-fatigue:hover{background:#3a2800}
+.badge-new-blue{background:#1e1b33;color:#a78bfa;border:1px solid #2d2b55;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.badge-new-orange{background:#2a1200;color:#f97316;border:1px solid #9a3412;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
+.badge-new-red{background:#450a0a;color:#ef4444;border:1px solid #7f1d1d;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;white-space:nowrap}
 .ac-name{font-size:14px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px}
 .ac-status{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 .st-active{background:#064e3b;color:#34d399}
@@ -681,6 +684,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <div class="section-title" style="color:#22c55e;margin-bottom:10px">🏆 CREATIVE WINS TO CLONE</div>
     <div id="ccWinsList"></div>
   </div>
+  <div id="ccWatchSection" style="margin-bottom:20px;display:none">
+    <div class="section-title" style="color:#a78bfa;margin-bottom:10px">🐕 NEW CLIENT WATCH</div>
+    <div id="ccWatchList"></div>
+  </div>
   <div id="ccAllClear" style="display:none;text-align:center;padding:40px">
     <div style="font-size:40px;margin-bottom:12px">🎉</div>
     <div style="font-size:18px;font-weight:700;color:#34d399">All clear! Nothing urgent right now.</div>
@@ -1257,6 +1264,7 @@ let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
 let fatigueData   = null; // creative-fatigue.json (F7)
 let slFlaggedData    = null; // slack-flagged.json (F9/F10)
 let creativeIntelData = null; // creative-intel.json (F8)
+let watchdogData      = null; // watchdog.json (F13)
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -2557,6 +2565,8 @@ function renderMeta() {
   const payMap = buildPaymentMap();
   const vioMap = buildViolationsMap();
   const fatMap = buildFatigueMap();
+  const wdMap  = {};
+  ((watchdogData && watchdogData.new_clients) || []).forEach(c => { wdMap[c.account_id] = c; });
 
   grid.innerHTML = list.map(c => {
     const d7 = c.last_7_days || {}, d30 = c.last_30_days || {};
@@ -2599,6 +2609,14 @@ function renderMeta() {
     const fatEntry = fatMap[id];
     const fatBadge = fatEntry ? `<span class="badge-fatigue" onclick="openFatigueModal('${id}')" title="CTR dropped ${fatEntry.drop_pct}% — click to create ticket">🎨 CREATIVE FATIGUE</span>` : '';
 
+    const wdEntry = wdMap[id];
+    const newBadge = wdEntry ? (() => {
+      const d = wdEntry.days_since;
+      const cls = wdEntry.badge_level === 'red' ? 'badge-new-red' : wdEntry.badge_level === 'orange' ? 'badge-new-orange' : 'badge-new-blue';
+      const tip = wdEntry.alerts.length ? wdEntry.alerts.join(' | ') : `Day ${d} of 30`;
+      return `<span class="${cls}" title="${esc(tip)}">NEW — Day ${d}</span>`;
+    })() : '';
+
     const hs     = calculateHealthScore(c);
     const hsCls  = healthScoreTierClass(hs);
     const hsTip  = hs >= 80 ? 'Healthy' : hs >= 60 ? 'Needs Monitoring' : hs >= 40 ? 'At Risk' : 'Critical';
@@ -2613,7 +2631,7 @@ function renderMeta() {
     return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         <div class="ac-name" title="${nameE}">${nameE}</div>
-        ${billingBadge}${violBadge}${fatBadge}
+        ${billingBadge}${violBadge}${fatBadge}${newBadge}
         <span class="ac-status ${active?'st-active':'st-nodata'}">${active?'Active':'No Data'}</span>
         ${hsBadge}
       </div>
@@ -3814,6 +3832,32 @@ function renderCommandCenter() {
     }
   }
 
+  // F13: New Client Watch
+  const watchSection = document.getElementById('ccWatchSection');
+  const watchList    = document.getElementById('ccWatchList');
+  if (watchSection && watchList) {
+    const newClients = (watchdogData && watchdogData.new_clients) || [];
+    if (newClients.length) {
+      watchSection.style.display = '';
+      watchList.innerHTML = newClients.map(c => {
+        const badgeCls = c.badge_level === 'red' ? 'badge-new-red' : c.badge_level === 'orange' ? 'badge-new-orange' : 'badge-new-blue';
+        const alertHtml = c.alerts && c.alerts.length
+          ? `<div style="margin-top:6px">${c.alerts.map(a => `<div style="font-size:11px;color:#f97316">⚠ ${esc(a)}</div>`).join('')}</div>`
+          : '';
+        return `<div style="background:#12101f;border:1px solid #2d2b55;border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+            <span style="font-weight:700;color:#e0e0e0">${esc(c.account_name)}</span>
+            <span class="${badgeCls}">NEW — Day ${c.days_since}</span>
+          </div>
+          <div style="font-size:11px;color:#555">${c.leads} leads · CPL ${c.cpl ? '$' + c.cpl : '—'} · $${c.spend} spend (7d)</div>
+          ${alertHtml}
+        </div>`;
+      }).join('');
+    } else {
+      watchSection.style.display = 'none';
+    }
+  }
+
   // All clear?
   const allClear = document.getElementById('ccAllClear');
   if (allClear) {
@@ -3821,7 +3865,8 @@ function renderCommandCenter() {
     const hasVideo = document.getElementById('ccVideoSection') && document.getElementById('ccVideoSection').style.display !== 'none';
     const hasTasks = document.getElementById('ccTaskSection') && document.getElementById('ccTaskSection').style.display !== 'none';
     const hasSlack = document.getElementById('ccSlackSection') && document.getElementById('ccSlackSection').style.display !== 'none';
-    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack) ? '' : 'none';
+    const hasWatch = document.getElementById('ccWatchSection') && document.getElementById('ccWatchSection').style.display !== 'none';
+    allClear.style.display = (!hasFires && !hasVideo && !hasTasks && !hasSlack && !hasWatch) ? '' : 'none';
   }
 
   // Update nav badges while we're here
@@ -3855,6 +3900,7 @@ async function loadAll() {
       fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`),  // 6 — Creative fatigue (F7)
       fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),     // 7 — Slack flagged (F9/F10)
       fetchJ(`${BASE}/creative-intel.json?_=${ts}`),  // 8 — Cross-portfolio intel (F8)
+      fetchJ(`${BASE}/watchdog.json?_=${ts}`),        // 9 — 30-day watchdog (F13)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -3871,7 +3917,8 @@ async function loadAll() {
     }
     if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData    = staticFetches[6].value; }
     if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData      = staticFetches[7].value; }
-    if (staticFetches[8].status === 'fulfilled' && staticFetches[8].value) { creativeIntelData  = staticFetches[8].value; }
+    if (staticFetches[8].status === 'fulfilled' && staticFetches[8].value) { creativeIntelData = staticFetches[8].value; }
+    if (staticFetches[9].status === 'fulfilled' && staticFetches[9].value) { watchdogData      = staticFetches[9].value; }
     if (metaData) renderMeta();
     if (slFlaggedData) updateSlackBadge();
 
