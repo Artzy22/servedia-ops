@@ -535,35 +535,39 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div>
 
 <!-- ════════════════ DAILY MAINTENANCE ════════════════ -->
-<!-- ════════════════ MORNING BRIEFING ════════════════ -->
-<div id="panel-briefing" class="panel active content">
+<!-- ════════════════ COMMAND CENTER ════════════════ -->
+<div id="panel-command" class="panel active content">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:12px">
     <div>
-      <div style="font-size:22px;font-weight:800;color:#fff">Good morning, Byron ☀️</div>
-      <div style="font-size:13px;color:#555;margin-top:4px" id="briefDate"></div>
-    </div>
-    <div style="display:flex;gap:8px">
-      <div class="stat-card" style="text-align:center;min-width:80px"><div class="stat-label">Reviewed</div><div class="stat-value green" id="bDone">0</div></div>
-      <div class="stat-card" style="text-align:center;min-width:80px"><div class="stat-label">Remaining</div><div class="stat-value orange" id="bRemain">–</div></div>
+      <div style="font-size:22px;font-weight:800;color:#fff" id="ccGreeting">Command Center</div>
+      <div style="font-size:13px;color:#555;margin-top:4px" id="ccDate"></div>
     </div>
   </div>
-  <div id="bFireSection" style="margin-bottom:20px">
+  <div class="stat-grid" style="margin-bottom:20px">
+    <div class="stat-card"><div class="stat-label">Active Accounts</div><div class="stat-value purple" id="ccActiveAccounts">–</div></div>
+    <div class="stat-card"><div class="stat-label">7-Day Spend</div><div class="stat-value" id="ccSpend7">–</div></div>
+    <div class="stat-card"><div class="stat-label">Needs Review</div><div class="stat-value orange" id="ccReviewCount">–</div></div>
+    <div class="stat-card"><div class="stat-label">Video Tickets</div><div class="stat-value yellow" id="ccVideoCount">–</div></div>
+    <div class="stat-card"><div class="stat-label">Urgent Tasks</div><div class="stat-value red" id="ccUrgentCount">–</div></div>
+    <div class="stat-card"><div class="stat-label">Slack Alerts</div><div class="stat-value" id="ccSlackCount">–</div></div>
+  </div>
+  <div id="ccFireSection" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#f87171;margin-bottom:10px">🔥 NEEDS ATTENTION NOW</div>
-    <div id="bFireGrid" class="meta-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
+    <div id="ccFireGrid" class="meta-grid" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
   </div>
-  <div id="bVideoSection" style="margin-bottom:20px">
+  <div id="ccVideoSection" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#fb923c;margin-bottom:10px">🎬 VIDEO TICKETS READY FOR YOU</div>
-    <div id="bVideoList"></div>
+    <div id="ccVideoList"></div>
   </div>
-  <div id="bTaskSection" style="margin-bottom:20px">
+  <div id="ccTaskSection" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#fbbf24;margin-bottom:10px">☑️ URGENT &amp; OVERDUE TASKS</div>
-    <div id="bTaskList"></div>
+    <div id="ccTaskList"></div>
   </div>
-  <div id="bSlackSection" style="margin-bottom:20px">
+  <div id="ccSlackSection" style="margin-bottom:20px;display:none">
     <div class="section-title" style="color:#a78bfa;margin-bottom:10px">💬 SLACK — NEEDS YOUR RESPONSE</div>
-    <div id="bSlackList"></div>
+    <div id="ccSlackList"></div>
   </div>
-  <div id="bAllClear" style="display:none;text-align:center;padding:40px">
+  <div id="ccAllClear" style="display:none;text-align:center;padding:40px">
     <div style="font-size:40px;margin-bottom:12px">🎉</div>
     <div style="font-size:18px;font-weight:700;color:#34d399">All clear! Nothing urgent right now.</div>
     <div style="font-size:13px;color:#555;margin-top:6px">Head to Daily Maintenance to start your reviews.</div>
