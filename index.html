@@ -482,29 +482,94 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
-<!-- ════════════════ HEADER ════════════════ -->
-<div class="header">
-  <div class="logo">Servedia<span>Ops</span></div>
-  <div class="header-meta">
-    <div>
-      <div class="sync-info" id="syncInfo"><b>Last sync</b><br>Loading...</div>
-      <div class="sync-counter" id="syncCounter">–</div>
-    </div>
-    <button class="hbtn" onclick="openSettings()">⚙ Config</button>
-    <button class="hbtn" onclick="loadAll()">↺ Refresh</button>
+<div class="app-shell">
+
+<!-- ── Top Bar ── -->
+<div class="topbar">
+  <div class="topbar-brand">
+    <div class="topbar-logo">S</div>
+    <span class="topbar-name">Servedia Ops</span>
+  </div>
+  <div class="topbar-right">
+    <span class="topbar-sync" id="syncInfo">Loading...</span>
+    <button class="topbar-btn" onclick="openSettings()">⚙ Settings</button>
   </div>
 </div>
 
-<!-- ════════════════ TABS ════════════════ -->
-<div class="tabs">
-  <div class="tab active" id="tab-briefing" onclick="switchTab('briefing')">☀️ Morning Briefing <span class="tab-badge red" id="briefBadge">–</span></div>
-  <div class="tab" id="tab-meta" onclick="switchTab('meta')">📊 Meta Ads <span class="tab-badge green" id="metaBadge">–</span></div>
-  <div class="tab" id="tab-maintenance" onclick="switchTab('maintenance')">✅ Daily Maintenance <span class="tab-badge red" id="maintBadge">–</span></div>
-  <div class="tab" id="tab-tasks" onclick="switchTab('tasks')">☑ Tasks <span class="tab-badge orange" id="tasksBadge">–</span></div>
-  <div class="tab" id="tab-video" onclick="switchTab('video')">🎬 Video Editing <span class="tab-badge blue" id="videoBadge">–</span></div>
-  <div class="tab" id="tab-slack" onclick="switchTab('slack')">💬 Slack <span class="tab-badge orange" id="slackBadge">–</span></div>
-  <div class="tab" id="tab-retention" onclick="switchTab('retention')">⚠️ Retention <span class="tab-badge red" id="retBadge">–</span></div>
-</div>
+<!-- ── Body Row ── -->
+<div class="body-row">
+
+<!-- ── Sidebar ── -->
+<nav class="sidebar">
+
+  <!-- Command Center -->
+  <div class="nav-group">
+    <div class="nav-item active" id="nav-command" onclick="switchSection('command')">
+      <div class="nav-item-left">
+        <span class="nav-icon">⚡</span>
+        <span class="nav-label">Command Center</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Media Buying -->
+  <div class="nav-group">
+    <span class="nav-group-label">Media Buying</span>
+    <div class="nav-item" id="nav-meta" onclick="switchSection('meta')">
+      <div class="nav-item-left"><span class="nav-icon">📊</span><span class="nav-label">Meta Ads</span></div>
+      <span class="nav-badge nb-orange" id="navBadge-meta">–</span>
+    </div>
+    <div class="nav-item" id="nav-maintenance" onclick="switchSection('maintenance')">
+      <div class="nav-item-left"><span class="nav-icon">🗂️</span><span class="nav-label">Daily Maintenance</span></div>
+      <span class="nav-badge nb-red" id="navBadge-maintenance">–</span>
+    </div>
+    <div class="nav-item" id="nav-retention" onclick="switchSection('retention')">
+      <div class="nav-item-left"><span class="nav-icon">🏆</span><span class="nav-label">Creative Intel</span></div>
+      <span class="nav-badge nb-gray" id="navBadge-retention">–</span>
+    </div>
+  </div>
+
+  <!-- Clients -->
+  <div class="nav-group">
+    <span class="nav-group-label">Clients</span>
+    <div class="nav-item" id="nav-crm" onclick="switchSection('crm')">
+      <div class="nav-item-left"><span class="nav-icon">🤝</span><span class="nav-label">CRM</span></div>
+      <span class="nav-badge nb-yellow" id="navBadge-crm">–</span>
+    </div>
+    <div class="nav-item" id="nav-onboarding" onclick="switchSection('onboarding')">
+      <div class="nav-item-left"><span class="nav-icon">🚀</span><span class="nav-label">Onboarding</span></div>
+    </div>
+    <div class="nav-item" id="nav-watchdog" onclick="switchSection('watchdog')">
+      <div class="nav-item-left"><span class="nav-icon">🆕</span><span class="nav-label">Watchdog</span></div>
+      <span class="nav-badge nb-orange" id="navBadge-watchdog">–</span>
+    </div>
+  </div>
+
+  <!-- Work Queue -->
+  <div class="nav-group">
+    <span class="nav-group-label">Work Queue</span>
+    <div class="nav-item" id="nav-video" onclick="switchSection('video')">
+      <div class="nav-item-left"><span class="nav-icon">🎬</span><span class="nav-label">Video Tickets</span></div>
+      <span class="nav-badge nb-purple" id="navBadge-video">–</span>
+    </div>
+    <div class="nav-item" id="nav-tech" onclick="switchSection('tech')">
+      <div class="nav-item-left"><span class="nav-icon">⚙️</span><span class="nav-label">Tech Tickets</span></div>
+      <span class="nav-badge nb-red" id="navBadge-tech">–</span>
+    </div>
+    <div class="nav-item" id="nav-slack" onclick="switchSection('slack')">
+      <div class="nav-item-left"><span class="nav-icon">💬</span><span class="nav-label">Slack</span></div>
+      <span class="nav-badge nb-yellow" id="navBadge-slack">–</span>
+    </div>
+    <div class="nav-item" id="nav-tasks" onclick="switchSection('tasks')">
+      <div class="nav-item-left"><span class="nav-icon">☑️</span><span class="nav-label">Tasks</span></div>
+      <span class="nav-badge nb-gray" id="navBadge-tasks">–</span>
+    </div>
+  </div>
+
+</nav>
+
+<!-- ── Main Content ── -->
+<div class="main-content" id="mainContent">
 
 <!-- ════════════════ META ADS ════════════════ -->
 <div id="panel-meta" class="panel content">
@@ -742,6 +807,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   </div>
   <div id="retLoadingMsg" style="text-align:center;padding:48px;color:#555;font-size:14px">Set Client Management List ID in Config to load retention data.</div>
 </div>
+
+</div><!-- /.main-content -->
+</div><!-- /.body-row -->
+</div><!-- /.app-shell -->
 
 <!-- ════════════════ SETTINGS MODAL ════════════════ -->
 <div class="modal-ov" id="settingsModal">
