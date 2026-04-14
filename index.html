@@ -276,6 +276,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* ══════════ SLACK ══════════ */
 .slack-layout{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid #1e1e1e;border-radius:12px;overflow:hidden;min-height:480px}
+.slack-attn-panel{border:1px solid #2a1200;border-radius:10px;background:#0d0800;padding:12px 14px;margin-bottom:14px}
+.slack-attn-hd{font-size:11px;font-weight:800;color:#f97316;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.slack-attn-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid #1a1000}
+.slack-attn-item:last-child{border:none}
+.slack-attn-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.dot-red{background:#ef4444}.dot-yellow{background:#fbbf24}.dot-gray{background:#555}
+.slack-attn-body{flex:1;min-width:0}
+.slack-attn-meta{font-size:10px;color:#666;margin-bottom:3px}
+.slack-attn-text{font-size:12px;color:#ccc;word-break:break-word;line-height:1.45}
+.slack-attn-footer{display:flex;align-items:center;gap:8px;margin-top:5px;flex-wrap:wrap}
+.slack-attn-kw{font-size:10px;background:#2a1200;color:#f97316;border-radius:4px;padding:1px 6px}
+.slack-create-btn{font-size:11px;background:#7c3aed;border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;font-weight:700}
+.slack-create-btn:hover{background:#6d28d9}
+.slack-created-lbl{font-size:11px;color:#34d399;font-weight:600}
 .ch-list{background:#111;border-right:1px solid #1e1e1e;padding:10px 0}
 .ch-list-hd{font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.5px;padding:5px 14px 9px;font-weight:600}
 .ch-item{padding:7px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:background .1s}
@@ -788,6 +802,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <input class="filter-input" id="slSearch" placeholder="Search messages..." oninput="renderSlack()">
     <div style="font-size:11px;color:#555;white-space:nowrap" id="slUpdated"></div>
   </div>
+  <!-- F10: Needs Attention panel -->
+  <div id="slackAttnPanel" style="display:none"></div>
   <div class="slack-layout">
     <div class="ch-list">
       <div class="ch-list-hd">Channels</div>
@@ -968,6 +984,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div><!-- /.body-row -->
 </div><!-- /.app-shell -->
 
+<!-- ════════════════ SLACK TASK CONFIRM MODAL (F9) ════════════════ -->
+<div class="modal-ov" id="slackTaskModal" onclick="if(event.target===this)closeSlackTaskModal()">
+  <div class="modal" style="max-width:500px">
+    <div class="modal-title">
+      ⚡ Create ClickUp Task from Slack
+      <button class="modal-close" onclick="closeSlackTaskModal()">✕</button>
+    </div>
+    <div id="slackTaskModalBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeSlackTaskModal()">Cancel</button>
+      <button id="slackTaskConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Create Task</button>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════ CREATIVE FATIGUE CONFIRM MODAL ════════════════ -->
 <div class="modal-ov" id="fatigueModal" onclick="if(event.target===this)closeFatigueModal()">
   <div class="modal" style="max-width:480px">
@@ -1128,6 +1159,7 @@ let metaData = null, cuData = null, slData = null, vidData = null, maintData = n
 let paymentData = null, violationsData = null;
 let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
 let fatigueData   = null; // creative-fatigue.json (F7)
+let slFlaggedData = null; // slack-flagged.json (F9/F10)
 let crmFilter = 'all';
 let techFilter = 'all';
 let clientMgmtData = {};      // adAccountId → enriched client record (from ClickUp Client Management)
@@ -1531,6 +1563,132 @@ function cpbKls(v) {
   if (v < 50) return 'kb-green';
   if (v <= 100) return 'kb-yellow';
   return 'kb-red';
+}
+
+// ── F9/F10: Slack urgent message detection ──
+
+function updateSlackBadge() {
+  if (!slFlaggedData) return;
+  const urgentCount = slFlaggedData.urgent_count || 0;
+  const slBadge = document.getElementById('slackBadge');
+  if (slBadge && urgentCount > 0) {
+    slBadge.textContent = urgentCount;
+    slBadge.style.background = '#ef4444';
+  }
+}
+
+function renderSlackAttention() {
+  const panel = document.getElementById('slackAttnPanel');
+  if (!panel) return;
+
+  const flagged = (slFlaggedData && slFlaggedData.flagged) || [];
+  if (!flagged.length) { panel.style.display = 'none'; return; }
+
+  const items = flagged.map(m => {
+    const dotCls  = m.type === 'urgent' ? 'dot-red' : m.type === 'question' ? 'dot-yellow' : 'dot-gray';
+    const kwHtml  = m.keywords_found.map(k => `<span class="slack-attn-kw">${esc(k)}</span>`).join('');
+    const timeStr = m.ts_iso ? fmtTime(m.ts_iso) : (m.ts ? fmtTime(new Date(parseFloat(m.ts)*1000).toISOString()) : '');
+    const assignee = m.assignee ? `<span style="font-size:10px;color:#777">→ ${esc(m.assignee)}</span>` : '';
+
+    const actionHtml = m.task_created
+      ? `<span class="slack-created-lbl">✅ Task created</span>`
+      : m.type === 'urgent'
+        ? `<button class="slack-create-btn" onclick="openSlackTaskModal(this.dataset.id)" data-id="${esc(m.id)}">+ Create Task</button>${assignee}`
+        : '';
+
+    return `<div class="slack-attn-item">
+      <div class="slack-attn-dot ${dotCls}"></div>
+      <div class="slack-attn-body">
+        <div class="slack-attn-meta">#${esc(m.channel)} · ${timeStr}</div>
+        <div class="slack-attn-text">${esc(m.text)}</div>
+        <div class="slack-attn-footer">${kwHtml}${actionHtml}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const urgentN   = flagged.filter(m => m.type === 'urgent').length;
+  const questionN = flagged.filter(m => m.type === 'question').length;
+  const countStr  = [urgentN && `${urgentN} urgent`, questionN && `${questionN} question${questionN>1?'s':''}`].filter(Boolean).join(' · ');
+
+  panel.style.display = '';
+  panel.innerHTML = `<div class="slack-attn-panel">
+    <div class="slack-attn-hd">🚨 Needs Response <span style="font-weight:400;color:#888;text-transform:none;font-size:10px">${countStr}</span></div>
+    ${items}
+  </div>`;
+}
+
+function openSlackTaskModal(elOrId) {
+  const msgId = typeof elOrId === 'string' ? elOrId : elOrId.dataset.id;
+  const flagged = (slFlaggedData && slFlaggedData.flagged) || [];
+  const msg = flagged.find(m => m.id === msgId);
+  if (!msg) return;
+
+  const modal = document.getElementById('slackTaskModal');
+  const body  = document.getElementById('slackTaskModalBody');
+  const btn   = document.getElementById('slackTaskConfirmBtn');
+  if (!modal || !body) return;
+
+  const listName = msg.channel.toLowerCase().includes('video') ? 'Video Editing' : 'Media Tickets';
+  const listId   = msg.channel.toLowerCase().includes('video') ? '901512331541' : '901515083916';
+
+  body.innerHTML = `
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:#aaa">
+      <div style="font-size:10px;color:#555;margin-bottom:4px">#${esc(msg.channel)}</div>
+      <div style="color:#ccc">${esc(msg.text)}</div>
+    </div>
+    <div style="margin-bottom:10px;font-size:12px">
+      <b>List:</b> <span style="color:#a78bfa">${esc(listName)}</span><br>
+      <b>Assignee:</b> <span style="color:#ccc">${esc(msg.assignee || 'Byron')}</span>
+    </div>
+    <p style="color:#aaa;font-size:12px">A ClickUp task will be created in <b style="color:#fff">${esc(listName)}</b> with this message as the description.</p>`;
+
+  btn.onclick = () => confirmSlackTask(msg, listId, listName);
+  modal.classList.add('open');
+}
+
+function closeSlackTaskModal() {
+  const modal = document.getElementById('slackTaskModal');
+  if (modal) modal.classList.remove('open');
+}
+
+async function confirmSlackTask(msg, listId, listName) {
+  const cfg = getCfg();
+  if (!cfg.token) {
+    alert('ClickUp API token required. Please configure in Settings (⚙).');
+    return;
+  }
+
+  const btn = document.getElementById('slackTaskConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const taskName = `[Slack] ${msg.text.slice(0, 80)}${msg.text.length > 80 ? '…' : ''}`;
+  const desc = `From Slack #${msg.channel}:\n\n${msg.text}\n\nKeywords detected: ${msg.keywords_found.join(', ')}`;
+
+  try {
+    const r = await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2 }),
+    });
+    if (!r.ok) {
+      const err = await r.json().catch(() => ({}));
+      throw new Error(err.err || 'HTTP ' + r.status);
+    }
+    const task = await r.json();
+
+    // Mark as task_created in local data
+    if (slFlaggedData) {
+      const m = (slFlaggedData.flagged || []).find(m => m.id === msg.id);
+      if (m) m.task_created = true;
+    }
+
+    closeSlackTaskModal();
+    renderSlackAttention();
+    alert(`✅ Task created in ${listName}!\n\nView: ${task.url || 'ClickUp'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create Task'; btn.disabled = false; }
+    alert('❌ Failed to create task: ' + e.message);
+  }
 }
 
 function buildFatigueMap() {
@@ -2943,6 +3101,7 @@ function renderSlack() {
   const search = (document.getElementById('slSearch').value || '').toLowerCase();
   if (slData.pulled_at) document.getElementById('slUpdated').textContent = 'Synced: ' + fmtTime(slData.pulled_at);
   { const _e = document.getElementById('slackBadge'); if (_e) _e.textContent = msgs.length; }
+  renderSlackAttention();  // F10: Needs Attention panel
 
   // Channels
   const chanMap = {};
@@ -3348,7 +3507,8 @@ async function loadAll() {
       fetchJ(`${BASE}/payment-status.json?_=${ts}`),   // 3 — Payment failures (F2)
       fetchJ(`${BASE}/policy-violations.json?_=${ts}`),// 4 — Policy violations (F3)
       fetchJ(`${BASE}/client-map.json?_=${ts}`),         // 5 — Client map (F5 suggestions)
-      fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`), // 6 — Creative fatigue (F7)
+      fetchJ(`${BASE}/creative-fatigue.json?_=${ts}`),  // 6 — Creative fatigue (F7)
+      fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),    // 7 — Slack flagged (F9/F10)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -3363,8 +3523,10 @@ async function loadAll() {
         metaClientMap[id] = e;
       });
     }
-    if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData = staticFetches[6].value; }
+    if (staticFetches[6].status === 'fulfilled' && staticFetches[6].value) { fatigueData    = staticFetches[6].value; }
+    if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData  = staticFetches[7].value; }
     if (metaData) renderMeta();
+    if (slFlaggedData) updateSlackBadge();
 
     if (hasToken) {
       // LIVE MODE — fetch directly from ClickUp API
