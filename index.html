@@ -628,6 +628,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="leads">Most Leads</option>
       <option value="name">Name A–Z</option>
     </select>
+    <button style="background:#7c3aed;border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap" onclick="openOnboardingModal()">+ New Client</button>
   </div>
   <div class="section-title" id="metaSubtitle">Loading...</div>
   <div class="meta-grid" id="metaGrid"></div>
@@ -987,6 +988,97 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </div><!-- /.main-content -->
 </div><!-- /.body-row -->
 </div><!-- /.app-shell -->
+
+<!-- ════════════════ NEW CLIENT ONBOARDING MODAL (F12) ════════════════ -->
+<div class="modal-ov" id="onboardingModal" onclick="if(event.target===this)closeOnboardingModal()">
+  <div class="modal" style="max-width:580px;max-height:92vh">
+    <div class="modal-title">
+      🚀 New Client Onboarding
+      <button class="modal-close" onclick="closeOnboardingModal()">✕</button>
+    </div>
+    <!-- Step 1: Form -->
+    <div id="obStep1">
+      <p style="font-size:12px;color:#666;margin-bottom:14px">Fill in the details below. Click Preview to see the tasks that will be created.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Client Name *</label>
+          <input class="filter-input" id="ob-name" placeholder="e.g. Nunova Health" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Meta Account ID *</label>
+          <input class="filter-input" id="ob-account-id" placeholder="e.g. 2151825605165694" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Niche</label>
+          <input class="filter-input" id="ob-niche" placeholder="e.g. medspa" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Daily Ad Budget ($)</label>
+          <input class="filter-input" id="ob-budget" type="number" placeholder="e.g. 75" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Target CPL ($)</label>
+          <input class="filter-input" id="ob-target-cpl" type="number" placeholder="12" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Offer Price ($)</label>
+          <input class="filter-input" id="ob-offer-price" type="number" placeholder="e.g. 99" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Treatment / Service</label>
+          <input class="filter-input" id="ob-treatment" placeholder="e.g. Botox" style="width:100%">
+        </div>
+        <div>
+          <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Assignee</label>
+          <select class="filter-select" id="ob-assignee" style="width:100%">
+            <option value="Byron">Byron</option>
+            <option value="Anca">Anca</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Funnel URL</label>
+        <input class="filter-input" id="ob-funnel" placeholder="https://..." style="width:100%">
+      </div>
+      <div style="margin-bottom:10px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Drive Folder ID</label>
+        <input class="filter-input" id="ob-drive" placeholder="1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf" style="width:100%">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;color:#888;display:block;margin-bottom:4px">Special Rules</label>
+        <textarea class="filter-input" id="ob-rules" placeholder="e.g. No AI creatives, client must approve all" style="width:100%;height:56px;resize:vertical"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="filter-select" style="cursor:pointer" onclick="closeOnboardingModal()">Cancel</button>
+        <button style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700" onclick="previewOnboarding()">Preview Tasks →</button>
+      </div>
+    </div>
+    <!-- Step 2: Preview -->
+    <div id="obStep2" style="display:none">
+      <p style="font-size:12px;color:#666;margin-bottom:10px">Review the checklist tasks that will be created in ClickUp:</p>
+      <div id="obTaskPreview" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end">
+        <button class="filter-select" style="cursor:pointer" onclick="document.getElementById('obStep1').style.display='';document.getElementById('obStep2').style.display='none'">← Back</button>
+        <button id="obConfirmBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700" onclick="confirmOnboarding()">Confirm &amp; Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ CREATIVE REQUEST MODAL (F12 step 2) ════════════════ -->
+<div class="modal-ov" id="creativeRequestModal" onclick="if(event.target===this)closeCreativeRequestModal()">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-title">
+      🎨 First Creative Request
+      <button class="modal-close" onclick="closeCreativeRequestModal()">✕</button>
+    </div>
+    <div id="creativeRequestBody" style="margin-top:12px;font-size:13px;color:#ccc"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;justify-content:flex-end">
+      <button class="filter-select" style="cursor:pointer" onclick="closeCreativeRequestModal()">Skip for now</button>
+      <button id="creativeRequestBtn" style="background:#7c3aed;border:none;color:#fff;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700">Confirm &amp; Send to Saquib</button>
+    </div>
+  </div>
+</div>
 
 <!-- ════════════════ SLACK TASK CONFIRM MODAL (F9) ════════════════ -->
 <div class="modal-ov" id="slackTaskModal" onclick="if(event.target===this)closeSlackTaskModal()">
@@ -1568,6 +1660,229 @@ function cpbKls(v) {
   if (v < 50) return 'kb-green';
   if (v <= 100) return 'kb-yellow';
   return 'kb-red';
+}
+
+// ══════════════════════════════════════════════════════════════
+// ══ F12: New Client Onboarding ══
+// ══════════════════════════════════════════════════════════════
+
+const ONBOARDING_TASKS = [
+  { name: 'Get Meta Ad Account Admin Access', priority: 1 },
+  { name: 'Install Meta Pixel on Website', priority: 2 },
+  { name: 'Set Up Lead Form or Landing Page', priority: 2 },
+  { name: 'Create Campaign Structure (Campaign → Ad Set → Ads)', priority: 2 },
+  { name: 'Create First Creative Brief for Video Team', priority: 2 },
+  { name: 'Review and Approve First Creatives', priority: 3 },
+  { name: 'Launch First Campaign', priority: 1 },
+  { name: 'Set Up Weekly Reporting & Initial Optimization', priority: 3 },
+];
+
+let _obPendingData = null; // stores form data between step 1 and confirm
+
+function openOnboardingModal() {
+  // Reset form
+  ['ob-name','ob-account-id','ob-niche','ob-budget','ob-target-cpl',
+   'ob-offer-price','ob-treatment','ob-funnel','ob-drive','ob-rules'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'ob-drive' ? '1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf' : '';
+  });
+  document.getElementById('obStep1').style.display = '';
+  document.getElementById('obStep2').style.display = 'none';
+  document.getElementById('onboardingModal').classList.add('open');
+}
+
+function closeOnboardingModal() {
+  document.getElementById('onboardingModal').classList.remove('open');
+}
+
+function previewOnboarding() {
+  const name = (document.getElementById('ob-name').value || '').trim();
+  if (!name) { alert('Client name is required.'); return; }
+
+  const treatment = document.getElementById('ob-treatment').value.trim();
+  const offerPrice = document.getElementById('ob-offer-price').value.trim();
+
+  const preview = document.getElementById('obTaskPreview');
+  preview.innerHTML = ONBOARDING_TASKS.map((t, i) => {
+    const taskName = t.name.replace('{CLIENT}', name).replace('{TREATMENT}', treatment || 'treatment');
+    return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1a1a1a">
+      <span style="width:20px;height:20px;border-radius:50%;background:#1e1b33;border:1px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:10px;color:#a78bfa;flex-shrink:0">${i+1}</span>
+      <span style="font-size:12px;color:#ccc">${esc(taskName)}</span>
+      <span class="kbadge" style="margin-left:auto;font-size:9px;background:${t.priority===1?'#450a0a':t.priority===2?'#2a1a00':'#1a1a2e'};color:${t.priority===1?'#f87171':t.priority===2?'#fb923c':'#818cf8'}">${t.priority===1?'urgent':t.priority===2?'high':'normal'}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('obStep1').style.display = 'none';
+  document.getElementById('obStep2').style.display = '';
+}
+
+async function confirmOnboarding() {
+  const cfg = getCfg();
+  if (!cfg.token) { alert('ClickUp API token required. Please configure in Settings (⚙).'); return; }
+
+  const data = {
+    name:       (document.getElementById('ob-name').value || '').trim(),
+    accountId:  (document.getElementById('ob-account-id').value || '').trim(),
+    niche:      (document.getElementById('ob-niche').value || '').trim(),
+    budget:     parseFloat(document.getElementById('ob-budget').value) || null,
+    targetCpl:  parseFloat(document.getElementById('ob-target-cpl').value) || 12,
+    offerPrice: parseFloat(document.getElementById('ob-offer-price').value) || null,
+    treatment:  (document.getElementById('ob-treatment').value || '').trim(),
+    assignee:   document.getElementById('ob-assignee').value,
+    funnel:     (document.getElementById('ob-funnel').value || '').trim(),
+    drive:      (document.getElementById('ob-drive').value || '1Lu4Gi3zZB9eLojJwwQNT9Zv-yMbImwYf').trim(),
+    rules:      (document.getElementById('ob-rules').value || '').trim(),
+  };
+
+  if (!data.name) { alert('Client name is required.'); return; }
+
+  const btn = document.getElementById('obConfirmBtn');
+  if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
+
+  const listId = cfg.clientMgmtListId || '901514441223';
+  const headers = { 'Authorization': cfg.token, 'Content-Type': 'application/json' };
+
+  try {
+    // 1. Create main client task in ClickUp
+    const desc = [
+      data.treatment && `Treatment: ${data.treatment}`,
+      data.offerPrice && `Offer Price: $${data.offerPrice}`,
+      data.budget && `Daily Budget: $${data.budget}/day`,
+      `Target CPL: $${data.targetCpl}`,
+      data.funnel && `Funnel URL: ${data.funnel}`,
+      data.drive && `Drive Folder: https://drive.google.com/drive/folders/${data.drive}`,
+      data.rules && `Special Rules: ${data.rules}`,
+      data.niche && `Niche: ${data.niche}`,
+    ].filter(Boolean).join('\n');
+
+    const taskR = await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ name: data.name, description: desc, priority: 2, status: 'in onboarding' }),
+    });
+    if (!taskR.ok) throw new Error('Failed to create client task: ' + taskR.status);
+    const task = await taskR.json();
+
+    // 2. Create 8 onboarding checklist tasks as subtasks
+    for (const t of ONBOARDING_TASKS) {
+      await fetch(`https://api.clickup.com/api/v2/list/${listId}/task`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ name: t.name, priority: t.priority, parent: task.id }),
+      });
+    }
+
+    // 3. Update client-map.json via GitHub API
+    const newEntry = {
+      meta_account_id: data.accountId,
+      meta_name:       data.name,
+      clickup_task_id: task.id,
+      clickup_name:    data.name,
+      matched:         true,
+      confidence:      1.0,
+      niche:           data.niche || null,
+      target_cpl:      data.targetCpl,
+      daily_budget:    data.budget,
+      onboarded_date:  new Date().toISOString().split('T')[0],
+      special_rules:   data.rules || null,
+      funnel_url:      data.funnel || null,
+      drive_folder:    data.drive ? `https://drive.google.com/drive/folders/${data.drive}` : null,
+      assignee:        data.assignee,
+    };
+
+    try {
+      const pat = localStorage.getItem('gh_pat');
+      if (pat) {
+        const cmR = await fetch(`https://api.github.com/repos/Artzy22/servedia-ops/contents/data/client-map.json`,
+          { headers: { Authorization: 'token ' + pat } });
+        if (cmR.ok) {
+          const cmFile = await cmR.json();
+          const existing = JSON.parse(atob(cmFile.content.replace(/\n/g,'')));
+          const clients = (existing.clients || existing || []).filter(e => e.meta_account_id !== data.accountId);
+          clients.push(newEntry);
+          const updated = typeof existing.clients !== 'undefined'
+            ? { ...existing, clients }
+            : clients;
+          await fetch(`https://api.github.com/repos/Artzy22/servedia-ops/contents/data/client-map.json`, {
+            method: 'PUT',
+            headers: { Authorization: 'token ' + pat, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: `onboard: add ${data.name}`, content: btoa(unescape(encodeURIComponent(JSON.stringify(updated, null, 2)))), sha: cmFile.sha }),
+          });
+        }
+      }
+    } catch(e) { console.warn('client-map update failed:', e); }
+
+    // 4. Slack notification
+    const slCfg = localStorage.getItem('gh_pat'); // best we have without server
+    // (Slack post from browser requires CORS-enabled relay — note for Byron)
+
+    _obPendingData = { ...data, taskId: task.id, taskUrl: task.url };
+    closeOnboardingModal();
+    showCreativeRequestModal(data);
+
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Create'; btn.disabled = false; }
+    alert('❌ Error: ' + e.message);
+  }
+}
+
+function showCreativeRequestModal(data) {
+  const modal = document.getElementById('creativeRequestModal');
+  const body  = document.getElementById('creativeRequestBody');
+  const btn   = document.getElementById('creativeRequestBtn');
+  if (!modal || !body) return;
+
+  body.innerHTML = `
+    <p style="margin-bottom:12px">Client <b style="color:#a78bfa">${esc(data.name)}</b> has been created in ClickUp with 8 onboarding tasks.</p>
+    <p style="margin-bottom:12px;color:#aaa;font-size:12px">Would you like to send a creative request to <b style="color:#fff">Saquib</b> for the first ad creative? This will create a ticket in the Video Editing list with a 3 business day deadline.</p>
+    <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;font-size:12px;color:#888">
+      <div><b style="color:#ccc">Client:</b> ${esc(data.name)}</div>
+      ${data.treatment ? `<div><b style="color:#ccc">Treatment:</b> ${esc(data.treatment)}</div>` : ''}
+      ${data.offerPrice ? `<div><b style="color:#ccc">Offer Price:</b> $${data.offerPrice}</div>` : ''}
+    </div>`;
+
+  btn.onclick = () => confirmCreativeRequest(data);
+  modal.classList.add('open');
+}
+
+function closeCreativeRequestModal() {
+  document.getElementById('creativeRequestModal').classList.remove('open');
+  alert('✅ Onboarding complete! Client added to ClickUp.');
+}
+
+async function confirmCreativeRequest(data) {
+  const cfg = getCfg();
+  if (!cfg.token) { alert('ClickUp token needed.'); return; }
+
+  const btn = document.getElementById('creativeRequestBtn');
+  if (btn) { btn.textContent = 'Sending…'; btn.disabled = true; }
+
+  // Due date: 3 business days from now
+  const now = new Date();
+  let bizDays = 0, d = new Date(now);
+  while (bizDays < 3) {
+    d.setDate(d.getDate() + 1);
+    if (d.getDay() !== 0 && d.getDay() !== 6) bizDays++;
+  }
+
+  const taskName = `[New Client] First creative — ${data.name}${data.treatment ? ' | ' + data.treatment : ''}`;
+  const desc = `New client onboarding — first ad creative needed.\n\nClient: ${data.name}\n${data.treatment?'Treatment: '+data.treatment+'\n':''}${data.offerPrice?'Offer Price: $'+data.offerPrice+'\n':''}${data.funnel?'Funnel: '+data.funnel+'\n':''}\nPlease create 3 ad creative variations for this client's launch campaign.`;
+
+  try {
+    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+      method: 'POST',
+      headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: taskName, description: desc, priority: 2, due_date: d.getTime() }),
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const task = await r.json();
+    closeCreativeRequestModal();
+    document.getElementById('creativeRequestModal').classList.remove('open');
+    alert(`✅ Onboarding complete!\n\nCreative request sent to Saquib.\nDue: ${d.toLocaleDateString()}\n\nView: ${task.url || 'ClickUp → Video Editing'}`);
+  } catch(e) {
+    if (btn) { btn.textContent = 'Confirm & Send to Saquib'; btn.disabled = false; }
+    alert('❌ Failed: ' + e.message);
+  }
 }
 
 // ── F9/F10: Slack urgent message detection ──
