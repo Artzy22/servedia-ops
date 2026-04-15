@@ -4380,6 +4380,7 @@ async function loadAll() {
       fetchJ(`${BASE}/slack-flagged.json?_=${ts}`),     // 7 — Slack flagged (F9/F10)
       fetchJ(`${BASE}/creative-intel.json?_=${ts}`),  // 8 — Cross-portfolio intel (F8)
       fetchJ(`${BASE}/watchdog.json?_=${ts}`),        // 9 — 30-day watchdog (F13)
+      fetchJ(`${BASE}/assignments.json?_=${ts}`),     // 10 — account assignments (Phase 1)
     ]);
 
     if (staticFetches[0].status === 'fulfilled' && staticFetches[0].value) { metaData       = staticFetches[0].value; normalizeMetaData(); }
@@ -4398,6 +4399,10 @@ async function loadAll() {
     if (staticFetches[7].status === 'fulfilled' && staticFetches[7].value) { slFlaggedData      = staticFetches[7].value; }
     if (staticFetches[8].status === 'fulfilled' && staticFetches[8].value) { creativeIntelData = staticFetches[8].value; }
     if (staticFetches[9].status === 'fulfilled' && staticFetches[9].value) { watchdogData      = staticFetches[9].value; }
+    if (staticFetches[10].status === 'fulfilled' && staticFetches[10].value) {
+      assignmentData = staticFetches[10].value;
+      window.assignmentData = assignmentData; // T4 actions also read from window.assignmentData
+    }
     if (metaData) renderMeta();
     if (slFlaggedData) updateSlackBadge();
 

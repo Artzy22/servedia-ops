@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servedia Ops — Full Platform Plan</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0f; color: #e0e0e0; min-height: 100vh; padding: 32px 24px 60px; }
+
+  .hero { text-align: center; margin-bottom: 48px; }
+  .hero-label { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #7c3aed; margin-bottom: 12px; }
+  .hero h1 { font-size: 36px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+  .hero p { font-size: 15px; color: #666; max-width: 560px; margin: 0 auto; line-height: 1.6; }
+
+  .pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 48px; }
+  .pillar { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 20px; text-align: center; }
+  .pillar-icon { font-size: 28px; margin-bottom: 10px; }
+  .pillar h3 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .pillar p { font-size: 12px; color: #555; line-height: 1.5; }
+
+  .section-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #555; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: #1e1e1e; }
+
+  /* ── MODULE GRID ── */
+  .modules { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 48px; }
+  .module { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 22px; position: relative; overflow: hidden; }
+  .module::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .module.purple::before { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
+  .module.green::before  { background: linear-gradient(90deg, #059669, #34d399); }
+  .module.orange::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+  .module.blue::before   { background: linear-gradient(90deg, #1d4ed8, #60a5fa); }
+  .module.pink::before   { background: linear-gradient(90deg, #be185d, #f472b6); }
+  .module.teal::before   { background: linear-gradient(90deg, #0e7490, #22d3ee); }
+
+  .mod-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+  .mod-title { font-size: 16px; font-weight: 800; color: #fff; }
+  .mod-sub { font-size: 11px; color: #555; margin-top: 3px; }
+  .mod-badge { font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; margin-left: 10px; margin-top: 2px; }
+  .badge-done  { background: #052e16; color: #34d399; border: 1px solid #065f46; }
+  .badge-build { background: #1e1b33; color: #a78bfa; border: 1px solid #7c3aed; }
+  .badge-new   { background: #2a1200; color: #fb923c; border: 1px solid #7c2d12; }
+
+  .feat-list { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .feat-list li { font-size: 12px; color: #aaa; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; }
+  .feat-list li .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .dot-done   { background: #34d399; }
+  .dot-build  { background: #7c3aed; }
+  .dot-new    { background: #fb923c; }
+
+  /* ── AUTOMATION ROW ── */
+  .auto-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 48px; }
+  .auto-card { background: #0d0d14; border: 1px solid #1a1a2e; border-radius: 10px; padding: 16px; text-align: center; }
+  .auto-card .icon { font-size: 22px; margin-bottom: 8px; }
+  .auto-card h4 { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+  .auto-card p  { font-size: 11px; color: #555; line-height: 1.4; }
+  .auto-card .trigger { font-size: 10px; color: #7c3aed; margin-top: 8px; font-weight: 600; }
+
+  /* ── BUILD ORDER ── */
+  .build-order { display: flex; flex-direction: column; gap: 8px; margin-bottom: 48px; }
+  .build-row { display: flex; align-items: center; gap: 12px; background: #111; border: 1px solid #1e1e1e; border-radius: 10px; padding: 12px 16px; }
+  .build-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; flex-shrink: 0; }
+  .num-done  { background: #052e16; color: #34d399; }
+  .num-build { background: #1e1b33; color: #a78bfa; border: 1px solid #7c3aed; }
+  .num-new   { background: #2a1200; color: #fb923c; }
+  .build-name { font-size: 13px; font-weight: 700; color: #fff; min-width: 200px; }
+  .build-desc { font-size: 12px; color: #555; flex: 1; }
+  .build-eta { font-size: 11px; color: #3d3d3d; flex-shrink: 0; }
+  .unlock-badge { font-size: 10px; color: #f59e0b; background: #2a1f00; border: 1px solid #713f12; padding: 2px 7px; border-radius: 5px; flex-shrink: 0; }
+
+  /* ── LEGEND ── */
+  .legend { display: flex; gap: 20px; justify-content: center; margin-bottom: 32px; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">Servedia Media Buying Agency</div>
+  <h1>Full Platform Roadmap</h1>
+  <p>A complete ops dashboard for managing 33+ Meta ad accounts, media buying workflows, tech tickets, and client relationships — all in one place.</p>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:#34d399"></div> Already Built</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#7c3aed"></div> In Progress / Next</div>
+  <div class="leg-item"><div class="leg-dot" style="background:#fb923c"></div> New (Not Started)</div>
+</div>
+
+<!-- 3 PILLARS -->
+<div class="section-label">Three Core Pillars</div>
+<div class="pillars">
+  <div class="pillar">
+    <div class="pillar-icon">📈</div>
+    <h3>Media Buying Ops</h3>
+    <p>Monitor 33+ Meta ad accounts, detect CPL issues, surface AI suggestions, automate creative requests</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-icon">⚙️</div>
+    <h3>Tech & Creative Tasks</h3>
+    <p>Manage video tickets, tech requests, Slack urgent messages — all routed to the right person automatically</p>
+  </div>
+  <div class="pillar">
+    <div class="pillar-icon">🤝</div>
+    <h3>Client CRM / CSM</h3>
+    <p>Full client lifecycle — onboarding, health scores, renewals, retention risk, 30-day watchdog for new clients</p>
+  </div>
+</div>
+
+<!-- MODULES -->
+<div class="section-label">Platform Modules</div>
+<div class="modules">
+
+  <!-- Morning Briefing -->
+  <div class="module purple">
+    <div class="mod-head">
+      <div><div class="mod-title">☀️ Morning Briefing</div><div class="mod-sub">Daily command center</div></div>
+      <span class="mod-badge badge-done">LIVE</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>🔥 "Needs Attention Now" fire items</li>
+      <li><span class="dot dot-done"></span>🎬 Video tickets awaiting approval</li>
+      <li><span class="dot dot-done"></span>☑️ Urgent & overdue ClickUp tasks</li>
+      <li><span class="dot dot-done"></span>💬 Slack messages needing response</li>
+      <li><span class="dot dot-new"></span>🏆 Creative Wins to Clone (cross-portfolio)</li>
+      <li><span class="dot dot-new"></span>🆕 New Client Watchdog section</li>
+    </ul>
+  </div>
+
+  <!-- Meta Ads -->
+  <div class="module green">
+    <div class="mod-head">
+      <div><div class="mod-title">📊 Meta Ads Intelligence</div><div class="mod-sub">33 ad accounts, live CPL monitoring</div></div>
+      <span class="mod-badge badge-build">BUILDING</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>CPL color tiers (configurable Great/Good/OK/Watch/Cut)</li>
+      <li><span class="dot dot-done"></span>AI suggestions per account (scale, pause, cut)</li>
+      <li><span class="dot dot-done"></span>Sort by CPL / worst first</li>
+      <li><span class="dot dot-build"></span>Auto-map Meta accounts → ClickUp clients</li>
+      <li><span class="dot dot-build"></span>🚨 Payment failure detector + red badge</li>
+      <li><span class="dot dot-build"></span>⚠️ Policy violation detector + yellow badge</li>
+      <li><span class="dot dot-build"></span>Creative fatigue detection + amber badge</li>
+    </ul>
+  </div>
+
+  <!-- Daily Maintenance -->
+  <div class="module orange">
+    <div class="mod-head">
+      <div><div class="mod-title">🗂️ Daily Maintenance</div><div class="mod-sub">Per-client review workflow</div></div>
+      <span class="mod-badge badge-done">LIVE</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>Per-client cards with CPL, CPB, leads</li>
+      <li><span class="dot dot-done"></span>Flag / complete / notes per client</li>
+      <li><span class="dot dot-done"></span>AI suggestions panel per card</li>
+      <li><span class="dot dot-done"></span>Drive folder links, ClickUp links</li>
+      <li><span class="dot dot-build"></span>Sort by "Needs Attention" smart score</li>
+      <li><span class="dot dot-build"></span>Health score badge on each card</li>
+    </ul>
+  </div>
+
+  <!-- Client CRM -->
+  <div class="module pink">
+    <div class="mod-head">
+      <div><div class="mod-title">🤝 Client CRM / CSM</div><div class="mod-sub">Full client lifecycle management</div></div>
+      <span class="mod-badge badge-new">NEW</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>Client drawer (renewal date, happiness, refund)</li>
+      <li><span class="dot dot-done"></span>Churn risk signals (existing)</li>
+      <li><span class="dot dot-build"></span>Health score 0–100 (CPL + tasks + fatigue)</li>
+      <li><span class="dot dot-new"></span>Full client profile page</li>
+      <li><span class="dot dot-new"></span>New client onboarding flow + first creative request</li>
+      <li><span class="dot dot-new"></span>30-day Watchdog mode for new clients</li>
+      <li><span class="dot dot-new"></span>Renewal pipeline tracker</li>
+    </ul>
+  </div>
+
+  <!-- Tech & Creative Tickets -->
+  <div class="module blue">
+    <div class="mod-head">
+      <div><div class="mod-title">🎬 Media & Tech Tickets</div><div class="mod-sub">ClickUp task management</div></div>
+      <span class="mod-badge badge-build">BUILDING</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>Video editing tickets (Saquib's queue)</li>
+      <li><span class="dot dot-done"></span>Media/tech task list with filters</li>
+      <li><span class="dot dot-done"></span>Focus queue (drag-to-prioritize)</li>
+      <li><span class="dot dot-build"></span>Slack urgent keyword → auto-create task (Byron confirms)</li>
+      <li><span class="dot dot-new"></span>Tech ticket section (website, funnel, tech ops)</li>
+      <li><span class="dot dot-new"></span>Assignee routing (Byron → Anca → Saquib)</li>
+    </ul>
+  </div>
+
+  <!-- Automation Engine -->
+  <div class="module teal">
+    <div class="mod-head">
+      <div><div class="mod-title">🤖 GitHub Actions Engine</div><div class="mod-sub">Background automation — no server needed</div></div>
+      <span class="mod-badge badge-build">BUILDING</span>
+    </div>
+    <ul class="feat-list">
+      <li><span class="dot dot-done"></span>Meta KPIs sync (every 30 min)</li>
+      <li><span class="dot dot-done"></span>ClickUp tasks, Slack, Drive sync</li>
+      <li><span class="dot dot-build"></span>Auto-map Meta → ClickUp (weekly)</li>
+      <li><span class="dot dot-build"></span>Payment failure scan (daily 8am)</li>
+      <li><span class="dot dot-build"></span>Policy violation scan (daily 7am)</li>
+      <li><span class="dot dot-build"></span>Creative fatigue scan (daily 9am)</li>
+      <li><span class="dot dot-build"></span>Cross-portfolio wins (daily 10am)</li>
+      <li><span class="dot dot-build"></span>Slack keyword detector (every 30 min)</li>
+      <li><span class="dot dot-new"></span>New client watchdog (every 6 hrs)</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- AUTOMATION TRIGGERS -->
+<div class="section-label">Automation Flow — Byron Always Confirms</div>
+<div class="auto-row">
+  <div class="auto-card">
+    <div class="icon">🔍</div>
+    <h4>Detect</h4>
+    <p>GitHub Actions scan Meta API, ClickUp, Slack every 15–30 min</p>
+    <div class="trigger">Scheduled / Always On</div>
+  </div>
+  <div class="auto-card">
+    <div class="icon">💾</div>
+    <h4>Store</h4>
+    <p>Write findings to JSON files in /data — no server required</p>
+    <div class="trigger">Git commit + push</div>
+  </div>
+  <div class="auto-card">
+    <div class="icon">🚨</div>
+    <h4>Surface</h4>
+    <p>Dashboard reads JSON, shows badges, alerts, and suggested actions</p>
+    <div class="trigger">Byron opens dashboard</div>
+  </div>
+  <div class="auto-card">
+    <div class="icon">✅</div>
+    <h4>Confirm</h4>
+    <p>Every write to Meta / ClickUp / Slack requires Byron's "Confirm & Execute"</p>
+    <div class="trigger">Byron clicks confirm</div>
+  </div>
+</div>
+
+<!-- BUILD ORDER -->
+<div class="section-label">Build Order — What's Next</div>
+<div class="build-order">
+
+  <div class="build-row">
+    <div class="build-num num-build">1</div>
+    <div class="build-name">F1 — Auto-Map Client Map</div>
+    <div class="build-desc">Fuzzy match 33 Meta accounts → ClickUp tasks, write client-map.json via GitHub Action</div>
+    <span class="unlock-badge">🔓 Unlocks F2–F13</span>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">2</div>
+    <div class="build-name">F2 — Payment Failure Detector</div>
+    <div class="build-desc">Daily scan of Meta billing status → red pulsing badge on account card</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">3</div>
+    <div class="build-name">F3 — Policy Violation Detector</div>
+    <div class="build-desc">Daily scan for disapproved/flagged ads → yellow badge + modal details</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">4</div>
+    <div class="build-name">F7 — Creative Fatigue Detection</div>
+    <div class="build-desc">CTR trend analysis — 3-day avg vs 14-day peak, amber badge, Byron confirm to create ticket</div>
+    <div class="build-eta">~3 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">5</div>
+    <div class="build-name">F11 — Client Health Score</div>
+    <div class="build-desc">0–100 score: CPL + leads/day + tasks + fatigue + payment + policy signals</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">6</div>
+    <div class="build-name">F8 — Cross-Portfolio Creative Intel</div>
+    <div class="build-desc">Find winning ad formulas across accounts, "Creative Wins to Clone" morning briefing panel</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">7</div>
+    <div class="build-name">F9 — Slack Task Detector</div>
+    <div class="build-desc">Every 30 min: scan for urgent keywords, create ClickUp task on Byron's confirm</div>
+    <div class="build-eta">~3 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-new">8</div>
+    <div class="build-name">CRM — Full Client Profiles</div>
+    <div class="build-desc">Dedicated client profile page: full history, health score timeline, renewal pipeline</div>
+    <div class="build-eta">~3 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">9</div>
+    <div class="build-name">F12 — New Client Onboarding</div>
+    <div class="build-desc">"New Client" button → 8-step form → ClickUp tasks + Slack alert + first creative request</div>
+    <div class="build-eta">~4 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-new">10</div>
+    <div class="build-name">Tech Ticket Section</div>
+    <div class="build-desc">Dedicated tech ops tab — website issues, funnel fixes, tech tasks routed to right assignee</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+  <div class="build-row">
+    <div class="build-num num-build">11</div>
+    <div class="build-name">F13 — 30-Day Watchdog Mode</div>
+    <div class="build-desc">Every 6 hrs: alert on new clients with 0 leads after 5 days, CPL >$20 in week 1, no active ads</div>
+    <div class="build-eta">~2 hrs</div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:20px 0;color:#333;font-size:12px">Total estimated: ~27 hours of build time remaining &nbsp;·&nbsp; Stack: Pure HTML/CSS/JS + GitHub Actions (no server)</div>
+
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sidebar Navigation Design</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0a0f; color: #e0e0e0; padding: 32px 24px 60px; }
+
+  h2 { font-size: 22px; font-weight: 800; color: #fff; text-align: center; margin-bottom: 6px; }
+  .sub { font-size: 13px; color: #555; text-align: center; margin-bottom: 36px; }
+
+  .layout { display: grid; grid-template-columns: 240px 1fr; gap: 24px; max-width: 1000px; margin: 0 auto 48px; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { background: #0d0d14; border: 1px solid #1a1a2e; border-radius: 16px; padding: 16px 10px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; padding: 6px 10px 18px; border-bottom: 1px solid #1a1a1a; margin-bottom: 14px; }
+  .brand-dot { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, #7c3aed, #a78bfa); display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .brand-name { font-size: 14px; font-weight: 800; color: #fff; }
+  .brand-sub  { font-size: 10px; color: #444; }
+
+  .nav-group { margin-bottom: 18px; }
+  .nav-group-label { font-size: 9px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #333; padding: 0 10px; margin-bottom: 5px; }
+
+  .nav-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: all .15s; margin-bottom: 1px; }
+  .nav-item:hover { background: #15151f; }
+  .nav-item.active { background: #1e1b33; border-left: 2px solid #7c3aed; padding-left: 8px; }
+  .nav-left { display: flex; align-items: center; gap: 9px; }
+  .nav-icon { font-size: 14px; line-height: 1; }
+  .nav-label { font-size: 12px; font-weight: 600; color: #aaa; }
+  .nav-item.active .nav-label { color: #c4b5fd; }
+  .nav-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 8px; }
+  .badge-red    { background: #450a0a; color: #f87171; }
+  .badge-orange { background: #2a1200; color: #fb923c; }
+  .badge-purple { background: #1e1b33; color: #a78bfa; }
+  .badge-green  { background: #052e16; color: #34d399; }
+  .badge-yellow { background: #2a1a00; color: #fbbf24; }
+
+  .nav-source { font-size: 9px; color: #2a2a3a; font-weight: 700; letter-spacing: .5px; }
+
+  /* ── RIGHT PANEL — Section details ── */
+  .panel { display: flex; flex-direction: column; gap: 16px; }
+
+  .section-card { background: #111; border: 1px solid #1e1e1e; border-radius: 14px; padding: 20px; }
+  .sc-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+  .sc-title { font-size: 15px; font-weight: 800; color: #fff; }
+  .sc-sub { font-size: 11px; color: #444; margin-top: 3px; }
+  .sc-source { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .src-pill { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; }
+  .src-meta   { background: #0f1f3d; color: #60a5fa; border: 1px solid #1e3a5f; }
+  .src-cu     { background: #1a1030; color: #a78bfa; border: 1px solid #3b1f6a; }
+  .src-slack  { background: #1a1009; color: #f59e0b; border: 1px solid #713f12; }
+  .src-ghl    { background: #0a1f12; color: #34d399; border: 1px solid #065f46; }
+  .src-gh     { background: #111827; color: #9ca3af; border: 1px solid #374151; }
+
+  .feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .feat { background: #0d0d0d; border: 1px solid #1a1a1a; border-radius: 8px; padding: 10px 12px; }
+  .feat-name { font-size: 11px; font-weight: 700; color: #ccc; margin-bottom: 3px; }
+  .feat-desc { font-size: 11px; color: #555; line-height: 1.4; }
+  .feat-status { display: inline-block; font-size: 9px; font-weight: 700; padding: 1px 6px; border-radius: 4px; margin-top: 5px; }
+  .st-live  { background: #052e16; color: #34d399; }
+  .st-build { background: #1e1b33; color: #a78bfa; }
+  .st-new   { background: #2a1200; color: #fb923c; }
+
+  /* Integration legend */
+  .int-legend { background: #0d0d14; border: 1px solid #1a1a2e; border-radius: 12px; padding: 18px 20px; }
+  .int-legend h4 { font-size: 12px; font-weight: 800; color: #fff; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+  .int-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .int-row:last-child { margin-bottom: 0; }
+  .int-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .int-name { font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+  .int-desc { font-size: 11px; color: #555; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<h2>Sidebar Navigation — Layout B</h2>
+<p class="sub">Real integrations: Meta Ads · ClickUp · GoHighLevel · Slack</p>
+
+<div class="layout">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar">
+    <div class="brand">
+      <div class="brand-dot">S</div>
+      <div><div class="brand-name">Servedia Ops</div><div class="brand-sub">Media Buying Dashboard</div></div>
+    </div>
+
+    <!-- HOME -->
+    <div class="nav-group">
+      <div class="nav-item active">
+        <div class="nav-left"><span class="nav-icon">☀️</span><span class="nav-label">Morning Briefing</span></div>
+        <span class="nav-badge badge-red">6</span>
+      </div>
+    </div>
+
+    <!-- MEDIA BUYING -->
+    <div class="nav-group">
+      <div class="nav-group-label">Media Buying</div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">📊</span><span class="nav-label">Meta Ads</span></div>
+        <span class="nav-source">META</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🗂️</span><span class="nav-label">Daily Maintenance</span></div>
+        <span class="nav-badge badge-orange">4</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🏆</span><span class="nav-label">Creative Intel</span></div>
+        <span class="nav-source">META</span>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="nav-group">
+      <div class="nav-group-label">Clients</div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🤝</span><span class="nav-label">CRM</span></div>
+        <span class="nav-badge badge-yellow">2</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🚀</span><span class="nav-label">Onboarding</span></div>
+        <span class="nav-source">GHL</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🆕</span><span class="nav-label">Watchdog</span></div>
+        <span class="nav-badge badge-orange">2</span>
+      </div>
+    </div>
+
+    <!-- WORK QUEUE -->
+    <div class="nav-group">
+      <div class="nav-group-label">Work Queue</div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">🎬</span><span class="nav-label">Video Tickets</span></div>
+        <span class="nav-badge badge-purple">7</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">⚙️</span><span class="nav-label">Tech Tickets</span></div>
+        <span class="nav-badge badge-red">3</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">💬</span><span class="nav-label">Slack</span></div>
+        <span class="nav-badge badge-yellow">5</span>
+      </div>
+      <div class="nav-item">
+        <div class="nav-left"><span class="nav-icon">☑️</span><span class="nav-label">Tasks</span></div>
+        <span class="nav-source">CU</span>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="nav-group">
+      <div class="nav-item" style="margin-top:8px;border-top:1px solid #1a1a1a;padding-top:12px">
+        <div class="nav-left"><span class="nav-icon">⚙️</span><span class="nav-label" style="color:#444">Settings</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="panel">
+
+    <!-- Media Buying -->
+    <div class="section-card">
+      <div class="sc-head">
+        <div>
+          <div class="sc-title">📊 Media Buying</div>
+          <div class="sc-sub">Meta Ads monitoring + daily account management</div>
+          <div class="sc-source">
+            <span class="src-pill src-meta">Meta Ads API</span>
+            <span class="src-pill src-cu">ClickUp</span>
+            <span class="src-pill src-gh">GitHub Actions</span>
+          </div>
+        </div>
+      </div>
+      <div class="feat-grid">
+        <div class="feat"><div class="feat-name">CPL Color Tiers</div><div class="feat-desc">Great/Good/OK/Watch/Cut across every view</div><span class="feat-status st-live">LIVE</span></div>
+        <div class="feat"><div class="feat-name">AI Suggestions</div><div class="feat-desc">Scale, pause, cut, reallocate budget per account</div><span class="feat-status st-live">LIVE</span></div>
+        <div class="feat"><div class="feat-name">Payment Failure Badge</div><div class="feat-desc">Red pulsing alert when billing paused on Meta</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Policy Violation Badge</div><div class="feat-desc">Yellow badge — disapproved/flagged ads detected</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Creative Fatigue</div><div class="feat-desc">CTR drop detection — amber badge + confirm modal</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Sort by Attention Score</div><div class="feat-desc">Smart score: CPL + payment + policy + velocity</div><span class="feat-status st-build">BUILDING</span></div>
+      </div>
+    </div>
+
+    <!-- Clients / CRM -->
+    <div class="section-card">
+      <div class="sc-head">
+        <div>
+          <div class="sc-title">🤝 Client CRM / CSM</div>
+          <div class="sc-sub">Full client lifecycle — health, renewals, onboarding</div>
+          <div class="sc-source">
+            <span class="src-pill src-cu">ClickUp</span>
+            <span class="src-pill src-ghl">GoHighLevel</span>
+            <span class="src-pill src-meta">Meta Ads</span>
+          </div>
+        </div>
+      </div>
+      <div class="feat-grid">
+        <div class="feat"><div class="feat-name">Client Health Score</div><div class="feat-desc">0–100 score: CPL + leads + tasks + payment + fatigue</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Renewal Pipeline</div><div class="feat-desc">Upcoming renewals, happiness status, renewal risk</div><span class="feat-status st-new">NEW</span></div>
+        <div class="feat"><div class="feat-name">GHL Contact Sync</div><div class="feat-desc">Pull client contacts & pipeline stages from GHL</div><span class="feat-status st-new">NEW</span></div>
+        <div class="feat"><div class="feat-name">GHL Funnel Status</div><div class="feat-desc">Is the client's funnel live? Last conversion? Issues?</div><span class="feat-status st-new">NEW</span></div>
+        <div class="feat"><div class="feat-name">New Client Onboarding</div><div class="feat-desc">8-step form → ClickUp + GHL + Slack on confirm</div><span class="feat-status st-new">NEW</span></div>
+        <div class="feat"><div class="feat-name">30-Day Watchdog</div><div class="feat-desc">Alert: 0 leads day 5, CPL&gt;$20 week 1, no active ads</div><span class="feat-status st-new">NEW</span></div>
+      </div>
+    </div>
+
+    <!-- Work Queue -->
+    <div class="section-card">
+      <div class="sc-head">
+        <div>
+          <div class="sc-title">⚙️ Work Queue</div>
+          <div class="sc-sub">Video, tech, Slack tasks — all routed to the right person</div>
+          <div class="sc-source">
+            <span class="src-pill src-cu">ClickUp</span>
+            <span class="src-pill src-slack">Slack</span>
+          </div>
+        </div>
+      </div>
+      <div class="feat-grid">
+        <div class="feat"><div class="feat-name">Video Tickets</div><div class="feat-desc">Saquib's queue — approval status, priority, client</div><span class="feat-status st-live">LIVE</span></div>
+        <div class="feat"><div class="feat-name">Tech Tickets</div><div class="feat-desc">Website, funnel, tech ops — routed to right assignee</div><span class="feat-status st-new">NEW</span></div>
+        <div class="feat"><div class="feat-name">Slack Urgent Detector</div><div class="feat-desc">Keyword scan → Byron confirms → ClickUp task created</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Slack Urgency Panel</div><div class="feat-desc">Flagged messages + questions pinned to top</div><span class="feat-status st-live">LIVE</span></div>
+        <div class="feat"><div class="feat-name">Cross-Portfolio Intel</div><div class="feat-desc">Winning creative formulas to clone across clients</div><span class="feat-status st-build">BUILDING</span></div>
+        <div class="feat"><div class="feat-name">Focus Queue</div><div class="feat-desc">Drag-to-prioritize task list for Byron's daily focus</div><span class="feat-status st-live">LIVE</span></div>
+      </div>
+    </div>
+
+    <!-- Integration legend -->
+    <div class="int-legend">
+      <h4>Data Sources</h4>
+      <div class="int-row">
+        <div class="int-icon">📘</div>
+        <div><div class="int-name">Meta Ads API</div><div class="int-desc">33 ad accounts — spend, CPL, leads, billing status, policy flags, creative performance. Synced every 30 min via GitHub Actions.</div></div>
+      </div>
+      <div class="int-row">
+        <div class="int-icon">📋</div>
+        <div><div class="int-name">ClickUp API</div><div class="int-desc">Client management list, video editing tickets, tech tickets, media tasks. Live fetch + 30-min JSON backup.</div></div>
+      </div>
+      <div class="int-row">
+        <div class="int-icon">🟢</div>
+        <div><div class="int-name">GoHighLevel (GHL)</div><div class="int-desc">Client contacts, pipeline stages, funnel status, appointment data. Used for CRM section + onboarding flow.</div></div>
+      </div>
+      <div class="int-row">
+        <div class="int-icon">💬</div>
+        <div><div class="int-name">Slack</div><div class="int-desc">All channels last 24h — urgent keyword detection, message flagging, task creation on Byron's confirm.</div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
