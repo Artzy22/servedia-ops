@@ -1,11 +1,11 @@
 {
   "assignments": [
-    { "client_name": "HEC Wellness Center",          "media_buyer": "Felipe Guimaraes", "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
-    { "client_name": "Thorpe Wellness 2.0",          "media_buyer": "Anca Elamparo",    "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
-    { "client_name": "Delray Laser",                 "media_buyer": "Julianne Navarro", "csm": "Adriana Gonzalez",  "team": "Skinfluencers" },
-    { "client_name": "About Face & Body MedSpa",     "media_buyer": "Julianne Navarro", "csm": "Adriana Gonzalez",  "team": "Skinfluencers" },
-    { "client_name": "Ideal Weightloss",             "media_buyer": "Felipe Guimaraes", "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
-    { "client_name": "Body Slim WLC",                "media_buyer": "Anca Elamparo",    "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
-    { "client_name": "MAC OKC",                      "media_buyer": "Felipe Guimaraes", "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" }
+    { "client_name": "HEC Wellness Center",          "media_buyer": "Byron Vale",     "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
+    { "client_name": "Thorpe Wellness 2.0",          "media_buyer": "Anca Elamparo",  "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
+    { "client_name": "Delray Laser",                 "media_buyer": "Byron Vale",     "csm": "Adriana Gonzalez",  "team": "Skinfluencers" },
+    { "client_name": "About Face & Body MedSpa",     "media_buyer": "Byron Vale",     "csm": "Adriana Gonzalez",  "team": "Skinfluencers" },
+    { "client_name": "Ideal Weightloss",             "media_buyer": "Byron Vale",     "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
+    { "client_name": "Body Slim WLC",                "media_buyer": "Anca Elamparo",  "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" },
+    { "client_name": "MAC OKC",                      "media_buyer": "Byron Vale",     "csm": "Adriana Gonzalez",  "team": "Ad-Vengers" }
   ]
 }
