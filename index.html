@@ -3159,24 +3159,35 @@ function buildDmClients() {
     };
   });
 
-  // Filter to accounts assigned to Byron or Anka.
-  // Priority: maintenance task assignees → CM team field → has a maintenance task → active account
-  const byronAnka = result.filter(c => {
-    if (c._cuTask && isByronOrAnkaTask(c._cuTask)) return true;
-    if (c.team) {
-      const t = c.team.toLowerCase();
-      if (t.includes('byron') || t.includes('vale') || t.includes('anka') || t.includes('anca') ||
-          t.includes('alemparo') || t.includes('elamparo')) return true;
+  // Return all accounts that have any data — standalone maint tasks appended below
+  // The dropdown filter in renderMaintenance() handles per-person filtering
+  const withData = result.filter(c => c._cuTask || c.status === 'active' || c.cpl !== null);
+
+  // Append maintenance-only tasks (no matching Meta account)
+  tasks.forEach(t => {
+    if (!usedMaintIds.has(t.id)) {
+      const cm = null;
+      withData.push({
+        id: t.id, name: t.name || '',
+        status: 'active', cpl: t.cpb_7d ?? null, leads7: 0, spend7: 0,
+        cpb: t.cpb_7d ?? null, adAccountUrl: t.ad_account_url || null,
+        kpiStatus: t.kpi_status || null, clientHappiness: t.client_happiness || null,
+        refundNeeded: false, requiresApproval: t.requires_approval || null,
+        lastOptimized: t.last_optimized || null, checkBackDate: t.check_back_date || null,
+        marketingOffers: t.marketing_offers || null, dosDonts: t.dos_donts || null,
+        contentStatus: t.content_status || null,
+        driveLink: t.drive_link || getDriveFolder(t.name || ''),
+        statsSheet: t.stats_sheet_url || null, serviceAd: t.service_advertised || null,
+        optNotes: t.optimization_notes || null, cuTaskUrl: t.url || null, cuTaskId: t.id || null,
+        contactName: null, phone: null, ltv: null, monthly: null, dailyBudget: null,
+        agreement: null, team: null, niche: null, sop: null, renewalDate: null,
+        launchDate: null, onboardingDuration: null, lifecycleStatus: null,
+        abrLast7: null, bookingsLast7: null, cmAssignees: t.assignees || [], _cuTask: t,
+      });
     }
-    return false;
   });
-  // If we found assigned accounts, return those
-  if (byronAnka.length) return byronAnka;
-  // Fallback: tasks exist but none have assignees — show all that have a maintenance task
-  const withTask = result.filter(c => c._cuTask);
-  if (withTask.length) return withTask;
-  // Last resort: show all active Meta accounts
-  return result.filter(c => c.status === 'active');
+
+  return withData;
 }
 
 // Word overlap helper for fuzzy name matching
@@ -3338,49 +3349,24 @@ function renderMaintenance() {
   // Config warning — show if maintenance.json hasn't synced yet
   document.getElementById('cfgWarn').style.display = maintData ? 'none' : 'flex';
 
-  // Assignment filter dropdown — populate from clientMgmtAllTasks assignees
+  // Assignment filter dropdown — always show, use TEAM_MEMBERS as options
   const user = getUser();
   const assignSel = document.getElementById('maintAssignFilter');
-  if (assignSel && clientMgmtAllTasks && clientMgmtAllTasks.length) {
+  if (assignSel) {
     assignSel.style.display = '';
-    // Build unique assignee display names from CM tasks
-    const seenNames = new Set();
-    const assigneeList = [];
-    (clientMgmtAllTasks || []).forEach(t => {
-      (t.assignees || []).forEach(a => {
-        const display = a.username || a.email || '';
-        if (display && !seenNames.has(display)) {
-          seenNames.add(display);
-          assigneeList.push({ display, username: (a.username||'').toLowerCase(), email: (a.email||'').toLowerCase() });
-        }
-      });
-    });
-    // Also add TEAM_MEMBERS names as options so "Byron Vale" etc. work even before CM loads
-    TEAM_MEMBERS.forEach(m => {
-      if (!seenNames.has(m.name)) { seenNames.add(m.name); assigneeList.push({ display: m.name, username: m.name.toLowerCase().replace(/[^a-z]/g,''), email: '' }); }
-    });
-    // Rebuild options only when list changes
-    const optKey = assigneeList.map(a => a.display).join(',');
-    if (assignSel.dataset.optKey !== optKey) {
-      const prev = assignSel.value;
-      assignSel.innerHTML = '<option value="all">👥 All clients</option>' +
-        assigneeList.sort((a,b) => a.display.localeCompare(b.display))
-          .map(a => `<option value="${esc(a.display)}">${esc(a.display)}</option>`).join('');
-      if (prev && [...assignSel.options].some(o => o.value === prev)) assignSel.value = prev;
-      assignSel.dataset.optKey = optKey;
-    }
-    // Default for media_buyer: pre-select their own name on first load
     if (!assignSel.dataset.initialized) {
+      // Build options from TEAM_MEMBERS (media buyers + admin only — people who manage accounts)
+      const buyers = TEAM_MEMBERS.filter(m => m.role === 'media_buyer' || m.role === 'admin');
+      assignSel.innerHTML = '<option value="all">👥 All clients</option>' +
+        buyers.map(m => `<option value="${esc(m.name)}">${esc(m.name)}</option>`).join('');
+      // Default: media_buyer pre-selects themselves, admin stays on "All"
       if (user && user.role === 'media_buyer') {
-        const match = [...assignSel.options].find(o => o.value.toLowerCase().replace(/[^a-z]/g,'') === (user.name||'').toLowerCase().replace(/[^a-z]/g,''));
+        const match = [...assignSel.options].find(o => o.value === user.name);
         if (match) assignSel.value = match.value;
       }
       assignSel.dataset.initialized = '1';
     }
     maintFilterUser = assignSel.value;
-  } else if (assignSel) {
-    assignSel.style.display = 'none';
-    maintFilterUser = 'all';
   }
 
   if (maintFilterUser && maintFilterUser !== 'all') {
