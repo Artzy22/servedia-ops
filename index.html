@@ -1450,6 +1450,37 @@ const T4_ACTIONS = [
 const t4Executed = new Map(); // actionId → { state: 'idle'|'confirming'|'executing'|'done'|'error', msg?: string }
 const DRIVE_ROOT = 'https://drive.google.com/drive/folders/1NpuOATCVLq42KrVse4U-2S_PzDgeBUrr';
 
+// ══════════════════════════════════════════════════════════════
+// TEAM MEMBERS — hardcoded for Phase 1, managed via Admin Panel in Phase 3
+// roles: media_buyer | csm | tech | isa | video_editor | admin
+// ══════════════════════════════════════════════════════════════
+const TEAM_MEMBERS = [
+  { name: 'Byron Vale',           role: 'admin' },
+  { name: 'Felipe Guimaraes',    role: 'media_buyer' },
+  { name: 'Julianne Navarro',    role: 'csm' },
+  { name: 'Adriana Gonzalez',    role: 'csm' },
+  { name: 'Anca Elamparo',       role: 'media_buyer' },
+  { name: 'Autumn Ismirnioglou', role: 'video_editor' },
+  { name: 'Saquib Shaikh',       role: 'tech' },
+];
+
+// Admin password — SHA-256 of "Servedia2026!" — never store plain text
+const ADMIN_PW_HASH = '96864b8317c1514456bfeff42cdb337dad97e4de679e78f82559a30ac63cfdbd';
+
+// Assignment data — populated from data/assignments.json on loadAll()
+let assignmentData = null;
+
+// ── User identity helpers ──
+function getUser() {
+  try { return JSON.parse(localStorage.getItem('servedia_user') || 'null'); } catch { return null; }
+}
+function setUser(obj) {
+  localStorage.setItem('servedia_user', JSON.stringify(obj));
+}
+function clearUser() {
+  localStorage.removeItem('servedia_user');
+}
+
 let metaData = null, cuData = null, slData = null, vidData = null, maintData = null, driveData = null, techData = null;
 let paymentData = null, violationsData = null;
 let metaClientMap = {};   // account_id → client-map entry, for F5 suggestions
