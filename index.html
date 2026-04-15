@@ -1699,6 +1699,61 @@ async function confirmUserPick() {
   applyRoleVisibility(member.role);
 }
 
+function applyRoleVisibility(role) {
+  // Nav IDs → roles that can see them
+  const ROLE_NAV = {
+    'nav-meta':        ['media_buyer', 'admin'],
+    'nav-maintenance': ['media_buyer', 'admin'],
+    'nav-retention':   ['media_buyer', 'admin'],
+    'nav-creative':    ['media_buyer', 'admin'],
+    'nav-crm':         ['csm', 'admin'],
+    'nav-onboarding':  ['csm', 'tech', 'admin'],
+    'nav-watchdog':    ['csm', 'admin'],
+    'nav-video':       ['video_editor', 'media_buyer', 'admin'],
+    'nav-tech':        ['tech', 'admin'],
+    'nav-slack':       ['csm', 'admin'],
+    'nav-tasks':       ['media_buyer', 'csm', 'tech', 'isa', 'admin'],
+  };
+
+  // Show/hide each nav item
+  for (const [navId, allowedRoles] of Object.entries(ROLE_NAV)) {
+    const el = document.getElementById(navId);
+    if (!el) continue;
+    el.style.display = allowedRoles.includes(role) ? '' : 'none';
+  }
+
+  // Hide entire nav-groups whose all nav-items are hidden
+  document.querySelectorAll('.nav-group').forEach(group => {
+    const items = group.querySelectorAll('.nav-item');
+    const allHidden = Array.from(items).every(el => el.style.display === 'none');
+    group.style.display = allHidden ? 'none' : '';
+  });
+
+  // Topbar admin badge
+  const badge = document.getElementById('topbarUserBadge');
+  if (badge) badge.style.display = role === 'admin' ? '' : 'none';
+
+  // Sidebar footer
+  const user = getUser();
+  if (user) {
+    const footer = document.getElementById('sidebarFooter');
+    if (footer) {
+      footer.style.display = '';
+      document.getElementById('sfName').textContent = user.name;
+      document.getElementById('sfRole').textContent = '· ' + user.role.replace('_', ' ');
+    }
+  }
+}
+
+function checkUser() {
+  const user = getUser();
+  if (!user || !user.name || !user.role) {
+    showUserPicker();
+    return;
+  }
+  applyRoleVisibility(user.role);
+}
+
 // ══════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════
