@@ -1837,7 +1837,8 @@ function esc(s) {
 }
 
 function fmtCur(n) {
-  if (!n && n !== 0) return '—';
+  n = parseFloat(n);
+  if (isNaN(n)) return '—';
   if (n >= 1000) return '$' + (n/1000).toFixed(1) + 'k';
   return '$' + n.toFixed(2);
 }
