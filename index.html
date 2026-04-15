@@ -5565,6 +5565,7 @@ setInterval(() => {
 // INIT
 // ══════════════════════════════════════════════════════════════
 document.addEventListener('DOMContentLoaded', () => {
+  checkUser();     // show picker if no identity, apply role visibility if returning user
   switchSection('command');
   renderTasks();   // show loading placeholder immediately
   renderVideo();   // show loading placeholder immediately
