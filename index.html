@@ -1650,6 +1650,56 @@ async function syncMetaNow() {
 }
 
 // ══════════════════════════════════════════════════════════════
+// USER PICKER — modal control + SHA-256 password check
+// ══════════════════════════════════════════════════════════════
+function showUserPicker() {
+  const sel = document.getElementById('upSelect');
+  // Populate dropdown from TEAM_MEMBERS
+  sel.innerHTML = '<option value="">— Select your name —</option>' +
+    TEAM_MEMBERS.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+  document.getElementById('upPwrap').style.display = 'none';
+  document.getElementById('upPassErr').style.display = 'none';
+  document.getElementById('upPass').value = '';
+  document.getElementById('userPickerOv').classList.remove('hidden');
+}
+
+function onUserSelectChange() {
+  const sel = document.getElementById('upSelect');
+  const member = TEAM_MEMBERS.find(m => m.name === sel.value);
+  document.getElementById('upPwrap').style.display =
+    (member && member.role === 'admin') ? 'block' : 'none';
+  document.getElementById('upPassErr').style.display = 'none';
+}
+
+async function checkAdminPassword(pass) {
+  const enc = new TextEncoder();
+  const buf = await crypto.subtle.digest('SHA-256', enc.encode(pass));
+  const hex = Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  return hex === ADMIN_PW_HASH;
+}
+
+async function confirmUserPick() {
+  const sel = document.getElementById('upSelect');
+  const name = sel.value;
+  if (!name) return;
+  const member = TEAM_MEMBERS.find(m => m.name === name);
+  if (!member) return;
+
+  if (member.role === 'admin') {
+    const pass = document.getElementById('upPass').value;
+    const ok = await checkAdminPassword(pass);
+    if (!ok) {
+      document.getElementById('upPassErr').style.display = 'block';
+      return;
+    }
+  }
+
+  setUser({ name: member.name, role: member.role, isAdmin: member.role === 'admin' });
+  document.getElementById('userPickerOv').classList.add('hidden');
+  applyRoleVisibility(member.role);
+}
+
+// ══════════════════════════════════════════════════════════════
 // CONFIG
 // ══════════════════════════════════════════════════════════════
 function getCfg() {
