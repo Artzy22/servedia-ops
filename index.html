@@ -558,6 +558,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 </head>
 <body>
 
+<!-- ════════ USER PICKER MODAL ════════ -->
+<div id="userPickerOv" class="up-ov hidden">
+  <div class="up-box">
+    <div class="up-title">Welcome to Servedia Ops</div>
+    <div class="up-sub">Who are you? Your view will be personalized.</div>
+    <label class="up-label" for="upSelect">Your name</label>
+    <select class="up-select" id="upSelect" onchange="onUserSelectChange()">
+      <option value="">— Select your name —</option>
+    </select>
+    <div class="up-pwrap" id="upPwrap" style="display:none">
+      <label class="up-label" for="upPass">Admin password</label>
+      <input class="up-pinput" type="password" id="upPass" placeholder="Enter password" oninput="document.getElementById('upPassErr').style.display='none'">
+      <div class="up-perr" id="upPassErr">Incorrect password. Try again.</div>
+    </div>
+    <button class="up-btn" onclick="confirmUserPick()">Enter Dashboard</button>
+  </div>
+</div>
+
 <div class="app-shell">
 
 <!-- ── Top Bar ── -->
@@ -567,6 +585,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <span class="topbar-name">Servedia Ops</span>
   </div>
   <div class="topbar-right">
+    <span id="topbarUserBadge" style="display:none" class="admin-badge">ADMIN</span>
     <span class="topbar-sync" id="syncInfo">Loading...</span>
     <button class="topbar-btn" onclick="syncMetaNow()" id="metaSyncBtn" title="Fetch live Meta data now" style="display:none">⟳ Meta</button>
     <button class="topbar-btn" onclick="openSettings()">⚙ Settings</button>
@@ -644,6 +663,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="nav-item-left"><span class="nav-icon">☑️</span><span class="nav-label">Tasks</span></div>
       <span class="nav-badge nb-gray" id="navBadge-tasks">–</span>
     </div>
+  </div>
+
+  <!-- Sidebar footer — identity + switch user -->
+  <div class="sidebar-footer" id="sidebarFooter" style="display:none">
+    <div class="sf-user"><span class="sf-name" id="sfName">–</span> <span class="sf-role" id="sfRole"></span></div>
+    <span class="sf-switch" onclick="clearUser();location.reload()">Switch user</span>
   </div>
 
 </nav>
