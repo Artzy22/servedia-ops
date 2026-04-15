@@ -796,6 +796,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="fbtn" id="dmf-flagged" onclick="setDmFilter('flagged')">🚩 Flagged</button>
     <button class="fbtn" id="dmf-pending" onclick="setDmFilter('pending')">⏳ Pending</button>
     <button class="fbtn" id="dmf-approval" onclick="setDmFilter('approval')">⚠️ Needs Approval</button>
+    <button class="fbtn" id="maintAssignToggle" onclick="toggleMaintAssign()" style="display:none">👤 My clients</button>
+    <button class="fbtn" id="dmExportBtn" onclick="exportDailyReport()" style="margin-left:auto;border-color:#7c3aed;color:#a78bfa">📋 Export Day</button>
   </div>
   <div class="cpl-strip-wrap" id="maintCplStrip" style="margin-bottom:14px">
     <div class="cpl-strip-hd" onclick="toggleCPLStrip('maintCplStrip')">
@@ -1471,6 +1473,7 @@ const ADMIN_PW_HASH = '96864b8317c1514456bfeff42cdb337dad97e4de679e78f82559a30ac
 // Assignment data — populated from data/assignments.json on loadAll()
 let assignmentData = null;
 let metaShowMine = false; // toggled per-session; default depends on role
+let maintShowMine = false; // same for Daily Maintenance
 
 // ── User identity helpers ──
 function getUser() {
@@ -3213,13 +3216,133 @@ function setDmFilter(f) {
   renderMaintenance();
 }
 
-function renderMaintenance() {
+function toggleMaintAssign() {
+  maintShowMine = !maintShowMine;
+  const btn = document.getElementById('maintAssignToggle');
+  if (btn) btn.classList.toggle('active', maintShowMine);
+  renderMaintenance();
+}
+
+function exportDailyReport() {
+  const user  = getUser();
+  const state = getDmState();
   const all   = buildDmClients();
+  const date  = today();
+
+  // Scope to assigned clients if filter is active, otherwise all
+  let clients = all;
+  if (maintShowMine && user && assignmentData) {
+    const myNames = new Set(
+      (assignmentData.assignments || [])
+        .filter(a => a.media_buyer === user.name)
+        .map(a => (a.client_name || '').toLowerCase())
+    );
+    clients = all.filter(c => {
+      const nl = (c.name || '').toLowerCase();
+      return Array.from(myNames).some(n => nl.includes(n) || n.includes(nl));
+    });
+  }
+
+  const done    = clients.filter(c => (state[c.id]||{}).complete);
+  const flagged = clients.filter(c => (state[c.id]||{}).flagged);
+  const pending = clients.filter(c => !(state[c.id]||{}).complete && !(state[c.id]||{}).flagged);
+
+  const lines = [];
+  lines.push(`DAILY MAINTENANCE REPORT`);
+  lines.push(`${user ? user.name : 'Unknown'} — ${date}`);
+  lines.push(`${'─'.repeat(50)}`);
+  lines.push(`Reviewed: ${done.length}/${clients.length}   Flagged: ${flagged.length}   Pending: ${pending.length}`);
+  lines.push('');
+
+  if (flagged.length) {
+    lines.push('🚩 FLAGGED');
+    flagged.forEach(c => {
+      const cs = state[c.id] || {};
+      const changes = getDmChanges(c.id);
+      const notes   = getDmNotes(c.id);
+      lines.push(`  ${c.name}  |  CPL: ${c.cpl ? '$'+c.cpl.toFixed(2) : 'N/A'}  |  Spend 7d: $${(c.spend7||0).toFixed(0)}`);
+      if (changes) lines.push(`    Changes: ${changes}`);
+      if (notes)   lines.push(`    Notes: ${notes}`);
+    });
+    lines.push('');
+  }
+
+  if (done.length) {
+    lines.push('✅ COMPLETED');
+    done.forEach(c => {
+      const changes = getDmChanges(c.id);
+      const notes   = getDmNotes(c.id);
+      lines.push(`  ${c.name}  |  CPL: ${c.cpl ? '$'+c.cpl.toFixed(2) : 'N/A'}  |  Spend 7d: $${(c.spend7||0).toFixed(0)}`);
+      if (changes) lines.push(`    Changes: ${changes}`);
+      if (notes)   lines.push(`    Notes: ${notes}`);
+    });
+    lines.push('');
+  }
+
+  if (pending.length) {
+    lines.push('⏳ PENDING');
+    pending.forEach(c => {
+      lines.push(`  ${c.name}  |  CPL: ${c.cpl ? '$'+c.cpl.toFixed(2) : 'N/A'}  |  Spend 7d: $${(c.spend7||0).toFixed(0)}`);
+    });
+  }
+
+  const text = lines.join('\n');
+
+  // Copy to clipboard + offer download
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('dmExportBtn');
+      if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.textContent = '📋 Export Day'; }, 2500); }
+    });
+  }
+
+  // Also trigger download as .txt
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `maintenance-${date}${user ? '-' + user.name.split(' ')[0].toLowerCase() : ''}.txt`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function renderMaintenance() {
+  let all     = buildDmClients();
   const state = getDmState();
   const search = (document.getElementById('dmSearch').value || '').toLowerCase();
 
   // Config warning — show if maintenance.json hasn't synced yet
   document.getElementById('cfgWarn').style.display = maintData ? 'none' : 'flex';
+
+  // Assignment filter — same pattern as Meta Ads
+  const user = getUser();
+  const maintToggle = document.getElementById('maintAssignToggle');
+  if (maintToggle) {
+    if (user && user.role === 'media_buyer' && assignmentData) {
+      maintToggle.style.display = '';
+      if (!maintToggle.dataset.initialized) {
+        maintShowMine = true;
+        maintToggle.classList.add('active');
+        maintToggle.dataset.initialized = '1';
+      }
+    } else {
+      maintToggle.style.display = 'none';
+      maintShowMine = false;
+    }
+  }
+  if (maintShowMine && user && assignmentData) {
+    const myNames = new Set(
+      (assignmentData.assignments || [])
+        .filter(a => a.media_buyer === user.name)
+        .map(a => (a.client_name || '').toLowerCase())
+    );
+    all = all.filter(c => {
+      const nl = (c.name || '').toLowerCase();
+      return Array.from(myNames).some(n => nl.includes(n) || n.includes(nl));
+    });
+  }
+  if (maintToggle && maintToggle.style.display !== 'none') {
+    maintToggle.textContent = maintShowMine ? `👤 My clients (${all.length})` : `👁 All clients (${all.length})`;
+  }
 
   // Filter
   let list = all.filter(c => {
