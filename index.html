@@ -1679,17 +1679,22 @@ async function checkAdminPassword(pass) {
 }
 
 async function confirmUserPick() {
+  const btn = document.querySelector('#userPickerOv .up-btn');
+  if (btn && btn.disabled) return;
+  if (btn) btn.disabled = true;
   const sel = document.getElementById('upSelect');
   const name = sel.value;
-  if (!name) return;
+  if (!name) { if (btn) btn.disabled = false; return; }
   const member = TEAM_MEMBERS.find(m => m.name === name);
   if (!member) return;
 
   if (member.role === 'admin') {
     const pass = document.getElementById('upPass').value;
+    if (!pass) { document.getElementById('upPassErr').style.display = 'block'; if (btn) btn.disabled = false; return; }
     const ok = await checkAdminPassword(pass);
     if (!ok) {
       document.getElementById('upPassErr').style.display = 'block';
+      if (btn) btn.disabled = false;
       return;
     }
   }
@@ -1700,6 +1705,13 @@ async function confirmUserPick() {
 }
 
 function applyRoleVisibility(role) {
+  const KNOWN_ROLES = ['media_buyer', 'csm', 'tech', 'isa', 'video_editor', 'admin'];
+  if (!KNOWN_ROLES.includes(role)) {
+    console.warn('[applyRoleVisibility] Unknown role:', role, '— clearing user and showing picker');
+    clearUser();
+    showUserPicker();
+    return;
+  }
   // Nav IDs → roles that can see them
   const ROLE_NAV = {
     'nav-meta':        ['media_buyer', 'admin'],
@@ -1740,7 +1752,7 @@ function applyRoleVisibility(role) {
     if (footer) {
       footer.style.display = '';
       document.getElementById('sfName').textContent = user.name;
-      document.getElementById('sfRole').textContent = '· ' + user.role.replace('_', ' ');
+      document.getElementById('sfRole').textContent = '· ' + user.role.replace(/_/g, ' ');
     }
   }
 }
