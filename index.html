@@ -796,7 +796,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
     <button class="fbtn" id="dmf-flagged" onclick="setDmFilter('flagged')">🚩 Flagged</button>
     <button class="fbtn" id="dmf-pending" onclick="setDmFilter('pending')">⏳ Pending</button>
     <button class="fbtn" id="dmf-approval" onclick="setDmFilter('approval')">⚠️ Needs Approval</button>
-    <button class="fbtn" id="maintAssignToggle" onclick="toggleMaintAssign()" style="display:none">👤 My clients</button>
+    <select id="maintAssignFilter" onchange="renderMaintenance()" style="display:none;background:#1a1a2e;color:#e0e0e0;border:1px solid #333;border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer"><option value="all">👥 All clients</option></select>
     <button class="fbtn" id="dmExportBtn" onclick="exportDailyReport()" style="margin-left:auto;border-color:#7c3aed;color:#a78bfa">📋 Export Day</button>
   </div>
   <div class="cpl-strip-wrap" id="maintCplStrip" style="margin-bottom:14px">
@@ -1473,7 +1473,7 @@ const ADMIN_PW_HASH = '96864b8317c1514456bfeff42cdb337dad97e4de679e78f82559a30ac
 // Assignment data — populated from data/assignments.json on loadAll()
 let assignmentData = null;
 let metaShowMine = false; // toggled per-session; default depends on role
-let maintShowMine = false; // same for Daily Maintenance
+let maintFilterUser = 'all'; // assignee filter for Daily Maintenance
 
 // ── User identity helpers ──
 function getUser() {
@@ -3238,12 +3238,6 @@ function userMatchesAssignee(userName, assignees) {
   });
 }
 
-function toggleMaintAssign() {
-  maintShowMine = !maintShowMine;
-  const btn = document.getElementById('maintAssignToggle');
-  if (btn) btn.classList.toggle('active', maintShowMine);
-  renderMaintenance();
-}
 
 function exportDailyReport() {
   const user  = getUser();
@@ -3251,17 +3245,27 @@ function exportDailyReport() {
   const all   = buildDmClients();
   const date  = today();
 
-  // Scope to assigned clients if filter is active, otherwise all
+  // Scope to filtered clients (match whatever the current DM filter shows)
+  const sel = document.getElementById('maintAssignFilter');
+  const filterName = sel ? sel.value : 'all';
   let clients = all;
-  if (maintShowMine && user && assignmentData) {
-    const myNames = new Set(
-      (assignmentData.assignments || [])
-        .filter(a => a.media_buyer === user.name)
-        .map(a => (a.client_name || '').toLowerCase())
-    );
+  if (filterName && filterName !== 'all') {
+    const cmTaskAssignees = {};
+    (clientMgmtAllTasks || []).forEach(t => {
+      const norm = normalizeName(t.name || '');
+      if (norm) cmTaskAssignees[norm] = (t.assignees || []).map(a => ({
+        username: (a.username || '').toLowerCase(),
+        email:    (a.email    || '').toLowerCase(),
+      }));
+    });
     clients = all.filter(c => {
-      const nl = (c.name || '').toLowerCase();
-      return Array.from(myNames).some(n => nl.includes(n) || n.includes(nl));
+      const nl = normalizeName(c.name || '');
+      if (cmTaskAssignees[nl] !== undefined) return userMatchesAssignee(filterName, cmTaskAssignees[nl]);
+      for (const [cmNorm, assignees] of Object.entries(cmTaskAssignees)) {
+        if (nl && cmNorm && (nl.includes(cmNorm) || cmNorm.includes(nl) || wordsOverlap(nl, cmNorm))) return userMatchesAssignee(filterName, assignees);
+      }
+      if (c.cmAssignees && c.cmAssignees.length) return userMatchesAssignee(filterName, c.cmAssignees);
+      return false;
     });
   }
 
@@ -3335,27 +3339,53 @@ function renderMaintenance() {
   // Config warning — show if maintenance.json hasn't synced yet
   document.getElementById('cfgWarn').style.display = maintData ? 'none' : 'flex';
 
-  // Assignment filter — same pattern as Meta Ads
+  // Assignment filter dropdown — populate from clientMgmtAllTasks assignees
   const user = getUser();
-  const maintToggle = document.getElementById('maintAssignToggle');
-  if (maintToggle) {
-    const canFilter = user && (user.role === 'media_buyer' || user.role === 'admin') && clientMgmtAllTasks && clientMgmtAllTasks.length;
-    if (canFilter) {
-      maintToggle.style.display = '';
-      if (!maintToggle.dataset.initialized) {
-        // media buyers default to "my clients"; admins default to "all"
-        maintShowMine = user.role === 'media_buyer';
-        maintToggle.classList.toggle('active', maintShowMine);
-        maintToggle.dataset.initialized = '1';
-      }
-    } else {
-      maintToggle.style.display = 'none';
-      maintShowMine = false;
+  const assignSel = document.getElementById('maintAssignFilter');
+  if (assignSel && clientMgmtAllTasks && clientMgmtAllTasks.length) {
+    assignSel.style.display = '';
+    // Build unique assignee display names from CM tasks
+    const seenNames = new Set();
+    const assigneeList = [];
+    (clientMgmtAllTasks || []).forEach(t => {
+      (t.assignees || []).forEach(a => {
+        const display = a.username || a.email || '';
+        if (display && !seenNames.has(display)) {
+          seenNames.add(display);
+          assigneeList.push({ display, username: (a.username||'').toLowerCase(), email: (a.email||'').toLowerCase() });
+        }
+      });
+    });
+    // Also add TEAM_MEMBERS names as options so "Byron Vale" etc. work even before CM loads
+    TEAM_MEMBERS.forEach(m => {
+      if (!seenNames.has(m.name)) { seenNames.add(m.name); assigneeList.push({ display: m.name, username: m.name.toLowerCase().replace(/[^a-z]/g,''), email: '' }); }
+    });
+    // Rebuild options only when list changes
+    const optKey = assigneeList.map(a => a.display).join(',');
+    if (assignSel.dataset.optKey !== optKey) {
+      const prev = assignSel.value;
+      assignSel.innerHTML = '<option value="all">👥 All clients</option>' +
+        assigneeList.sort((a,b) => a.display.localeCompare(b.display))
+          .map(a => `<option value="${esc(a.display)}">${esc(a.display)}</option>`).join('');
+      if (prev && [...assignSel.options].some(o => o.value === prev)) assignSel.value = prev;
+      assignSel.dataset.optKey = optKey;
     }
+    // Default for media_buyer: pre-select their own name on first load
+    if (!assignSel.dataset.initialized) {
+      if (user && user.role === 'media_buyer') {
+        const match = [...assignSel.options].find(o => o.value.toLowerCase().replace(/[^a-z]/g,'') === (user.name||'').toLowerCase().replace(/[^a-z]/g,''));
+        if (match) assignSel.value = match.value;
+      }
+      assignSel.dataset.initialized = '1';
+    }
+    maintFilterUser = assignSel.value;
+  } else if (assignSel) {
+    assignSel.style.display = 'none';
+    maintFilterUser = 'all';
   }
-  if (maintShowMine && user) {
-    // Build a name→assignees lookup from ALL clientMgmtAllTasks (name-based, catches clients
-    // that don't have an ad account URL set in ClickUp)
+
+  if (maintFilterUser && maintFilterUser !== 'all') {
+    // Build name→assignees lookup from clientMgmtAllTasks
     const cmTaskAssignees = {};
     (clientMgmtAllTasks || []).forEach(t => {
       const norm = normalizeName(t.name || '');
@@ -3364,41 +3394,28 @@ function renderMaintenance() {
         email:    (a.email    || '').toLowerCase(),
       }));
     });
-
+    const filterName = maintFilterUser;
     all = all.filter(c => {
       const nl = normalizeName(c.name || '');
-
-      // Priority 1: exact normalized name match in CM tasks
-      if (cmTaskAssignees[nl] !== undefined) {
-        return userMatchesAssignee(user.name, cmTaskAssignees[nl]);
-      }
-
-      // Priority 1b: fuzzy name match across CM tasks
+      // Priority 1: exact normalized name match
+      if (cmTaskAssignees[nl] !== undefined) return userMatchesAssignee(filterName, cmTaskAssignees[nl]);
+      // Priority 1b: fuzzy match
       for (const [cmNorm, assignees] of Object.entries(cmTaskAssignees)) {
         if (nl && cmNorm && (nl.includes(cmNorm) || cmNorm.includes(nl) || wordsOverlap(nl, cmNorm))) {
-          return userMatchesAssignee(user.name, assignees);
+          return userMatchesAssignee(filterName, assignees);
         }
       }
-
-      // Priority 2: cmAssignees already on the record (indexed by ad account ID)
-      if (c.cmAssignees && c.cmAssignees.length) {
-        return userMatchesAssignee(user.name, c.cmAssignees);
-      }
-
+      // Priority 2: cmAssignees on record
+      if (c.cmAssignees && c.cmAssignees.length) return userMatchesAssignee(filterName, c.cmAssignees);
       // Priority 3: static assignments.json fallback
       if (assignmentData) {
         const myNames = (assignmentData.assignments || [])
-          .filter(a => a.media_buyer === user.name)
+          .filter(a => a.media_buyer === filterName)
           .map(a => (a.client_name || '').toLowerCase());
         if (myNames.length) return myNames.some(n => (c.name||'').toLowerCase().includes(n) || n.includes((c.name||'').toLowerCase()));
       }
-
-      // No assignment data found for this client — hide it when filter is on
       return false;
     });
-  }
-  if (maintToggle && maintToggle.style.display !== 'none') {
-    maintToggle.textContent = maintShowMine ? `👤 My clients (${all.length})` : `👁 All clients (${all.length})`;
   }
 
   // Filter
