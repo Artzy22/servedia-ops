@@ -3187,6 +3187,41 @@ function buildDmClients() {
     }
   });
 
+  // Pass 3: pull in ALL ClickUp CM tasks (Renewed, Paused, Special, etc.)
+  // These won't have Meta data but still need to appear in Daily Maintenance
+  const usedNames = new Set(withData.map(c => normalizeName(c.name)));
+  (clientMgmtAllTasks || []).forEach(t => {
+    const tName = t.name || '';
+    const tNorm = normalizeName(tName);
+    if (!tNorm) return;
+    // Skip if already represented (by name fuzzy match)
+    const alreadyIn = usedNames.has(tNorm) || [...usedNames].some(n =>
+      n && (n.includes(tNorm) || tNorm.includes(n) || wordsOverlap(n, tNorm))
+    );
+    if (alreadyIn) return;
+    usedNames.add(tNorm);
+    withData.push({
+      id: t.id, name: tName,
+      status: (t.status || 'active'),
+      cpl: null, leads7: 0, spend7: 0, cpb: null,
+      adAccountUrl: null, kpiStatus: null,
+      clientHappiness: t.custom_fields ? (t.custom_fields.find(f => f.name === 'Client Happiness')?.value || null) : null,
+      refundNeeded: false, requiresApproval: null,
+      lastOptimized: null, checkBackDate: null,
+      marketingOffers: null, dosDonts: null, contentStatus: null,
+      driveLink: getDriveFolder(tName),
+      statsSheet: null, serviceAd: null, optNotes: null,
+      cuTaskUrl: t.url || null, cuTaskId: t.id || null,
+      contactName: null, phone: null, ltv: null, monthly: null, dailyBudget: null,
+      agreement: null, team: null, niche: null, sop: null,
+      renewalDate: null, launchDate: null, onboardingDuration: null,
+      lifecycleStatus: t.status || null,
+      abrLast7: null, bookingsLast7: null,
+      cmAssignees: (t.assignees || []).map(a => ({ username: (a.username||'').toLowerCase(), email: (a.email||'').toLowerCase() })),
+      _cuTask: t,
+    });
+  });
+
   return withData;
 }
 
