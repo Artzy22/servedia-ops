@@ -1774,10 +1774,11 @@ function checkUser() {
 function getCfg() {
   return {
     token:             localStorage.getItem('cu_token') || '',
-    adsListId:         localStorage.getItem('cu_ads_list') || '',
-    videoListId:       localStorage.getItem('cu_video_list') || '',
-    tasksListId:       localStorage.getItem('cu_tasks_list') || '',
-    clientMgmtListId:  localStorage.getItem('cu_client_mgmt_list') || '',
+    adsListId:         localStorage.getItem('cu_ads_list')         || '901514441223',
+    videoListId:       localStorage.getItem('cu_video_list')       || '8cnp5x7-4995',
+    tasksListId:       localStorage.getItem('cu_tasks_list')       || '901515083916',
+    clientMgmtListId:  localStorage.getItem('cu_client_mgmt_list') || '901512199767',
+    onboardingListId:  localStorage.getItem('cu_onboarding_list')  || '901512199678',
     ghPat:             localStorage.getItem('gh_pat') || '',
     metaAccessToken:   localStorage.getItem('meta_access_token') || '',
     metaAppId:         localStorage.getItem('meta_app_id') || '',
@@ -2089,7 +2090,7 @@ async function confirmOnboarding() {
   const btn = document.getElementById('obConfirmBtn');
   if (btn) { btn.textContent = 'Creating…'; btn.disabled = true; }
 
-  const listId = cfg.clientMgmtListId || '901514441223';
+  const listId = cfg.clientMgmtListId;
   const headers = { 'Authorization': cfg.token, 'Content-Type': 'application/json' };
 
   try {
@@ -2219,7 +2220,7 @@ async function confirmCreativeRequest(data) {
   const desc = `New client onboarding — first ad creative needed.\n\nClient: ${data.name}\n${data.treatment?'Treatment: '+data.treatment+'\n':''}${data.offerPrice?'Offer Price: $'+data.offerPrice+'\n':''}${data.funnel?'Funnel: '+data.funnel+'\n':''}\nPlease create 3 ad creative variations for this client's launch campaign.`;
 
   try {
-    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+    const r = await fetch(`https://api.clickup.com/api/v2/list/${cfg.videoListId}/task`, {
       method: 'POST',
       headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: taskName, description: desc, priority: 2, due_date: d.getTime() }),
@@ -2299,7 +2300,7 @@ function openSlackTaskModal(elOrId) {
   if (!modal || !body) return;
 
   const listName = msg.channel.toLowerCase().includes('video') ? 'Video Editing' : 'Media Tickets';
-  const listId   = msg.channel.toLowerCase().includes('video') ? '901512331541' : '901515083916';
+  const listId   = msg.channel.toLowerCase().includes('video') ? getCfg().videoListId : getCfg().tasksListId;
 
   body.innerHTML = `
     <div style="background:#0d0d0d;border:1px solid #222;border-radius:8px;padding:10px;margin-bottom:12px;font-size:12px;color:#aaa">
@@ -2410,8 +2411,7 @@ async function confirmFatigueTicket(accountId, entry) {
   const desc = `Creative fatigue detected on ${new Date().toLocaleDateString()}.\n\nCTR dropped ${entry.drop_pct}% from peak ${entry.peak_ctr}% to 3-day avg ${entry.avg_3day_ctr}%.\n\nPlease create new ad creative for this account.`;
 
   try {
-    // Video editing list: 901512331541
-    const r = await fetch('https://api.clickup.com/api/v2/list/901512331541/task', {
+    const r = await fetch(`https://api.clickup.com/api/v2/list/${cfg.videoListId}/task`, {
       method: 'POST',
       headers: { 'Authorization': cfg.token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name: taskName, description: desc, priority: 2 }),
@@ -4458,9 +4458,9 @@ async function loadAll() {
       // LIVE MODE — fetch directly from ClickUp API
       // Fetch Client Management in parallel with the other lists
       const liveFetches = await Promise.allSettled([
-        fetchCUListLive('901512331541', cfg.token, { includeClosed: true, subtasks: true }),  // video editing
-        fetchCUListLive('901515083916', cfg.token, { includeClosed: true }),                  // tasks (Media Tickets)
-        fetchCUListLive('901514441223', cfg.token, {}),                                       // maintenance
+        fetchCUListLive(cfg.videoListId,  cfg.token, { includeClosed: true, subtasks: true }),  // video editing
+        fetchCUListLive(cfg.tasksListId,  cfg.token, { includeClosed: true }),                  // tasks (Media Tickets)
+        fetchCUListLive(cfg.adsListId,    cfg.token, {}),                                       // ads management/maintenance
         loadClientMgmtData(),  // Client Management (enrichment + retention)
         cfg.techListId ? fetchCUListLive(cfg.techListId, cfg.token, { includeClosed: true }) : Promise.resolve(null), // tech tickets
       ]);
