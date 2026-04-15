@@ -701,6 +701,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <option value="leads">Most Leads</option>
       <option value="name">Name A–Z</option>
     </select>
+    <button class="fbtn" id="metaAssignToggle" onclick="toggleMetaAssign()" style="display:none">👤 My accounts</button>
     <button style="background:#7c3aed;border:none;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;white-space:nowrap" onclick="openOnboardingModal()">+ New Client</button>
   </div>
   <div class="section-title" id="metaSubtitle">Loading...</div>
@@ -1469,6 +1470,7 @@ const ADMIN_PW_HASH = '96864b8317c1514456bfeff42cdb337dad97e4de679e78f82559a30ac
 
 // Assignment data — populated from data/assignments.json on loadAll()
 let assignmentData = null;
+let metaShowMine = false; // toggled per-session; default depends on role
 
 // ── User identity helpers ──
 function getUser() {
@@ -2848,6 +2850,13 @@ function switchSection(section) {
 // ══════════════════════════════════════════════════════════════
 // ══ META ADS ══
 // ══════════════════════════════════════════════════════════════
+function toggleMetaAssign() {
+  metaShowMine = !metaShowMine;
+  const btn = document.getElementById('metaAssignToggle');
+  if (btn) btn.classList.toggle('active', metaShowMine);
+  renderMeta();
+}
+
 function renderMeta() {
   if (!metaData) return;
   const clients = metaData.clients || [];
@@ -2855,12 +2864,51 @@ function renderMeta() {
   const filt   = document.getElementById('metaFilter').value;
   const sort   = document.getElementById('metaSort').value;
 
+  // Assignment filter — show/configure toggle based on current user
+  const user = getUser();
+  const toggleBtn = document.getElementById('metaAssignToggle');
+  if (toggleBtn) {
+    if (user && user.role === 'media_buyer' && assignmentData) {
+      toggleBtn.style.display = '';
+      // Default to "my accounts" for media buyers on first render
+      if (!toggleBtn.dataset.initialized) {
+        metaShowMine = true;
+        toggleBtn.classList.add('active');
+        toggleBtn.dataset.initialized = '1';
+      }
+    } else {
+      toggleBtn.style.display = 'none';
+      metaShowMine = false;
+    }
+  }
+
+  // Build assigned account name set for this user (case-insensitive)
+  let myAccountNames = null;
+  if (metaShowMine && user && assignmentData) {
+    myAccountNames = new Set(
+      (assignmentData.assignments || [])
+        .filter(a => a.media_buyer === user.name)
+        .map(a => (a.client_name || '').toLowerCase())
+    );
+  }
+
   let list = clients.filter(c => {
     if (search && !(c.account_name || '').toLowerCase().includes(search)) return false;
     if (filt === 'active'  && c.status !== 'active') return false;
     if (filt === 'no_data' && c.status === 'active') return false;
+    if (myAccountNames !== null) {
+      const nameLC = (c.account_name || '').toLowerCase();
+      if (!Array.from(myAccountNames).some(n => nameLC.includes(n) || n.includes(nameLC))) return false;
+    }
     return true;
   });
+
+  // Update toggle button label with count
+  if (toggleBtn && toggleBtn.style.display !== 'none') {
+    toggleBtn.textContent = metaShowMine
+      ? `👤 My accounts (${list.length})`
+      : `👁 All accounts (${list.length})`;
+  }
 
   list.sort((a, b) => {
     const ac = (a.last_7_days?.leads > 0 && a.last_7_days?.cost_per_lead) ? a.last_7_days.cost_per_lead : null;
