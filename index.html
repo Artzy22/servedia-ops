@@ -3338,11 +3338,13 @@ function renderMaintenance() {
   const user = getUser();
   const maintToggle = document.getElementById('maintAssignToggle');
   if (maintToggle) {
-    if (user && user.role === 'media_buyer' && assignmentData) {
+    const canFilter = user && (user.role === 'media_buyer' || user.role === 'admin') && clientMgmtAllTasks && clientMgmtAllTasks.length;
+    if (canFilter) {
       maintToggle.style.display = '';
       if (!maintToggle.dataset.initialized) {
-        maintShowMine = true;
-        maintToggle.classList.add('active');
+        // media buyers default to "my clients"; admins default to "all"
+        maintShowMine = user.role === 'media_buyer';
+        maintToggle.classList.toggle('active', maintShowMine);
         maintToggle.dataset.initialized = '1';
       }
     } else {
@@ -3351,21 +3353,47 @@ function renderMaintenance() {
     }
   }
   if (maintShowMine && user) {
+    // Build a name→assignees lookup from ALL clientMgmtAllTasks (name-based, catches clients
+    // that don't have an ad account URL set in ClickUp)
+    const cmTaskAssignees = {};
+    (clientMgmtAllTasks || []).forEach(t => {
+      const norm = normalizeName(t.name || '');
+      if (norm) cmTaskAssignees[norm] = (t.assignees || []).map(a => ({
+        username: (a.username || '').toLowerCase(),
+        email:    (a.email    || '').toLowerCase(),
+      }));
+    });
+
     all = all.filter(c => {
-      // Priority 1: ClickUp Client Management assignees (live/cached)
+      const nl = normalizeName(c.name || '');
+
+      // Priority 1: exact normalized name match in CM tasks
+      if (cmTaskAssignees[nl] !== undefined) {
+        return userMatchesAssignee(user.name, cmTaskAssignees[nl]);
+      }
+
+      // Priority 1b: fuzzy name match across CM tasks
+      for (const [cmNorm, assignees] of Object.entries(cmTaskAssignees)) {
+        if (nl && cmNorm && (nl.includes(cmNorm) || cmNorm.includes(nl) || wordsOverlap(nl, cmNorm))) {
+          return userMatchesAssignee(user.name, assignees);
+        }
+      }
+
+      // Priority 2: cmAssignees already on the record (indexed by ad account ID)
       if (c.cmAssignees && c.cmAssignees.length) {
         return userMatchesAssignee(user.name, c.cmAssignees);
       }
-      // Priority 2: static assignments.json fallback
+
+      // Priority 3: static assignments.json fallback
       if (assignmentData) {
         const myNames = (assignmentData.assignments || [])
           .filter(a => a.media_buyer === user.name)
           .map(a => (a.client_name || '').toLowerCase());
-        const nl = (c.name || '').toLowerCase();
-        if (myNames.length) return myNames.some(n => nl.includes(n) || n.includes(nl));
+        if (myNames.length) return myNames.some(n => (c.name||'').toLowerCase().includes(n) || n.includes((c.name||'').toLowerCase()));
       }
-      // No assignment data at all — show the account
-      return true;
+
+      // No assignment data found for this client — hide it when filter is on
+      return false;
     });
   }
   if (maintToggle && maintToggle.style.display !== 'none') {
