@@ -2562,6 +2562,11 @@ function buildCMRecord(task) {
     adDosDonts:        getCF(task, "ad do"),
     // Links
     adAccountUrl:      getCF(task, 'ad account'),
+    // Assignees — raw ClickUp assignee objects kept for identity matching
+    assignees:         (task.assignees || []).map(a => ({
+      username: (a.username || '').toLowerCase(),
+      email:    (a.email    || '').toLowerCase(),
+    })),
   };
 }
 
@@ -3147,6 +3152,8 @@ function buildDmClients() {
       lifecycleStatus:   cm?.lifecycleStatus  || null,
       abrLast7:          cm?.abrLast7         || null,
       bookingsLast7:     cm?.bookingsLast7    || null,
+      // ClickUp CM assignees — used for "My clients" filter
+      cmAssignees:       cm?.assignees || [],
       // The ClickUp maintenance task itself (for assignee filtering)
       _cuTask:           cu || null,
     };
@@ -3214,6 +3221,20 @@ function setDmFilter(f) {
   const b = document.getElementById('dmf-' + f);
   if (b) b.classList.add('active');
   renderMaintenance();
+}
+
+// Match a full user name (e.g. "Felipe Guimaraes") against ClickUp assignee objects
+function userMatchesAssignee(userName, assignees) {
+  if (!userName || !assignees || !assignees.length) return false;
+  const norm = userName.toLowerCase().replace(/[^a-z]/g, '');
+  return assignees.some(a => {
+    const uname = (a.username || '').replace(/[^a-z]/g, '');
+    const email = (a.email    || '').split('@')[0].replace(/[^a-z]/g, '');
+    return uname === norm || email === norm ||
+           (uname.length > 3 && norm.includes(uname)) ||
+           (norm.length  > 3 && uname.includes(norm)) ||
+           (email.length > 3 && norm.includes(email));
+  });
 }
 
 function toggleMaintAssign() {
@@ -3329,15 +3350,22 @@ function renderMaintenance() {
       maintShowMine = false;
     }
   }
-  if (maintShowMine && user && assignmentData) {
-    const myNames = new Set(
-      (assignmentData.assignments || [])
-        .filter(a => a.media_buyer === user.name)
-        .map(a => (a.client_name || '').toLowerCase())
-    );
+  if (maintShowMine && user) {
     all = all.filter(c => {
-      const nl = (c.name || '').toLowerCase();
-      return Array.from(myNames).some(n => nl.includes(n) || n.includes(nl));
+      // Priority 1: ClickUp Client Management assignees (live/cached)
+      if (c.cmAssignees && c.cmAssignees.length) {
+        return userMatchesAssignee(user.name, c.cmAssignees);
+      }
+      // Priority 2: static assignments.json fallback
+      if (assignmentData) {
+        const myNames = (assignmentData.assignments || [])
+          .filter(a => a.media_buyer === user.name)
+          .map(a => (a.client_name || '').toLowerCase());
+        const nl = (c.name || '').toLowerCase();
+        if (myNames.length) return myNames.some(n => nl.includes(n) || n.includes(nl));
+      }
+      // No assignment data at all — show the account
+      return true;
     });
   }
   if (maintToggle && maintToggle.style.display !== 'none') {
