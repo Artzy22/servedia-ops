@@ -3467,6 +3467,20 @@
                                 margin-bottom: 18px;
                             "
                         ></div>
+                        <div
+                            id="ccSinceLastVisit"
+                            style="
+                                display: none;
+                                background: #0d1420;
+                                border: 1px solid #1e3a8a;
+                                border-left: 3px solid #3b82f6;
+                                border-radius: 8px;
+                                padding: 12px 16px;
+                                margin-bottom: 18px;
+                                font-size: 12px;
+                                color: #dbeafe;
+                            "
+                        ></div>
                         <div class="stat-grid" style="margin-bottom: 20px">
                             <div class="stat-card">
                                 <div class="stat-label">Active Accounts</div>
@@ -10727,8 +10741,119 @@
                     );
             }
 
+            // Compute a small snapshot of the "state of the world" so the
+            // since-last-visit banner can tell Byron what changed since he
+            // last acknowledged. Uses only already-loaded data; no fetches.
+            function ccSnapshotNow() {
+                const dismissed = new Set(
+                    JSON.parse(
+                        localStorage.getItem("slack_dismissed_ids") || "[]",
+                    ),
+                );
+                const flagged = (
+                    (slFlaggedData && slFlaggedData.flagged) ||
+                    []
+                ).filter((m) => !m.task_created && !dismissed.has(m.id));
+                const urgentSlack = flagged.filter(
+                    (m) => m.type === "urgent",
+                ).length;
+                const videoApproval = (
+                    (typeof vidData !== "undefined" && vidData?.tasks) || []
+                ).filter((t) => {
+                    const s = (t.status?.status || "").toLowerCase();
+                    return s.includes("approval") || s.includes("review");
+                }).length;
+                const activeClients = (
+                    (metaData && metaData.clients) ||
+                    []
+                ).filter((c) => (c.status || "").toUpperCase() === "ACTIVE")
+                    .length;
+                return {
+                    ts: Date.now(),
+                    metaPulledAt: metaData?.pulled_at || null,
+                    urgentSlack,
+                    videoApproval,
+                    activeClients,
+                };
+            }
+
+            function renderSinceLastVisit() {
+                const host = document.getElementById("ccSinceLastVisit");
+                if (!host) return;
+                const now = ccSnapshotNow();
+                let prev = null;
+                try {
+                    const raw = localStorage.getItem("cc_last_snapshot");
+                    if (raw) prev = JSON.parse(raw);
+                } catch {}
+                // First visit — just take a snapshot silently.
+                if (!prev || !prev.ts) {
+                    localStorage.setItem(
+                        "cc_last_snapshot",
+                        JSON.stringify(now),
+                    );
+                    host.style.display = "none";
+                    return;
+                }
+                const minsAgo = Math.round((now.ts - prev.ts) / 60000);
+                // Suppress banner if the visit was < 5 min ago (noise).
+                if (minsAgo < 5) {
+                    host.style.display = "none";
+                    return;
+                }
+
+                const lines = [];
+                const dSlack = now.urgentSlack - (prev.urgentSlack || 0);
+                if (dSlack > 0)
+                    lines.push(
+                        `💬 <b>${dSlack}</b> new urgent Slack message${dSlack !== 1 ? "s" : ""}`,
+                    );
+                const dVideo = now.videoApproval - (prev.videoApproval || 0);
+                if (dVideo > 0)
+                    lines.push(
+                        `🎬 <b>${dVideo}</b> new video ticket${dVideo !== 1 ? "s" : ""} awaiting approval`,
+                    );
+                const dActive = now.activeClients - (prev.activeClients || 0);
+                if (dActive !== 0)
+                    lines.push(
+                        `📊 Active account count: ${prev.activeClients} → <b>${now.activeClients}</b> (${dActive > 0 ? "+" : ""}${dActive})`,
+                    );
+
+                if (!lines.length) {
+                    host.style.display = "none";
+                    return;
+                }
+
+                const ago =
+                    minsAgo < 60
+                        ? `${minsAgo} min ago`
+                        : minsAgo < 1440
+                          ? `${Math.round(minsAgo / 60)}h ago`
+                          : `${Math.round(minsAgo / 1440)}d ago`;
+                host.style.display = "";
+                host.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-weight:700;margin-bottom:4px;color:#93c5fd">Since your last visit (${ago}):</div>
+        <ul style="margin:0;padding-left:18px;line-height:1.7">${lines.map((l) => `<li>${l}</li>`).join("")}</ul>
+      </div>
+      <button class="dmc-link-btn" style="font-size:11px" onclick="acknowledgeSinceLastVisit()">✓ Got it</button>
+    </div>`;
+            }
+
+            function acknowledgeSinceLastVisit() {
+                try {
+                    localStorage.setItem(
+                        "cc_last_snapshot",
+                        JSON.stringify(ccSnapshotNow()),
+                    );
+                } catch {}
+                const host = document.getElementById("ccSinceLastVisit");
+                if (host) host.style.display = "none";
+            }
+
             function renderCommandCenter() {
                 renderCCAlertChips();
+                renderSinceLastVisit();
                 // Date greeting
                 const dateEl = document.getElementById("ccDate");
                 if (dateEl) {
