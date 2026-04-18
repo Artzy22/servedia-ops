@@ -7444,6 +7444,9 @@
                     taskName: task.name,
                     taskUrl: task.url,
                     lifecycleStatus: task.status,
+                    dateCreated: task.date_created
+                        ? Number(task.date_created)
+                        : null,
                     // Contact
                     contactName:
                         getCF(task, "client full name") ||
@@ -11887,10 +11890,30 @@
                         const done = checks.filter((c) => c.done).length;
                         const pct = Math.round((done / checks.length) * 100);
 
-                        return `<div style="background:#0f0f14;border:1px solid #1e1e1e;border-radius:10px;padding:16px">
+                        const ageDays = r.dateCreated
+                            ? Math.floor(
+                                  (now - r.dateCreated) / 86400000,
+                              )
+                            : null;
+                        const needsEscalation =
+                            ageDays !== null &&
+                            ageDays > 14 &&
+                            !isLive;
+                        const dayChip =
+                            ageDays !== null
+                                ? `<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${needsEscalation ? "#450a0a" : ageDays > 7 ? "#2a1a00" : "#1a1730"};color:${needsEscalation ? "#fecaca" : ageDays > 7 ? "#fde68a" : "#c4b5fd"};border:1px solid ${needsEscalation ? "#7f1d1d" : ageDays > 7 ? "#a16207" : "#4c1d95"}">Day ${ageDays}</span>`
+                                : "";
+                        const escalateBtn = needsEscalation
+                            ? `<button class="dmc-link-btn" style="font-size:11px;background:#450a0a;color:#fecaca;border-color:#7f1d1d" onclick="escalateOnboarding('${esc(r.taskId)}','${esc(r.taskName).replace(/'/g, "\\'")}',${ageDays})">🚨 Escalate to Byron</button>`
+                            : "";
+
+                        return `<div style="background:#0f0f14;border:1px solid ${needsEscalation ? "#7f1d1d" : "#1e1e1e"};border-radius:10px;padding:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div>
-          <div style="font-size:14px;font-weight:700;color:#e0e0e0">${esc(r.taskName)}</div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="font-size:14px;font-weight:700;color:#e0e0e0">${esc(r.taskName)}</div>
+            ${dayChip}
+          </div>
           <div style="font-size:11px;color:#555;margin-top:2px">${r.launchDate ? "Launch: " + fmtDate(r.launchDate) : "No launch date set"} ${r.contactName ? "· " + esc(r.contactName) : ""}</div>
         </div>
         <div style="text-align:right">
@@ -11906,10 +11929,30 @@
         ${r.taskUrl ? `<a class="dmc-link-btn cu" href="${esc(r.taskUrl)}" target="_blank" style="font-size:11px">📋 ClickUp</a>` : ""}
         ${r.phone ? `<a class="dmc-link-btn" href="tel:${esc(r.phone)}" style="font-size:11px">📞 Call</a>` : ""}
         <button class="dmc-link-btn" style="font-size:11px" onclick="showGHLPrompt('${esc(r.taskName).replace(/'/g, "\\'")}','${esc(r.niche || "").replace(/'/g, "\\'")}','${esc(r.offer || "").replace(/'/g, "\\'")}')">🤖 GHL Setup Prompt</button>
+        ${escalateBtn}
       </div>
     </div>`;
                     })
                     .join("");
+            }
+
+            function escalateOnboarding(taskId, taskName, ageDays) {
+                const msg = `⚠️ ESCALATION — ${taskName} is Day ${ageDays} of onboarding and not yet live. Byron, please review.`;
+                const ok = confirm(
+                    `Escalate onboarding for "${taskName}" (Day ${ageDays})?\n\n` +
+                        `This will copy an escalation message to your clipboard so you can paste it into #media-ads or the ClickUp task comments.`,
+                );
+                if (!ok) return;
+                navigator.clipboard
+                    .writeText(msg)
+                    .then(() => {
+                        alert(
+                            "Escalation message copied to clipboard. Paste into #media-ads or ClickUp task comments.",
+                        );
+                    })
+                    .catch(() => {
+                        prompt("Copy this message:", msg);
+                    });
             }
 
             function showGHLPrompt(name, niche, offer) {
