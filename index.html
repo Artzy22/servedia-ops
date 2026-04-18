@@ -9947,14 +9947,19 @@
                 document.getElementById("msgsTitle").textContent =
                     selectedChannel ? "#" + selectedChannel : "All Messages";
                 const body = document.getElementById("msgsBody");
+                const warnHtml = slData.warning
+                    ? `<div style="background:#2a1200;border:1px solid #9a3412;color:#fed7aa;padding:12px 14px;border-radius:8px;margin:0 0 12px;font-size:12px;line-height:1.5;font-weight:500">⚠️ ${esc(slData.warning)}</div>`
+                    : "";
                 if (!fm.length) {
                     body.innerHTML =
+                        warnHtml +
                         '<div class="no-data">No messages found</div>';
                     return;
                 }
 
-                body.innerHTML = fm
-                    .map((m) => {
+                body.innerHTML =
+                    warnHtml +
+                    fm.map((m) => {
                         const uname = m.user_name || m.user || "Unknown";
                         const init = uname.slice(0, 2).toUpperCase();
                         const ts =
