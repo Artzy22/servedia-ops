@@ -530,6 +530,40 @@
                 border-radius: 10px;
                 font-weight: 600;
             }
+            .buyer-chip {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                font-size: 10px;
+                font-weight: 800;
+                flex-shrink: 0;
+                margin-right: 2px;
+            }
+            .niche-pill {
+                font-size: 10px;
+                font-weight: 600;
+                padding: 2px 7px;
+                border-radius: 10px;
+                background: #1a1730;
+                color: #c4b5fd;
+                white-space: nowrap;
+                text-transform: capitalize;
+            }
+            .rules-banner {
+                background: #2a1a00;
+                color: #fbbf24;
+                border: 1px solid #78350f;
+                border-left: 3px solid #fbbf24;
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-weight: 600;
+                margin: 8px 0 0 0;
+            }
+            .rules-banner b { color: #fde68a; }
             .st-active {
                 background: #064e3b;
                 color: #34d399;
@@ -8036,7 +8070,8 @@
                 );
 
                 grid.innerHTML = list
-                    .map((c) => {
+                    .map((rawC) => {
+                        const c = enrichAccount(rawC);
                         const d7 = c.last_7_days || {},
                             d30 = c.last_30_days || {};
                         const active = c.status === "active";
@@ -8149,13 +8184,27 @@
       ${metaSuggTips.map((s) => `<div class="dmc-sugg-item">${esc(s)}</div>`).join("")}
     </div>`;
 
+                        const buyerChipHtml = buyerChip(c._mediaBuyer);
+                        const nicheHtml = c._niche
+                            ? `<span class="niche-pill">${esc(c._niche)}</span>`
+                            : "";
+                        const rulesHtml = c._specialRules
+                            ? `<div class="rules-banner"><b>⚠ Rule:</b> ${esc(c._specialRules)}</div>`
+                            : "";
+                        const cuLinkHtml = c._clickupUrl
+                            ? `<a class="dmc-link-btn" href="${c._clickupUrl}" target="_blank">📋 ClickUp</a>`
+                            : "";
+
                         return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
+        ${buyerChipHtml}
         <div class="ac-name" title="${nameE}">${nameE}</div>
+        ${nicheHtml}
         ${billingBadge}${violBadge}${fatBadge}${newBadge}
         <span class="ac-status ${active ? "st-active" : "st-nodata"}">${active ? "Active" : "No Data"}</span>
         ${hsBadge}
       </div>
+      ${rulesHtml}
       <div class="mtabs" id="mt-${id}">
         <button class="mtab-btn active" onclick="switchMT(this)" data-id="${id}" data-p="7d">7 Days</button>
         <button class="mtab-btn"        onclick="switchMT(this)" data-id="${id}" data-p="30d">30 Days</button>
@@ -8165,6 +8214,7 @@
       ${metaSuggHtml}
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="dmc-link-btn" href="${adsUrl}" target="_blank">📈 Ads Manager</a>
+        ${cuLinkHtml}
         <button class="dmc-link-btn ci-btn" onclick="openClientModal('${id}','${nameE}')">ℹ Client Info</button>
       </div>
     </div>`;
@@ -10812,6 +10862,55 @@
 
                 // Update nav badges while we're here
                 updateNavBadges();
+            }
+
+            // ══════════════════════════════════════════════════════════════
+            // ENRICHMENT — merge meta account with client-map + assignments
+            // ══════════════════════════════════════════════════════════════
+            function enrichAccount(metaAccount) {
+                if (!metaAccount) return metaAccount;
+                const id = String(metaAccount.account_id || "").replace("act_", "");
+                const mapped = (metaClientMap && metaClientMap[id]) || {};
+                const nameLC = (metaAccount.account_name || "").toLowerCase();
+                const assignment =
+                    assignmentData && Array.isArray(assignmentData.assignments)
+                        ? assignmentData.assignments.find(
+                              (a) =>
+                                  (a.client_name || "").toLowerCase() === nameLC,
+                          )
+                        : null;
+                return Object.assign({}, metaAccount, {
+                    _map: mapped,
+                    _clickupTaskId: mapped.clickup_task_id || null,
+                    _clickupUrl: mapped.clickup_task_id
+                        ? `https://app.clickup.com/t/${mapped.clickup_task_id}`
+                        : null,
+                    _niche: mapped.niche || null,
+                    _targetCpl: mapped.target_cpl || null,
+                    _dailyBudget: mapped.daily_budget || null,
+                    _onboardedDate: mapped.onboarded_date || null,
+                    _mediaBuyer: assignment ? assignment.media_buyer || null : null,
+                    _csm: assignment ? assignment.csm || null : null,
+                    _team: assignment ? assignment.team || null : null,
+                    _driveFolder: mapped.drive_folder || null,
+                    _specialRules: mapped.special_rules || null,
+                });
+            }
+
+            // Buyer initial chip — colored badge with first letter of buyer's first name.
+            function buyerChip(buyerName) {
+                if (!buyerName) return "";
+                const first = buyerName.trim().split(/\s+/)[0] || "";
+                const initial = (first[0] || "?").toUpperCase();
+                // Stable color from name hash so each buyer gets a consistent hue.
+                let h = 0;
+                for (let i = 0; i < buyerName.length; i++)
+                    h = (h * 31 + buyerName.charCodeAt(i)) >>> 0;
+                const hue = h % 360;
+                const bg = `hsl(${hue}, 60%, 22%)`;
+                const fg = `hsl(${hue}, 80%, 78%)`;
+                const safe = String(buyerName).replace(/[<>"']/g, "");
+                return `<span class="buyer-chip" title="${safe}" style="background:${bg};color:${fg}">${initial}</span>`;
             }
 
             // ══════════════════════════════════════════════════════════════
