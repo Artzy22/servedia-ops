@@ -1,0 +1,904 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fill Client Map — Servedia Ops</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0a0a0f;
+        color: #e0e0e0;
+        min-height: 100vh;
+        padding: 0 0 90px 0;
+      }
+      .header {
+        background: #111;
+        border-bottom: 1px solid #1a1a1a;
+        padding: 16px 28px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .logo {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 15px;
+        font-weight: 900;
+        color: #fff;
+      }
+      h1 { font-size: 16px; font-weight: 800; margin: 0; color: #fff; }
+      .chips { display: flex; gap: 8px; margin-left: auto; }
+      .chip {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        color: #c4b5fd;
+        padding: 5px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .chip.green { color: #34d399; }
+      .chip.red { color: #f87171; }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-bottom: 1px solid #13131f;
+        background: #0b0b12;
+      }
+      .filter-group { display: flex; gap: 4px; background: #13131f; padding: 3px; border-radius: 8px; }
+      .filter-btn {
+        background: transparent;
+        border: none;
+        color: #777;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .filter-btn:hover { color: #e0e0e0; }
+      .filter-btn.active { background: #1a1730; color: #c4b5fd; }
+      .toolbar-spacer { flex: 1; }
+      .search-input {
+        background: #13131f;
+        border: 1px solid #1a1a1a;
+        color: #e0e0e0;
+        padding: 7px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        width: 240px;
+        font-family: inherit;
+      }
+      .search-input:focus { outline: none; border-color: #7c3aed; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      thead th {
+        position: sticky;
+        top: 64px;
+        background: #111;
+        border-bottom: 1px solid #1a1a1a;
+        color: #777;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 10px;
+        padding: 10px 16px;
+        z-index: 10;
+      }
+      tbody td {
+        border-bottom: 1px solid #13131f;
+        padding: 12px 16px;
+        vertical-align: top;
+      }
+      tbody tr:hover { background: #0e0e17; }
+      tbody tr.pending { background: #1a1730; }
+      tbody tr.pending:hover { background: #201a38; }
+      .acct-name { color: #e0e0e0; font-weight: 600; }
+      .acct-id { color: #555; font-size: 10px; margin-top: 3px; font-family: ui-monospace, monospace; }
+      .metrics { font-size: 11px; color: #aaa; white-space: nowrap; }
+      .metrics b { color: #e0e0e0; font-weight: 600; }
+      .metrics .sub { color: #555; margin: 0 4px; }
+      .current {
+        color: #aaa;
+        font-style: normal;
+      }
+      .current.unmapped { color: #555; font-style: italic; }
+      .suggestion {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .suggestion-name { color: #a78bfa; font-size: 11px; }
+      .suggestion-meta { display: flex; gap: 6px; align-items: center; }
+      .conf-pill {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: #1a1730;
+        color: #c4b5fd;
+      }
+      .conf-pill.good { background: #052e16; color: #34d399; }
+      .conf-pill.weak { background: #2a1200; color: #fb923c; }
+      .btn {
+        background: #1a1a1a;
+        border: 1px solid #2a2a2a;
+        color: #aaa;
+        padding: 5px 11px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: 600;
+        font-family: inherit;
+      }
+      .btn:hover:not(:disabled) { border-color: #7c3aed; color: #fff; }
+      .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      .btn.accept { color: #34d399; border-color: #0b4d2b; }
+      .btn.accept:hover { background: #052e16; color: #6ee7b7; border-color: #34d399; }
+      .btn.clear { color: #f87171; }
+      .btn.primary {
+        background: linear-gradient(135deg, #7c3aed, #a78bfa);
+        border: none;
+        color: #fff;
+        padding: 9px 18px;
+        font-size: 13px;
+      }
+      .btn.primary:hover:not(:disabled) { filter: brightness(1.1); }
+      .dropdown-wrap { position: relative; min-width: 260px; }
+      .dropdown-filter {
+        width: 100%;
+        background: #13131f;
+        border: 1px solid #1a1a1a;
+        color: #e0e0e0;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-family: inherit;
+        margin-bottom: 4px;
+      }
+      .dropdown-filter:focus { outline: none; border-color: #7c3aed; }
+      select.task-select {
+        width: 100%;
+        background: #13131f;
+        border: 1px solid #1a1a1a;
+        color: #e0e0e0;
+        padding: 6px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-family: inherit;
+        max-width: 300px;
+      }
+      select.task-select:focus { outline: none; border-color: #7c3aed; }
+      .actions { display: flex; gap: 6px; }
+      .save-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #111;
+        border-top: 1px solid #1a1730;
+        padding: 14px 28px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 40;
+        box-shadow: 0 -8px 24px rgba(124, 58, 237, 0.08);
+      }
+      .pending-count { font-size: 12px; color: #c4b5fd; font-weight: 600; }
+      .pending-count.zero { color: #555; }
+      .save-bar-spacer { flex: 1; }
+      .toast {
+        position: fixed;
+        bottom: 100px;
+        right: 28px;
+        background: #052e16;
+        border: 1px solid #34d399;
+        color: #6ee7b7;
+        padding: 12px 18px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 100;
+        max-width: 380px;
+      }
+      .toast.error { background: #450a0a; border-color: #f87171; color: #fca5a5; }
+      .toast.warn { background: #2a1200; border-color: #fb923c; color: #fdba74; }
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+      }
+      .modal {
+        background: #13131f;
+        border: 1px solid #1a1730;
+        border-radius: 10px;
+        padding: 22px 24px;
+        width: 440px;
+        max-width: 92vw;
+      }
+      .modal h2 { margin: 0 0 10px; font-size: 15px; font-weight: 800; color: #fff; }
+      .modal p { margin: 0 0 14px; font-size: 12px; color: #aaa; line-height: 1.55; }
+      .modal code { background: #0a0a0f; padding: 1px 6px; border-radius: 3px; color: #c4b5fd; font-size: 11px; }
+      .modal .pat-input {
+        width: 100%;
+        background: #0a0a0f;
+        border: 1px solid #1a1a1a;
+        color: #e0e0e0;
+        padding: 9px 12px;
+        border-radius: 7px;
+        font-size: 12px;
+        font-family: ui-monospace, monospace;
+        margin-bottom: 14px;
+      }
+      .modal .pat-input:focus { outline: none; border-color: #7c3aed; }
+      .modal .actions-row { display: flex; gap: 8px; justify-content: flex-end; }
+      .saved-hint { font-size: 11px; color: #34d399; margin-bottom: 10px; }
+      .loading { text-align: center; padding: 60px; color: #555; font-size: 13px; }
+      .error-panel {
+        margin: 40px 28px;
+        background: #450a0a;
+        border: 1px solid #f87171;
+        color: #fca5a5;
+        padding: 16px 20px;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .error-panel code { background: #0a0a0f; padding: 2px 6px; border-radius: 3px; }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="logo">S</div>
+      <h1>Fill Client Map</h1>
+      <div class="chips" id="chips"></div>
+    </div>
+
+    <div class="toolbar">
+      <div class="filter-group" id="filter-group">
+        <button class="filter-btn" data-filter="all">All</button>
+        <button class="filter-btn active" data-filter="unmapped">Unmapped only</button>
+        <button class="filter-btn" data-filter="mapped">Mapped</button>
+      </div>
+      <div class="toolbar-spacer"></div>
+      <input
+        type="search"
+        class="search-input"
+        id="row-search"
+        placeholder="Search Meta accounts…"
+      />
+    </div>
+
+    <div id="content"><div class="loading">Loading data…</div></div>
+
+    <div class="save-bar">
+      <div class="pending-count zero" id="pending-count">0 pending changes</div>
+      <div class="save-bar-spacer"></div>
+      <button class="btn" id="discard-btn" disabled>Discard changes</button>
+      <button class="btn" id="pat-btn">PAT: not set</button>
+      <button class="btn primary" id="save-btn" disabled>Save to GitHub</button>
+    </div>
+
+    <div id="toast-host"></div>
+    <div id="modal-host"></div>
+
+    <script>
+      // ═══════════════════════════════════════════════════════════════
+      // Config
+      // ═══════════════════════════════════════════════════════════════
+      const REPO_OWNER = "Artzy22";
+      const REPO_NAME = "servedia-ops";
+      const MAP_PATH = "data/client-map.json";
+      const PAT_KEY = "gh_pat";
+      const STOP_WORDS = new Set([
+        "medspa", "med", "spa", "aesthetics", "aesthetic", "wellness",
+        "clinic", "center", "centre", "by", "and", "the", "llc", "inc",
+        "co", "of", "at", "in", "for",
+      ]);
+
+      // ═══════════════════════════════════════════════════════════════
+      // State
+      // ═══════════════════════════════════════════════════════════════
+      const state = {
+        meta: null,            // { clients: [...] }
+        clickup: null,         // { tasks: [...] }
+        map: null,             // { clients: [...], ...workflow meta fields }
+        mapSha: null,          // SHA of data/client-map.json from GitHub
+        pending: new Map(),    // account_id -> { clickup_task_id, clickup_name } OR null to clear
+        filter: "unmapped",
+        search: "",
+        pat: localStorage.getItem(PAT_KEY) || "",
+      };
+
+      // ═══════════════════════════════════════════════════════════════
+      // Data fetch
+      // ═══════════════════════════════════════════════════════════════
+      async function fetchJ(url) {
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText} — ${url}`);
+        return r.json();
+      }
+
+      async function loadLocal() {
+        const ts = Date.now();
+        const [meta, clickup, map] = await Promise.all([
+          fetchJ(`../data/meta.json?_=${ts}`),
+          fetchJ(`../data/clickup.json?_=${ts}`),
+          fetchJ(`../data/client-map.json?_=${ts}`),
+        ]);
+        state.meta = meta;
+        state.clickup = clickup;
+        state.map = map;
+      }
+
+      async function fetchMapShaFromGitHub() {
+        if (!state.pat) throw new Error("No PAT set");
+        const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${MAP_PATH}`;
+        const r = await fetch(url, {
+          headers: {
+            Authorization: `token ${state.pat}`,
+            Accept: "application/vnd.github+json",
+          },
+          cache: "no-store",
+        });
+        if (r.status === 401 || r.status === 403)
+          throw new Error(`AUTH:${r.status}`);
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        const j = await r.json();
+        state.mapSha = j.sha;
+        // Decode base64 content and replace local state.map with what's on GitHub (authoritative).
+        const decoded = atob((j.content || "").replace(/\n/g, ""));
+        try {
+          state.map = JSON.parse(decoded);
+        } catch (e) {
+          /* keep local copy on decode failure */
+        }
+        return j.sha;
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Fuzzy match — token-set Jaccard after normalization
+      // (Honest approximation of build-client-map.yml's
+      //  SequenceMatcher.ratio; see PR description.)
+      // ═══════════════════════════════════════════════════════════════
+      function normalize(name) {
+        if (!name) return [];
+        const n = name.toLowerCase().replace(/[^a-z0-9 ]/g, " ");
+        return n.split(/\s+/).filter((t) => t && t.length > 1 && !STOP_WORDS.has(t));
+      }
+
+      function similarity(a, b) {
+        const ta = normalize(a);
+        const tb = normalize(b);
+        if (!ta.length || !tb.length) return 0;
+        const sa = new Set(ta);
+        const sb = new Set(tb);
+        let inter = 0;
+        for (const t of sa) if (sb.has(t)) inter++;
+        const union = sa.size + sb.size - inter;
+        const jaccard = inter / union;
+        // Bonus for shared leading token (helps "Beyond Vitaliti" beat noise).
+        const firstMatch = ta[0] === tb[0] ? 0.1 : 0;
+        return Math.min(1, jaccard + firstMatch);
+      }
+
+      function bestMatchForAccount(accountName) {
+        let best = { id: null, name: null, score: 0 };
+        for (const t of state.clickup.tasks || []) {
+          if (!t.id || !t.name) continue;
+          const s = similarity(accountName, t.name);
+          if (s > best.score) best = { id: t.id, name: t.name, score: s };
+        }
+        return best;
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Derived views
+      // ═══════════════════════════════════════════════════════════════
+      function currentMappingFor(accountId) {
+        // Pending edit wins over whatever is in map.
+        if (state.pending.has(accountId)) return state.pending.get(accountId);
+        const entries = (state.map && state.map.clients) || [];
+        const entry = entries.find((e) => e.meta_account_id === accountId);
+        if (!entry || !entry.clickup_task_id) return null;
+        return { clickup_task_id: entry.clickup_task_id, clickup_name: entry.clickup_name };
+      }
+
+      function isMapped(accountId) {
+        return currentMappingFor(accountId) !== null;
+      }
+
+      function counts() {
+        const total = (state.meta.clients || []).length;
+        let mapped = 0;
+        for (const c of state.meta.clients || []) if (isMapped(c.account_id)) mapped++;
+        return { total, mapped, unmapped: total - mapped };
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Rendering
+      // ═══════════════════════════════════════════════════════════════
+      const fmtMoney = (n) =>
+        n == null ? "—" : `$${(+n).toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+      const fmtNum = (n) => (n == null ? "—" : Math.round(+n).toLocaleString());
+
+      function renderChips() {
+        const c = counts();
+        document.getElementById("chips").innerHTML = `
+          <span class="chip green">${c.mapped} mapped</span>
+          <span class="chip red">${c.unmapped} unmapped</span>
+          <span class="chip">${c.total} total</span>
+        `;
+      }
+
+      function renderTable() {
+        const host = document.getElementById("content");
+        const clients = state.meta.clients || [];
+        const search = state.search.trim().toLowerCase();
+
+        const rows = clients.filter((c) => {
+          if (search && !(`${c.account_name} ${c.account_id}`.toLowerCase().includes(search)))
+            return false;
+          const mapped = isMapped(c.account_id);
+          if (state.filter === "unmapped" && mapped) return false;
+          if (state.filter === "mapped" && !mapped) return false;
+          return true;
+        });
+
+        if (!rows.length) {
+          host.innerHTML = `<div class="loading">No accounts match the current filter.</div>`;
+          return;
+        }
+
+        const taskOptions = (state.clickup.tasks || [])
+          .filter((t) => t.id && t.name)
+          .sort((a, b) => a.name.localeCompare(b.name));
+
+        let html = `<table>
+          <thead>
+            <tr>
+              <th style="width:22%">Meta account</th>
+              <th style="width:16%">Last 7d</th>
+              <th style="width:18%">Current mapping</th>
+              <th style="width:20%">Suggested match</th>
+              <th style="width:24%">Select ClickUp task</th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+        for (const c of rows) {
+          const current = currentMappingFor(c.account_id);
+          const currentId = current ? current.clickup_task_id : "";
+          const currentLabel = current
+            ? `<span class="current">${escapeHtml(current.clickup_name || "(no name)")}</span>`
+            : `<span class="current unmapped">— unmapped —</span>`;
+
+          const best = bestMatchForAccount(c.account_name);
+          const suggestHtml =
+            best && best.id && best.id !== currentId
+              ? `<div class="suggestion">
+                  <span class="suggestion-name">${escapeHtml(best.name)}</span>
+                  <div class="suggestion-meta">
+                    <span class="conf-pill ${confClass(best.score)}">${Math.round(
+                  best.score * 100
+                )}%</span>
+                    <button class="btn accept" data-accept="${c.account_id}" data-task-id="${
+                  best.id
+                }" data-task-name="${escapeAttr(best.name)}">✓ Accept</button>
+                  </div>
+                </div>`
+              : best && best.id && best.id === currentId
+              ? `<span class="current">(already selected)</span>`
+              : `<span class="current unmapped">no suggestion</span>`;
+
+          const spend = c.last_7_days?.spend;
+          const leads = c.last_7_days?.leads;
+          const cpl = c.last_7_days?.cost_per_lead;
+          const pending = state.pending.has(c.account_id);
+
+          html += `<tr class="${pending ? "pending" : ""}">
+            <td>
+              <div class="acct-name">${escapeHtml(c.account_name)}</div>
+              <div class="acct-id">${c.account_id}</div>
+            </td>
+            <td class="metrics">
+              <b>${fmtMoney(spend)}</b> <span class="sub">·</span>
+              <b>${fmtNum(leads)}</b> leads <span class="sub">·</span>
+              <b>${cpl == null ? "—" : "$" + Math.round(cpl)}</b> CPL
+            </td>
+            <td>${currentLabel}</td>
+            <td>${suggestHtml}</td>
+            <td>
+              <div class="dropdown-wrap">
+                <input type="search" class="dropdown-filter" data-filter-for="${c.account_id}" placeholder="Filter tasks…" />
+                <select class="task-select" data-account-id="${c.account_id}">
+                  <option value="">— Select ClickUp task —</option>
+                  ${taskOptions
+                    .map(
+                      (t) =>
+                        `<option value="${t.id}" data-name="${escapeAttr(t.name)}" ${
+                          t.id === currentId ? "selected" : ""
+                        }>${escapeHtml(t.name)}${t.status ? " · " + escapeHtml(t.status) : ""}</option>`
+                    )
+                    .join("")}
+                </select>
+                <div class="actions" style="margin-top:6px">
+                  <button class="btn clear" data-clear="${c.account_id}" ${
+            current ? "" : "disabled"
+          }>Clear mapping</button>
+                </div>
+              </div>
+            </td>
+          </tr>`;
+        }
+
+        html += `</tbody></table>`;
+        host.innerHTML = html;
+
+        // Wire row events.
+        host.querySelectorAll("select.task-select").forEach((sel) => {
+          sel.addEventListener("change", (e) => {
+            const accountId = e.target.dataset.accountId;
+            const taskId = e.target.value;
+            if (!taskId) {
+              applyChange(accountId, null);
+              return;
+            }
+            const opt = e.target.selectedOptions[0];
+            applyChange(accountId, {
+              clickup_task_id: taskId,
+              clickup_name: opt?.dataset.name || opt?.textContent.split(" · ")[0] || "",
+            });
+          });
+        });
+
+        host.querySelectorAll("[data-accept]").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const accountId = e.target.dataset.accept;
+            applyChange(accountId, {
+              clickup_task_id: e.target.dataset.taskId,
+              clickup_name: e.target.dataset.taskName,
+            });
+          });
+        });
+
+        host.querySelectorAll("[data-clear]").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            applyChange(e.target.dataset.clear, null);
+          });
+        });
+
+        host.querySelectorAll(".dropdown-filter").forEach((input) => {
+          input.addEventListener("input", (e) => {
+            const accountId = e.target.dataset.filterFor;
+            const select = host.querySelector(
+              `select.task-select[data-account-id="${accountId}"]`
+            );
+            if (!select) return;
+            const term = e.target.value.trim().toLowerCase();
+            for (const opt of select.options) {
+              if (!opt.value) { opt.hidden = false; continue; }
+              opt.hidden = !!term && !opt.textContent.toLowerCase().includes(term);
+            }
+          });
+        });
+      }
+
+      function confClass(s) {
+        if (s >= 0.75) return "good";
+        if (s < 0.4) return "weak";
+        return "";
+      }
+
+      function escapeHtml(s) {
+        return String(s ?? "").replace(/[&<>]/g, (c) =>
+          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])
+        );
+      }
+      function escapeAttr(s) {
+        return String(s ?? "").replace(/[&<>"']/g, (c) =>
+          ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+        );
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Pending changes
+      // ═══════════════════════════════════════════════════════════════
+      function applyChange(accountId, mapping) {
+        // Compare against the on-disk map to see if this edit is actually a change.
+        const entries = (state.map && state.map.clients) || [];
+        const existing = entries.find((e) => e.meta_account_id === accountId);
+        const existingMapping =
+          existing && existing.clickup_task_id
+            ? { clickup_task_id: existing.clickup_task_id, clickup_name: existing.clickup_name }
+            : null;
+
+        const sameAsExisting =
+          (mapping === null && existingMapping === null) ||
+          (mapping &&
+            existingMapping &&
+            mapping.clickup_task_id === existingMapping.clickup_task_id);
+
+        if (sameAsExisting) state.pending.delete(accountId);
+        else state.pending.set(accountId, mapping);
+
+        renderAll();
+      }
+
+      function renderAll() {
+        renderChips();
+        renderTable();
+        renderSaveBar();
+      }
+
+      function renderSaveBar() {
+        const n = state.pending.size;
+        const pc = document.getElementById("pending-count");
+        pc.textContent = `${n} pending change${n === 1 ? "" : "s"}`;
+        pc.classList.toggle("zero", n === 0);
+        document.getElementById("save-btn").disabled = n === 0 || !state.pat;
+        document.getElementById("discard-btn").disabled = n === 0;
+        const patBtn = document.getElementById("pat-btn");
+        patBtn.textContent = state.pat ? "PAT: set ✓" : "PAT: not set";
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Toasts
+      // ═══════════════════════════════════════════════════════════════
+      function toast(msg, kind = "ok", ms = 4500) {
+        const host = document.getElementById("toast-host");
+        host.innerHTML = `<div class="toast ${kind === "ok" ? "" : kind}">${escapeHtml(
+          msg
+        )}</div>`;
+        setTimeout(() => {
+          if (host.firstChild) host.innerHTML = "";
+        }, ms);
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // PAT modal
+      // ═══════════════════════════════════════════════════════════════
+      function openPatModal() {
+        const existing = state.pat;
+        const host = document.getElementById("modal-host");
+        host.innerHTML = `
+          <div class="modal-backdrop" id="pat-backdrop">
+            <div class="modal">
+              <h2>GitHub Personal Access Token</h2>
+              ${existing ? `<div class="saved-hint">Using saved PAT — paste a new one to replace it.</div>` : ""}
+              <p>
+                Needs <code>repo</code> scope (classic PAT) or
+                <code>Contents: Read and write</code> (fine-grained PAT, scoped to
+                <code>${REPO_OWNER}/${REPO_NAME}</code>).
+                Stored in <code>localStorage</code> under <code>${PAT_KEY}</code>
+                — same key the main dashboard uses.
+              </p>
+              <input type="password" class="pat-input" id="pat-input" placeholder="ghp_…" autocomplete="off" />
+              <div class="actions-row">
+                <button class="btn" id="pat-cancel">Cancel</button>
+                <button class="btn" id="pat-clear" ${existing ? "" : "disabled"}>Clear saved</button>
+                <button class="btn primary" id="pat-save">Save</button>
+              </div>
+            </div>
+          </div>
+        `;
+        const input = document.getElementById("pat-input");
+        input.focus();
+        document.getElementById("pat-cancel").onclick = closePatModal;
+        document.getElementById("pat-backdrop").onclick = (e) => {
+          if (e.target.id === "pat-backdrop") closePatModal();
+        };
+        document.getElementById("pat-clear").onclick = () => {
+          localStorage.removeItem(PAT_KEY);
+          state.pat = "";
+          closePatModal();
+          renderSaveBar();
+          toast("PAT cleared.", "warn");
+        };
+        document.getElementById("pat-save").onclick = () => {
+          const val = input.value.trim();
+          if (!val) {
+            toast("Paste a token first.", "error");
+            return;
+          }
+          localStorage.setItem(PAT_KEY, val);
+          state.pat = val;
+          closePatModal();
+          renderSaveBar();
+          toast("PAT saved.");
+        };
+      }
+      function closePatModal() {
+        document.getElementById("modal-host").innerHTML = "";
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Save flow
+      // ═══════════════════════════════════════════════════════════════
+      function mergeMap(basis, pending) {
+        // basis: { clients: [...], ...meta } from GitHub (authoritative)
+        // pending: Map<accountId, mapping|null>
+        // Preserve every field on the existing entry; only overwrite the
+        // clickup_task_id/clickup_name/matched/confidence fields.
+        const clone = JSON.parse(JSON.stringify(basis || {}));
+        if (!Array.isArray(clone.clients)) clone.clients = [];
+        const byId = new Map(clone.clients.map((e) => [e.meta_account_id, e]));
+
+        for (const [accountId, mapping] of pending.entries()) {
+          let entry = byId.get(accountId);
+          if (!entry) {
+            const metaRow = (state.meta.clients || []).find(
+              (c) => c.account_id === accountId
+            );
+            entry = {
+              meta_account_id: accountId,
+              meta_name: metaRow ? metaRow.account_name : accountId,
+            };
+            clone.clients.push(entry);
+            byId.set(accountId, entry);
+          }
+          if (mapping) {
+            entry.clickup_task_id = mapping.clickup_task_id;
+            entry.clickup_name = mapping.clickup_name;
+            entry.matched = true;
+            entry.confidence = 1.0; // manual match
+          } else {
+            entry.clickup_task_id = null;
+            entry.clickup_name = null;
+            entry.matched = false;
+            entry.confidence = 0.0;
+          }
+        }
+
+        // Recompute summary counts.
+        clone.total = clone.clients.length;
+        clone.matched = clone.clients.filter((e) => e.matched).length;
+        clone.unmatched = clone.total - clone.matched;
+        return clone;
+      }
+
+      async function saveToGitHub() {
+        if (!state.pat) { openPatModal(); return; }
+        if (!state.pending.size) return;
+
+        const saveBtn = document.getElementById("save-btn");
+        saveBtn.disabled = true;
+        saveBtn.textContent = "Saving…";
+
+        try {
+          // Pull fresh basis + sha from GitHub before merging.
+          try {
+            await fetchMapShaFromGitHub();
+          } catch (e) {
+            if (String(e.message).startsWith("AUTH:")) {
+              toast("PAT invalid or missing `repo` scope. Paste a new token.", "error", 7000);
+              openPatModal();
+              return;
+            }
+            throw e;
+          }
+
+          const merged = mergeMap(state.map, state.pending);
+          const today = new Date().toISOString().slice(0, 10);
+          const url = `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${MAP_PATH}`;
+          const body = {
+            message: `fill client map via scripts/fill-client-map.html (${today})`,
+            content: btoa(
+              unescape(encodeURIComponent(JSON.stringify(merged, null, 2)))
+            ),
+            sha: state.mapSha,
+          };
+
+          const r = await fetch(url, {
+            method: "PUT",
+            headers: {
+              Authorization: `token ${state.pat}`,
+              Accept: "application/vnd.github+json",
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          });
+
+          if (r.status === 401 || r.status === 403) {
+            toast("PAT invalid or missing `repo` scope. Paste a new token.", "error", 7000);
+            openPatModal();
+            return;
+          }
+          if (r.status === 409) {
+            toast(
+              "File changed on GitHub. Reloading — please redo your edits.",
+              "error",
+              7000
+            );
+            state.pending.clear();
+            await loadLocal();
+            renderAll();
+            return;
+          }
+          if (!r.ok) {
+            const txt = await r.text().catch(() => "");
+            throw new Error(`${r.status} ${r.statusText} — ${txt.slice(0, 200)}`);
+          }
+
+          state.pending.clear();
+          toast("Saved. GitHub Pages will refresh in ~1 min.");
+          // Reload from GitHub so sha is current for the next save.
+          await fetchMapShaFromGitHub();
+          renderAll();
+        } catch (e) {
+          console.error(e);
+          toast(`Save failed: ${e.message}`, "error", 7000);
+        } finally {
+          saveBtn.textContent = "Save to GitHub";
+          renderSaveBar();
+        }
+      }
+
+      // ═══════════════════════════════════════════════════════════════
+      // Event wiring
+      // ═══════════════════════════════════════════════════════════════
+      document.getElementById("filter-group").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-filter]");
+        if (!btn) return;
+        state.filter = btn.dataset.filter;
+        document
+          .querySelectorAll(".filter-btn")
+          .forEach((b) => b.classList.toggle("active", b === btn));
+        renderTable();
+      });
+      document.getElementById("row-search").addEventListener("input", (e) => {
+        state.search = e.target.value;
+        renderTable();
+      });
+      document.getElementById("pat-btn").addEventListener("click", openPatModal);
+      document.getElementById("save-btn").addEventListener("click", saveToGitHub);
+      document.getElementById("discard-btn").addEventListener("click", () => {
+        if (!state.pending.size) return;
+        if (!confirm(`Discard ${state.pending.size} pending change(s)?`)) return;
+        state.pending.clear();
+        renderAll();
+      });
+
+      // ═══════════════════════════════════════════════════════════════
+      // Boot
+      // ═══════════════════════════════════════════════════════════════
+      (async () => {
+        try {
+          await loadLocal();
+          renderAll();
+        } catch (e) {
+          document.getElementById("content").innerHTML = `
+            <div class="error-panel">
+              <b>Failed to load data files.</b><br>
+              ${escapeHtml(e.message)}<br><br>
+              This page expects <code>../data/meta.json</code>,
+              <code>../data/clickup.json</code>, and
+              <code>../data/client-map.json</code> to exist.
+              If <code>client-map.json</code> has an empty <code>clients: []</code>,
+              run the <i>Build Client Map</i> GitHub Action first.
+            </div>`;
+        }
+      })();
+    </script>
+  </body>
+</html>
