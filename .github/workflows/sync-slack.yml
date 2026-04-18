@@ -37,6 +37,16 @@ jobs:
               except Exception as e:
                   return {"ok": False, "error": str(e)}
 
+          # Diagnostics collector — surfaced to slack.json so dashboard can show actionable errors
+          diagnostics = {
+              "users_conversations_error": None,
+              "auth_test": None,
+              "conversations_list_error": None,
+              "join_failures": [],
+              "join_attempts": 0,
+              "join_successes": 0
+          }
+
           # Get channels the bot is member of
           member_channels = []
           cursor = ""
@@ -46,13 +56,33 @@ jobs:
                   params += f"&cursor={cursor}"
               data = slack_api("users.conversations", params)
               if not data.get("ok"):
-                  print(f"users.conversations error: {data.get('error')}")
+                  err = data.get("error", "unknown")
+                  diagnostics["users_conversations_error"] = err
+                  print(f"users.conversations error: {err}")
+                  print(f"  Full response: {json.dumps(data)[:300]}")
                   break
               member_channels.extend(data.get("channels", []))
               cursor = data.get("response_metadata", {}).get("next_cursor", "")
               if not cursor:
                   break
           print(f"Bot is member of {len(member_channels)} channels")
+
+          # If zero member channels, run auth.test so we know if the token itself is valid
+          if len(member_channels) == 0:
+              auth = slack_api("auth.test")
+              diagnostics["auth_test"] = {
+                  "ok": auth.get("ok"),
+                  "error": auth.get("error"),
+                  "bot_user_id": auth.get("user_id"),
+                  "bot_user": auth.get("user"),
+                  "team": auth.get("team"),
+                  "url": auth.get("url")
+              }
+              if auth.get("ok"):
+                  print(f"auth.test OK — bot user: @{auth.get('user')} (id={auth.get('user_id')}) in team {auth.get('team')}")
+                  print("Token is valid but bot is in zero channels. Invite @{} to the channels you want synced.".format(auth.get("user")))
+              else:
+                  print(f"auth.test FAILED: {auth.get('error')} — SLACK_BOT_TOKEN is invalid or missing required scopes")
 
           # If no member channels, try joining public channels
           if len(member_channels) == 0:
@@ -64,17 +94,33 @@ jobs:
                       params += f"&cursor={cursor}"
                   data = slack_api("conversations.list", params)
                   if not data.get("ok"):
+                      err = data.get("error", "unknown")
+                      diagnostics["conversations_list_error"] = err
+                      print(f"conversations.list error: {err}")
                       break
                   all_channels.extend(data.get("channels", []))
                   cursor = data.get("response_metadata", {}).get("next_cursor", "")
                   if not cursor:
                       break
+              print(f"Attempting to join {len(all_channels)} public channels...")
               for ch in all_channels:
+                  diagnostics["join_attempts"] += 1
                   result = slack_api("conversations.join", method="POST", body={"channel": ch["id"]})
                   if result.get("ok"):
                       member_channels.append(result.get("channel", ch))
+                      diagnostics["join_successes"] += 1
+                  else:
+                      err = result.get("error", "unknown")
+                      diagnostics["join_failures"].append({
+                          "channel": ch.get("name", ch["id"]),
+                          "channel_id": ch["id"],
+                          "error": err,
+                          "is_private": ch.get("is_private", False),
+                          "is_archived": ch.get("is_archived", False)
+                      })
+                      print(f"  join failed #{ch.get('name', ch['id'])}: {err}")
                   time.sleep(0.05)
-              print(f"After joining: {len(member_channels)} member channels")
+              print(f"After joining: {len(member_channels)} member channels ({diagnostics['join_successes']}/{diagnostics['join_attempts']} joined)")
 
           # Pull history - try with 24h window first, fall back to most recent 50
           cutoff_24h = str(time.time() - 86400)
@@ -123,6 +169,29 @@ jobs:
 
           print(f"Total: {len(all_messages)} messages from {len(channel_summaries)} channels")
 
+          # Build actionable warning so dashboard can display a specific remediation hint
+          warning = None
+          if diagnostics["users_conversations_error"]:
+              err = diagnostics["users_conversations_error"]
+              if err in ("missing_scope", "not_allowed_token_type"):
+                  warning = f"Slack token is missing required scope (got '{err}'). Add 'channels:read', 'channels:history', 'channels:join', 'groups:read', 'groups:history' under Bot Token Scopes, then Reinstall the app and update SLACK_BOT_TOKEN."
+              elif err in ("invalid_auth", "token_expired", "token_revoked", "account_inactive"):
+                  warning = f"Slack token is invalid ('{err}'). Reinstall the app and update the SLACK_BOT_TOKEN GitHub secret."
+              else:
+                  warning = f"users.conversations failed with Slack error '{err}'. Check Slack API status and token scopes."
+          elif len(member_channels) == 0:
+              auth = diagnostics.get("auth_test") or {}
+              bot_handle = auth.get("bot_user") or "servedia-ops"
+              if auth.get("ok"):
+                  warning = f"Bot @{bot_handle} is not in any channels. Invite @{bot_handle} to the channels you want synced (e.g. `/invite @{bot_handle}` in #media-ads, #video-editing)."
+              else:
+                  warning = f"Bot authentication failed ({auth.get('error', 'unknown')}). Reinstall the Slack app and update SLACK_BOT_TOKEN."
+          elif len(all_messages) == 0:
+              warning = f"Bot is in {len(member_channels)} channel(s) but no messages were found in the last 24h. This may be normal, but verify Slack has recent activity."
+
+          if warning:
+              print(f"WARNING: {warning}")
+
           import subprocess
           pulled_at = subprocess.check_output(["date","-u","+%Y-%m-%dT%H:%M:%SZ"]).decode().strip()
           output = {
@@ -132,6 +201,8 @@ jobs:
               "total_channels": len(member_channels),
               "member_channels": len(member_channels),
               "errors": errors,
+              "warning": warning,
+              "diagnostics": diagnostics,
               "pulled_at": pulled_at
           }
           with open("data/slack.json", "w") as f:
