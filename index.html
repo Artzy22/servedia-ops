@@ -564,6 +564,34 @@
                 margin: 8px 0 0 0;
             }
             .rules-banner b { color: #fde68a; }
+            .meta-write-row {
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+                margin-top: 10px;
+                padding-top: 10px;
+                border-top: 1px dashed #2a1a00;
+            }
+            .meta-write-btn {
+                background: #1a1a1a;
+                border: 1px solid #2a2a2a;
+                color: #aaa;
+                padding: 6px 11px;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 11px;
+                font-weight: 600;
+                font-family: inherit;
+                transition: all 0.12s;
+            }
+            .meta-write-btn:hover:not(:disabled) {
+                color: #fff;
+                border-color: #fbbf24;
+            }
+            .meta-write-btn:disabled { opacity: 0.6; cursor: wait; }
+            .meta-write-btn.pause:hover:not(:disabled) { border-color: #f87171; color: #fca5a5; }
+            .meta-write-btn.scale:hover:not(:disabled) { border-color: #34d399; color: #6ee7b7; }
+            .meta-write-btn.dup:hover:not(:disabled) { border-color: #a78bfa; color: #c4b5fd; }
             .st-active {
                 background: #064e3b;
                 color: #34d399;
@@ -5687,6 +5715,16 @@
                     💾 Save Configuration
                 </button>
                 <div class="mstatus" id="cfgStatus"></div>
+                <div style="margin-top:14px;text-align:right">
+                    <button
+                        type="button"
+                        onclick="openMetaAuditLog()"
+                        style="background:transparent;border:1px solid #2a2a2a;color:#777;padding:5px 11px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit"
+                        title="View this session's Meta write actions"
+                    >
+                        📋 Meta Write Audit Log
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -6040,6 +6078,298 @@
             // Uses batch requests: 37 accounts × 2 periods = 2 batch calls
             // ══════════════════════════════════════════════════════════════
             const META_GRAPH = "https://graph.facebook.com/v19.0";
+
+            // ══════════════════════════════════════════════════════════════
+            // META WRITE ACTIONS — Pause / Scale / Duplicate Winner
+            // Off by default; gated behind cfg.metaWritesEnabled. Each
+            // action has a two-step inline confirm. All actions append to
+            // an in-memory audit log viewable from Settings footer.
+            // ══════════════════════════════════════════════════════════════
+            const META_SCALE_PCT = 1.15;
+            const META_SCALE_DAILY_BUDGET_CEILING_USD = 500;
+            const META_DUPLICATE_MIN_LEADS = 5;
+            const META_DUPLICATE_MIN_SPEND = 100;
+            window.metaAuditLog = window.metaAuditLog || [];
+
+            function metaAudit(entry) {
+                const row = Object.assign(
+                    {
+                        timestamp: new Date().toISOString(),
+                        user: (getUser && getUser()?.name) || "unknown",
+                    },
+                    entry,
+                );
+                window.metaAuditLog.unshift(row);
+                console.log("[meta-audit]", row);
+            }
+
+            async function metaApi(path, method = "GET", body = null) {
+                const token = (
+                    localStorage.getItem("meta_access_token") || ""
+                ).trim();
+                if (!token) throw new Error("No Meta access token");
+                const url =
+                    META_GRAPH +
+                    (path.startsWith("/") ? path : "/" + path) +
+                    (path.includes("?") ? "&" : "?") +
+                    "access_token=" +
+                    encodeURIComponent(token);
+                const opts = { method, headers: {} };
+                if (body) {
+                    opts.headers["Content-Type"] = "application/json";
+                    opts.body = JSON.stringify(body);
+                }
+                const r = await fetch(url, opts);
+                const j = await r.json().catch(() => ({}));
+                if (!r.ok || j.error) {
+                    const msg =
+                        (j.error && (j.error.message || j.error.type)) ||
+                        `${r.status} ${r.statusText}`;
+                    throw new Error(msg);
+                }
+                return j;
+            }
+
+            async function metaListActiveCampaigns(accountId) {
+                const id = String(accountId).replace(/^act_/, "");
+                const j = await metaApi(
+                    `/act_${id}/campaigns?fields=id,name,status,daily_budget,effective_status&effective_status=["ACTIVE"]&limit=100`,
+                );
+                return Array.isArray(j.data) ? j.data : [];
+            }
+
+            async function metaPauseAllCampaigns(accountId) {
+                const camps = await metaListActiveCampaigns(accountId);
+                const results = [];
+                for (const c of camps) {
+                    try {
+                        await metaApi(`/${c.id}`, "POST", { status: "PAUSED" });
+                        results.push({ id: c.id, name: c.name, ok: true });
+                    } catch (e) {
+                        results.push({
+                            id: c.id,
+                            name: c.name,
+                            ok: false,
+                            error: e.message,
+                        });
+                    }
+                }
+                metaAudit({
+                    action: "pause_all_campaigns",
+                    target: `act_${String(accountId).replace(/^act_/, "")}`,
+                    count: camps.length,
+                    results,
+                });
+                return results;
+            }
+
+            async function metaScaleAllCampaigns(accountId) {
+                const camps = await metaListActiveCampaigns(accountId);
+                const ceilingMinor = META_SCALE_DAILY_BUDGET_CEILING_USD * 100;
+                const results = [];
+                for (const c of camps) {
+                    const cur = parseInt(c.daily_budget || "0", 10);
+                    if (!cur) {
+                        results.push({
+                            id: c.id,
+                            name: c.name,
+                            ok: false,
+                            error: "no campaign-level daily_budget (set at ad-set?)",
+                        });
+                        continue;
+                    }
+                    const next = Math.min(
+                        Math.round(cur * META_SCALE_PCT),
+                        ceilingMinor,
+                    );
+                    if (next === cur) {
+                        results.push({
+                            id: c.id,
+                            name: c.name,
+                            ok: false,
+                            error: `already at ceiling ($${ceilingMinor / 100}/day)`,
+                        });
+                        continue;
+                    }
+                    try {
+                        await metaApi(`/${c.id}`, "POST", {
+                            daily_budget: next,
+                        });
+                        results.push({
+                            id: c.id,
+                            name: c.name,
+                            ok: true,
+                            from: cur,
+                            to: next,
+                        });
+                    } catch (e) {
+                        results.push({
+                            id: c.id,
+                            name: c.name,
+                            ok: false,
+                            error: e.message,
+                        });
+                    }
+                }
+                metaAudit({
+                    action: "scale_all_campaigns",
+                    target: `act_${String(accountId).replace(/^act_/, "")}`,
+                    pct: META_SCALE_PCT,
+                    ceiling_usd: META_SCALE_DAILY_BUDGET_CEILING_USD,
+                    results,
+                });
+                return results;
+            }
+
+            async function metaFindBestAdSet(accountId) {
+                const id = String(accountId).replace(/^act_/, "");
+                const since = Math.floor((Date.now() - 7 * 86400000) / 1000);
+                const range = JSON.stringify({
+                    since: new Date(since * 1000).toISOString().slice(0, 10),
+                    until: new Date().toISOString().slice(0, 10),
+                });
+                const j = await metaApi(
+                    `/act_${id}/insights?level=adset&fields=adset_id,adset_name,spend,actions&time_range=${encodeURIComponent(range)}&limit=200`,
+                );
+                const rows = Array.isArray(j.data) ? j.data : [];
+                let best = null;
+                for (const r of rows) {
+                    const spend = parseFloat(r.spend || "0");
+                    if (spend < META_DUPLICATE_MIN_SPEND) continue;
+                    const leadsAct =
+                        (r.actions || []).find((a) =>
+                            String(a.action_type || "").includes("lead"),
+                        ) || null;
+                    const leads = leadsAct
+                        ? parseInt(leadsAct.value || "0", 10)
+                        : 0;
+                    if (leads < META_DUPLICATE_MIN_LEADS) continue;
+                    const cpl = spend / leads;
+                    if (!best || cpl < best.cpl) {
+                        best = {
+                            adset_id: r.adset_id,
+                            adset_name: r.adset_name,
+                            spend,
+                            leads,
+                            cpl,
+                        };
+                    }
+                }
+                return best;
+            }
+
+            async function metaDuplicateWinner(accountId) {
+                const best = await metaFindBestAdSet(accountId);
+                if (!best) {
+                    metaAudit({
+                        action: "duplicate_winner_skipped",
+                        target: `act_${String(accountId).replace(/^act_/, "")}`,
+                        reason: `no ad set met threshold (>=${META_DUPLICATE_MIN_LEADS} leads, >=$${META_DUPLICATE_MIN_SPEND})`,
+                    });
+                    throw new Error(
+                        `No ad set in last 7d had >= ${META_DUPLICATE_MIN_LEADS} leads AND >= $${META_DUPLICATE_MIN_SPEND} spend.`,
+                    );
+                }
+                const j = await metaApi(`/${best.adset_id}/copies`, "POST", {
+                    deep_copy: true,
+                    status_option: "PAUSED",
+                    rename_options: JSON.stringify({
+                        rename_suffix: " — Duplicate (paused)",
+                    }),
+                });
+                metaAudit({
+                    action: "duplicate_winner",
+                    target: `act_${String(accountId).replace(/^act_/, "")}`,
+                    source_adset: best,
+                    result: j,
+                });
+                return { source: best, result: j };
+            }
+
+            // Two-step inline confirm. First click arms, second click executes.
+            // Auto-disarms after 6s. Shared by all three buttons.
+            window.runMetaWriteAction = async function (
+                btn,
+                action,
+                accountId,
+                label,
+            ) {
+                if (btn.dataset.confirming !== "1") {
+                    btn.dataset.confirming = "1";
+                    btn.dataset.origLabel = btn.textContent;
+                    btn.textContent = `✓ Click again to confirm: ${label}`;
+                    btn.style.background = "#7f1d1d";
+                    btn.style.color = "#fff";
+                    setTimeout(() => {
+                        if (btn.dataset.confirming === "1") {
+                            btn.dataset.confirming = "";
+                            btn.textContent = btn.dataset.origLabel;
+                            btn.style.background = "";
+                            btn.style.color = "";
+                        }
+                    }, 6000);
+                    return;
+                }
+                btn.dataset.confirming = "";
+                const orig = btn.dataset.origLabel || btn.textContent;
+                btn.disabled = true;
+                btn.textContent = "Working…";
+                btn.style.background = "";
+                btn.style.color = "";
+                try {
+                    let summary = "";
+                    if (action === "pause") {
+                        const r = await metaPauseAllCampaigns(accountId);
+                        const okN = r.filter((x) => x.ok).length;
+                        summary = `Paused ${okN}/${r.length} campaigns`;
+                    } else if (action === "scale") {
+                        const r = await metaScaleAllCampaigns(accountId);
+                        const okN = r.filter((x) => x.ok).length;
+                        summary = `Scaled ${okN}/${r.length} (+${Math.round((META_SCALE_PCT - 1) * 100)}%, ceiling $${META_SCALE_DAILY_BUDGET_CEILING_USD}/d)`;
+                    } else if (action === "duplicate") {
+                        const r = await metaDuplicateWinner(accountId);
+                        summary = `Duplicated "${r.source.adset_name}" (PAUSED, CPL $${r.source.cpl.toFixed(2)})`;
+                    }
+                    btn.textContent = "✓ " + summary;
+                    btn.style.background = "#052e16";
+                    btn.style.color = "#34d399";
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.textContent = orig;
+                        btn.style.background = "";
+                        btn.style.color = "";
+                    }, 4500);
+                } catch (e) {
+                    console.error("meta write failed", e);
+                    btn.textContent = "✗ " + (e.message || "failed");
+                    btn.style.background = "#450a0a";
+                    btn.style.color = "#fca5a5";
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.textContent = orig;
+                        btn.style.background = "";
+                        btn.style.color = "";
+                    }, 6000);
+                }
+            };
+
+            window.openMetaAuditLog = function () {
+                const log = window.metaAuditLog || [];
+                const w = window.open("", "meta-audit", "width=900,height=700");
+                if (!w) {
+                    alert(
+                        "Pop-up blocked. Audit log: " +
+                            JSON.stringify(log, null, 2),
+                    );
+                    return;
+                }
+                w.document.title = "Meta Write Audit Log";
+                w.document.body.style.cssText =
+                    "background:#0a0a0f;color:#e0e0e0;font-family:ui-monospace,monospace;padding:20px;font-size:12px";
+                w.document.body.innerHTML = log.length
+                    ? `<h2 style="color:#fff">Meta write audit (${log.length} entries — session-only, not persisted)</h2><pre style="white-space:pre-wrap">${log.map((e) => JSON.stringify(e, null, 2)).join("\n\n")}</pre>`
+                    : '<h2 style="color:#fff">No actions taken this session.</h2>';
+            };
 
             async function fetchMetaLive() {
                 const token = localStorage.getItem("meta_access_token") || "";
@@ -8476,6 +8806,19 @@
                             ? `<a class="dmc-link-btn" href="${c._clickupUrl}" target="_blank">📋 ClickUp</a>`
                             : "";
 
+                        const _cfg =
+                            typeof getCfg === "function" ? getCfg() : {};
+                        const writesEnabled = !!(
+                            _cfg.metaWritesEnabled && _cfg.metaAccessToken
+                        );
+                        const writeBtnsHtml = active && writesEnabled
+                            ? `<div class="meta-write-row">
+        <button class="meta-write-btn pause" onclick="runMetaWriteAction(this,'pause','${id}','Pause all active campaigns')">⏸ Pause All</button>
+        <button class="meta-write-btn scale" onclick="runMetaWriteAction(this,'scale','${id}','Scale +15% (cap $${500}/d)')">📈 Scale 15%</button>
+        <button class="meta-write-btn dup" onclick="runMetaWriteAction(this,'duplicate','${id}','Duplicate winner ad set (PAUSED)')">📋 Duplicate Winner</button>
+      </div>`
+                            : "";
+
                         return `<div class="accard" id="acard-${id}">
       <div class="ac-header">
         ${buyerChipHtml}
@@ -8493,6 +8836,7 @@
       <div id="mg-${id}-7d">${mkGrid(rows7)}</div>
       <div id="mg-${id}-30d" style="display:none">${mkGrid(rows30)}</div>
       ${metaSuggHtml}
+      ${writeBtnsHtml}
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
         <a class="dmc-link-btn" href="${adsUrl}" target="_blank">📈 Ads Manager</a>
         ${cuLinkHtml}
