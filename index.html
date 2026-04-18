@@ -7087,7 +7087,15 @@
                 const panel = document.getElementById("slackAttnPanel");
                 if (!panel) return;
 
-                const flagged = (slFlaggedData && slFlaggedData.flagged) || [];
+                const dismissed = new Set(
+                    JSON.parse(
+                        localStorage.getItem("slack_dismissed_ids") || "[]",
+                    ),
+                );
+                const flagged = (
+                    (slFlaggedData && slFlaggedData.flagged) ||
+                    []
+                ).filter((m) => !m.task_created && !dismissed.has(m.id));
                 if (!flagged.length) {
                     panel.style.display = "none";
                     return;
@@ -7195,6 +7203,31 @@
             function closeSlackTaskModal() {
                 const modal = document.getElementById("slackTaskModal");
                 if (modal) modal.classList.remove("open");
+            }
+
+            // Dismiss a flagged Slack message so it stops appearing in the
+            // Command Center alert section. Stored locally — slack-flagged.json
+            // is regenerated server-side, so we track dismissals client-side.
+            function dismissSlackMessage(id) {
+                if (!id) return;
+                try {
+                    const raw =
+                        localStorage.getItem("slack_dismissed_ids") || "[]";
+                    const list = JSON.parse(raw);
+                    if (!list.includes(id)) {
+                        list.push(id);
+                        // Cap at 500 entries so the list can't grow unbounded.
+                        while (list.length > 500) list.shift();
+                        localStorage.setItem(
+                            "slack_dismissed_ids",
+                            JSON.stringify(list),
+                        );
+                    }
+                } catch {}
+                if (typeof renderCommandCenter === "function")
+                    renderCommandCenter();
+                if (typeof renderSlackAttention === "function")
+                    renderSlackAttention();
             }
 
             async function confirmSlackTask(msg, listId, listName) {
@@ -10928,29 +10961,58 @@
                     }
                 }
 
-                // Slack
+                // Slack — prefer flagged messages (urgent/question) over raw chatter.
+                // Filter out messages already converted to ClickUp tasks or dismissed.
                 const ccSlackList = document.getElementById("ccSlackList");
-                if (ccSlackList && slData) {
-                    const msgs = (slData.messages || slData.items || []).slice(
-                        0,
-                        6,
+                if (ccSlackList) {
+                    const dismissed = JSON.parse(
+                        localStorage.getItem("slack_dismissed_ids") || "[]",
                     );
-                    if (msgs.length === 0) {
+                    const dismissedSet = new Set(dismissed);
+                    const flagged = (
+                        (slFlaggedData && slFlaggedData.flagged) ||
+                        []
+                    ).filter(
+                        (m) =>
+                            !m.task_created && !dismissedSet.has(m.id),
+                    );
+                    const section = document.getElementById("ccSlackSection");
+                    if (flagged.length === 0) {
                         ccSlackList.innerHTML =
-                            '<div class="no-data" style="color:#34d399">No Slack alerts ✓</div>';
-                        document.getElementById(
-                            "ccSlackSection",
-                        ).style.display = "none";
+                            '<div class="no-data" style="color:#34d399">No flagged Slack messages ✓</div>';
+                        if (section) section.style.display = "none";
                     } else {
-                        ccSlackList.innerHTML = `<div style="display:flex;flex-direction:column;gap:6px">${msgs
-                            .map(
-                                (
-                                    m,
-                                ) => `<div style="background:#111;border:1px solid #1e1e1e;border-radius:8px;padding:10px 14px">
-          <div style="font-size:11px;color:#a78bfa;margin-bottom:3px;font-weight:600">${esc(m.user || m.username || "Slack")}</div>
-          <div style="font-size:12px;color:#ccc;line-height:1.4">${esc((m.text || "").slice(0, 200))}</div>
-        </div>`,
-                            )
+                        if (section) section.style.display = "";
+                        ccSlackList.innerHTML = `<div style="display:flex;flex-direction:column;gap:8px">${flagged
+                            .slice(0, 6)
+                            .map((m) => {
+                                const typeCol =
+                                    m.type === "urgent"
+                                        ? "#f87171"
+                                        : m.type === "question"
+                                          ? "#fbbf24"
+                                          : "#a78bfa";
+                                const kw = (m.keywords_found || [])
+                                    .slice(0, 3)
+                                    .map(
+                                        (k) =>
+                                            `<span style="font-size:10px;background:#1a1a1a;color:#888;padding:2px 6px;border-radius:4px">${esc(k)}</span>`,
+                                    )
+                                    .join(" ");
+                                const idAttr = esc(String(m.id || ""));
+                                return `<div style="background:#111;border:1px solid #1e1e1e;border-left:3px solid ${typeCol};border-radius:8px;padding:10px 14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+            <div style="font-size:11px;color:${typeCol};font-weight:700;text-transform:uppercase">${esc(m.type || "flagged")} · #${esc(m.channel || "")}</div>
+            <div style="font-size:10px;color:#555">${esc(m.user_name || m.user || "")}</div>
+          </div>
+          <div style="font-size:12px;color:#ccc;line-height:1.4;margin-bottom:6px">${esc((m.text || "").slice(0, 240))}${(m.text || "").length > 240 ? "…" : ""}</div>
+          ${kw ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${kw}</div>` : ""}
+          <div style="display:flex;gap:6px">
+            <button class="dmc-link-btn" style="font-size:11px;background:#1a1730;color:#c4b5fd;border-color:#4c1d95" onclick="openSlackTaskModal('${idAttr}')">📋 Create Task</button>
+            <button class="dmc-link-btn" style="font-size:11px" onclick="dismissSlackMessage('${idAttr}')">✕ Dismiss</button>
+          </div>
+        </div>`;
+                            })
                             .join("")}</div>`;
                     }
                 }
