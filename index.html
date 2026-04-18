@@ -3458,6 +3458,15 @@
                                 ></div>
                             </div>
                         </div>
+                        <div
+                            id="ccAlertChips"
+                            style="
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 8px;
+                                margin-bottom: 18px;
+                            "
+                        ></div>
                         <div class="stat-grid" style="margin-bottom: 20px">
                             <div class="stat-card">
                                 <div class="stat-label">Active Accounts</div>
@@ -10487,7 +10496,106 @@
                 renderT4Actions();
             }
 
+            // Click handler for Command Center alert chips: jump to Meta Ads,
+            // set sort to "attention" so flagged accounts surface to the top.
+            function jumpToMetaFlag(_flagType) {
+                const sortEl = document.getElementById("metaSort");
+                if (sortEl) {
+                    sortEl.value = "attention";
+                }
+                switchSection("meta");
+                if (typeof renderMeta === "function") renderMeta();
+                const panel = document.getElementById("panel-meta");
+                if (panel) panel.scrollIntoView({ behavior: "smooth" });
+            }
+
+            function renderCCAlertChips() {
+                const host = document.getElementById("ccAlertChips");
+                if (!host) return;
+                if (!metaData || !Array.isArray(metaData.clients)) {
+                    host.innerHTML = "";
+                    return;
+                }
+                const payMap =
+                    typeof buildPaymentMap === "function"
+                        ? buildPaymentMap()
+                        : {};
+                const vioMap =
+                    typeof buildViolationsMap === "function"
+                        ? buildViolationsMap()
+                        : {};
+                const fatMap =
+                    typeof buildFatigueMap === "function"
+                        ? buildFatigueMap()
+                        : {};
+                const billing = Object.keys(payMap).length;
+                const policy = Object.keys(vioMap).length;
+                const fatigue = Object.keys(fatMap).length;
+                const zeroLeads = metaData.clients.filter((c) => {
+                    const d7 = c.last_7_days || {};
+                    const isActive =
+                        (c.status || "").toUpperCase() === "ACTIVE";
+                    return isActive && (d7.leads || 0) === 0 && (d7.spend || 0) > 0;
+                }).length;
+
+                const chip = (
+                    icon,
+                    count,
+                    label,
+                    bg,
+                    border,
+                    color,
+                    flag,
+                ) => {
+                    if (!count) return "";
+                    return `<button type="button" onclick="jumpToMetaFlag('${flag}')" style="display:inline-flex;align-items:center;gap:6px;background:${bg};border:1px solid ${border};color:${color};padding:6px 12px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit" title="Click to view ${label} in Meta Ads panel">${icon} ${count} ${label}</button>`;
+                };
+
+                host.innerHTML =
+                    chip(
+                        "💳",
+                        billing,
+                        billing === 1 ? "Billing Issue" : "Billing Issues",
+                        "#450a0a",
+                        "#7f1d1d",
+                        "#fecaca",
+                        "billing",
+                    ) +
+                    chip(
+                        "⚠️",
+                        policy,
+                        policy === 1
+                            ? "Policy Violation"
+                            : "Policy Violations",
+                        "#2a1200",
+                        "#9a3412",
+                        "#fed7aa",
+                        "policy",
+                    ) +
+                    chip(
+                        "🎨",
+                        fatigue,
+                        fatigue === 1
+                            ? "Creative Fatigue"
+                            : "Creative Fatigue",
+                        "#2a1a00",
+                        "#a16207",
+                        "#fde68a",
+                        "fatigue",
+                    ) +
+                    chip(
+                        "🚨",
+                        zeroLeads,
+                        zeroLeads === 1 ? "Zero Leads" : "Zero Leads",
+                        "#450a0a",
+                        "#7f1d1d",
+                        "#fecaca",
+                        "zero_leads",
+                    );
+            }
+
             function renderCommandCenter() {
+                renderCCAlertChips();
                 // Date greeting
                 const dateEl = document.getElementById("ccDate");
                 if (dateEl) {
