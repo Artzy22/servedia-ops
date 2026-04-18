@@ -7638,7 +7638,7 @@
                     );
 
                 if (c.clientHappiness) {
-                    const h = StringString(c.clientHappiness || "").toLowerCase();
+                    const h = String(c.clientHappiness || "").toLowerCase();
                     if (h === "unhappy")
                         tips.push(
                             "Client is UNHAPPY — prioritize improvement. Check recent MB notes for context.",
