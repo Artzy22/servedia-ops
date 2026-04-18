@@ -11586,11 +11586,20 @@
                 if (!list) return;
 
                 const onboardingStatuses = [
+                    "sign up",
+                    "new sign up",
+                    "ob form",
                     "onboarding",
                     "in onboarding",
+                    "post-onboarding",
                     "new client",
                     "setup",
+                    "awaiting ad access",
+                    "awaiting access",
+                    "ads live",
+                    "launch overdue",
                     "launching",
+                    "kickoff",
                 ];
                 const clients = clientMgmtAllTasks
                     .filter((t) => {
